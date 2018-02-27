@@ -1,7 +1,28 @@
 # ImAxes
 ImAxes is an immersive data visualisation tool for multidimensional data exploration and analysis in virtual reality.
 [link to the original paper](https://www.researchgate.net/publication/318876157_ImAxes_Immersive_Axes_as_Embodied_Affordances_for_Interactive_Multivariate_Data_Visualisation)
+If you plan to use this software for research, please cite the paper:
 
+@inproceedings{Cordeil:2017:IIA:3126594.3126613,
+ author = {Cordeil, Maxime and Cunningham, Andrew and Dwyer, Tim and Thomas, Bruce H. and Marriott, Kim},
+ title = {ImAxes: Immersive Axes As Embodied Affordances for Interactive Multivariate Data Visualisation},
+ booktitle = {Proceedings of the 30th Annual ACM Symposium on User Interface Software and Technology},
+ series = {UIST '17},
+ year = {2017},
+ isbn = {978-1-4503-4981-9},
+ location = {Qu\&\#233;bec City, QC, Canada},
+ pages = {71--83},
+ numpages = {13},
+ url = {http://doi.acm.org/10.1145/3126594.3126613},
+ doi = {10.1145/3126594.3126613},
+ acmid = {3126613},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {immersion, immersive analytics, immersive visualization, information visualization, multidimensional data visualization, virtual reality},
+} 
+
+
+Have a look at what ImAxes does:
 <a href="https://www.youtube.com/watch?v=hxqJJ934Reg
 " target="_blank"><img src="https://img.youtube.com/vi/hxqJJ934Reg/0.jpg" alt="ImAxes"
  width="240" height="180" border="10" /></a>

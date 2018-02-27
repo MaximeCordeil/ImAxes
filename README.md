@@ -1,5 +1,10 @@
 # ImAxes
-Immersive visualisation tool for multidimensional data exploration and analysis. 
+ImAxes is an immersive data visualisation tool for multidimensional data exploration and analysis in virtual reality.
+[link to the original paper](https://www.researchgate.net/publication/318876157_ImAxes_Immersive_Axes_as_Embodied_Affordances_for_Interactive_Multivariate_Data_Visualisation)
+
+<a href="https://www.youtube.com/watch?v=hxqJJ934Reg
+" target="_blank"><img src="https://www.youtube.com/watch?v=hxqJJ934Reg/0.jpg" 
+ width="240" height="180" border="10" /></a>
 
 ## Installation Instructions
 ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6](https://unity3d.com/get-unity/download/archive)

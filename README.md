@@ -17,17 +17,16 @@ ImAxes works on Windows PCs. You will need a solid *gaming* confirmation, i.e. a
 
 The software currently supports 
 
-## Starting Imaxes
-ImAxes allows you to load data with a CSV or a TSV file format. 
-**Your CSV/TSV data file must be clean! if you have an empty line, or a line with incorrect data values, ImAxes is very likely to throw parsing exceptions**
-
-
+## Launching Imaxes
+ImAxes allows you to load data with a CSV or a TSV file format. The CSV/TSV dataset file:
+  * **must be clean! if you have an empty line, or a line with incorrect data values, ImAxes is very likely to throw parsing exceptions**
+  * **should not exceed 65,534 entries**
 
 ### In the editor
 The ViveScene and the OculusTouchScene have 
 
 ### Building and launching ImAxes
-You can
+You can build 
 
 ## Roadmap
 This is a *beta version of ImAxes*, it means that it is not bug-free and does not contain all the data visualisation features for now.

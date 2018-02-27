@@ -3,7 +3,7 @@ ImAxes is an immersive data visualisation tool for multidimensional data explora
 [link to the original paper](https://www.researchgate.net/publication/318876157_ImAxes_Immersive_Axes_as_Embodied_Affordances_for_Interactive_Multivariate_Data_Visualisation)
 
 <a href="https://www.youtube.com/watch?v=hxqJJ934Reg
-" target="_blank"><img src=" https://img.youtube.com/vi/https://www.youtube.com/watch?v=hxqJJ934Reg/1.jpg" 
+" target="_blank"><img src=" https://img.youtube.com/vi/https://www.youtube.com/watch?v=hxqJJ934Reg/1.jpg" alt="ImAxes"
  width="240" height="180" border="10" /></a>
 
 ## Installation Instructions

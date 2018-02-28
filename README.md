@@ -36,6 +36,8 @@ To create a metadata file:
 
 1. Right click in the editor (under Datasets/) and select ImAxes> Create Meta Data
 
+![metadata](https://user-images.githubusercontent.com/11532065/36769170-bf0b159c-1c96-11e8-824a-6d20df94ea6d.jpg | width=100)
+
 ### In the editor
 
 ### Building and launching ImAxes

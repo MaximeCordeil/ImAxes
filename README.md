@@ -28,17 +28,15 @@ The project contains two template scenes:
 
 Both scenes have a SceneManager Unity gameobject in the hierarchy. Click this object [1] and in the inspector window, you can drag and drop your CSV/TSV file into the *Source Data* field [2]. You can also create a *metadata* file for your dataset and drag and drop it into the *Metadata* field.
 
-### The metadata file
-
-
 ![datasource](https://user-images.githubusercontent.com/11532065/36767569-28938eb6-1c8f-11e8-8aa5-984aab9202a7.PNG)
 
-
+### The metadata file
+The metadata file allow s you to 
 ### In the editor
 The scene contains a 
 
 ### Building and launching ImAxes
-You can build 
+You can build and launch the HTCVive or the OculusTouch scene. Make sure you have attached the dataset file in the SceneManager gameobject.
 
 ## Roadmap
 This is a *beta version of ImAxes*, it means that it is not bug-free and does not contain all the data visualisation features for now.

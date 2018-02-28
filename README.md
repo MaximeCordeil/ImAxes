@@ -42,9 +42,11 @@ You can build and launch the HTCVive or the OculusTouch scene. Make sure you hav
 This is a *beta version of ImAxes*, it means that it is not bug-free and does not contain all the data visualisation features for now.
 We plan to:
 1. Make ImAxes work with Unity 2017.x
-2. Have a generic version for a variety of Mixed Reality devices (e.g. Hololens, Meta 2...)
-3. Integrate map visualisations
-4. Add data selection interaction
+2. Make ImAxes collaborative (multi user)
+3. Have a generic version for a variety of Mixed Reality devices (e.g. Hololens, Meta 2...)
+4. Integrate map visualisations
+5. Add data selection interaction
+6. Better handling of dataset loading in built versions. 
 
 ## Referencing ImAxes
 

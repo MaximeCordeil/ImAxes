@@ -26,6 +26,9 @@ The project contains two template scenes:
   * a ViveScene, to be used with the HTC Vive
   * an OculusTouchScene, to be used with the Oculus CV1
 
+![datasource](https://user-images.githubusercontent.com/11532065/36767569-28938eb6-1c8f-11e8-8aa5-984aab9202a7.PNG)
+
+
 ### In the editor
 The scene contains a 
 

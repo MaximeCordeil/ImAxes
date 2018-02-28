@@ -11,7 +11,6 @@ Have a look at what ImAxes does:
 ## Installation Instructions
 ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6](https://unity3d.com/get-unity/download/archive)
 
-
 ## Hardware and compatibility
 ImAxes works on Windows PCs. You will need a solid *gaming* confirmation, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.
 
@@ -31,9 +30,13 @@ Both scenes have a SceneManager Unity gameobject in the hierarchy. Click this ob
 ![datasource](https://user-images.githubusercontent.com/11532065/36767569-28938eb6-1c8f-11e8-8aa5-984aab9202a7.PNG)
 
 ### The metadata file
-The metadata file allow s you to 
+The metadata file is used to specify the data binning for the histograms corresponding to each data dimension. It is optional and if you do not create one the histograms will not have bins.
+
+To create a metadata file:
+
+1. Right click in the editor (under Datasets/) and select ImAxes> Create Meta Data
+
 ### In the editor
-The scene contains a 
 
 ### Building and launching ImAxes
 You can build and launch the HTCVive or the OculusTouch scene. Make sure you have attached the dataset file in the SceneManager gameobject.

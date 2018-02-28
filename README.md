@@ -42,7 +42,9 @@ To create a metadata file:
 3. Click on the file
 4. In the inspector specify the numbers of bins in the *Size* field (it corresponds to the number of dimensions in your dataset)
 5. Populate each *Element i* (i: 0 -> nbDimensions-1) bin with the bin size 
-### In the editor
+
+### Run ImAxes in the Unity editor
+Once you have attached a clean CSV/TSV file to the SceneManage (and optionnally a metadata file), you can run ImAxes in the editor by simply clicking the play button. 
 
 ### Building and launching ImAxes
 You can build and launch the HTCVive or the OculusTouch scene. Make sure you have attached the dataset file in the SceneManager gameobject.
@@ -58,7 +60,6 @@ We plan to:
 6. Better handling of dataset loading in built versions. 
 
 ## Referencing ImAxes
-
 If you plan to use this software for publication, please cite the paper:
 
 @inproceedings{Cordeil:2017:IIA:3126594.3126613,

@@ -34,10 +34,14 @@ The metadata file is used to specify the data binning for the histograms corresp
 
 To create a metadata file:
 
-1. Right click in the editor (under Datasets/) and select ImAxes> Create Meta Data
+1. Right click in the editor (e.g. under Datasets/) and select ImAxes> Data Object Metadata
 
 <img src="https://user-images.githubusercontent.com/11532065/36769170-bf0b159c-1c96-11e8-824a-6d20df94ea6d.jpg" width="40%">
 
+2. Name your metadata file (e.g. datasetname-metadata
+3. Click on the file
+4. In the inspector specify the numbers of bins in the *Size* field (it corresponds to the number of dimensions in your dataset)
+5. Populate each *Element i* (i: 0 -> nbDimensions-1) bin with the bin size 
 ### In the editor
 
 ### Building and launching ImAxes

@@ -15,15 +15,19 @@ ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6
 ## Hardware and compatibility
 ImAxes works on Windows PCs. You will need a solid *gaming* confirmation, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.
 
-The software currently supports 
+The HTC Vive and the Oculus Rift CV1 with Oculus touch controllers are currently supported.
 
 ## Launching Imaxes
 ImAxes allows you to load data with a CSV or a TSV file format. The CSV/TSV dataset file:
   * **must be clean! if you have an empty line, or a line with incorrect data values, ImAxes is very likely to throw parsing exceptions**
   * **should not exceed 65,534 entries**
 
+The project contains two template scenes:
+  * a ViveScene, to be used with the HTC Vive
+  * an OculusTouchScene, to be used with the Oculus CV1
+
 ### In the editor
-The ViveScene and the OculusTouchScene have 
+The scene contains a 
 
 ### Building and launching ImAxes
 You can build 

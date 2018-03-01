@@ -8,7 +8,7 @@ Have a look at what ImAxes does:
 " target="_blank"><img src="https://img.youtube.com/vi/hxqJJ934Reg/0.jpg" alt="ImAxes"
  width="240" height="180" border="10" /></a>
 
-## Installation Instructions
+## Installation instructions
 ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6](https://unity3d.com/get-unity/download/archive)
 
 ## Hardware and compatibility
@@ -20,6 +20,12 @@ The HTC Vive and the Oculus Rift CV1 with Oculus touch controllers are currently
 ImAxes allows you to load data with a CSV or a TSV file format. The CSV/TSV dataset file:
   * **must be clean! if you have an empty line, or a line with incorrect data values, ImAxes is very likely to throw parsing exceptions**
   * **should not exceed 65,534 entries**
+
+Your dataset file should look like something like this:
+
+![snipetdata](https://user-images.githubusercontent.com/11532065/36827716-5ea25eb2-1d69-11e8-8da4-f073c88d3923.PNG)
+
+Each colomun correspond to a dimension of the data.
 
 The project contains two template scenes:
   * a ViveScene, to be used with the HTC Vive

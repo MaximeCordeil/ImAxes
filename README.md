@@ -2,7 +2,11 @@
 ImAxes is an immersive data visualisation tool for multidimensional data exploration and analysis in virtual reality.
 [link to the original paper](https://www.researchgate.net/publication/318876157_ImAxes_Immersive_Axes_as_Embodied_Affordances_for_Interactive_Multivariate_Data_Visualisation)
 
-Have a look at what ImAxes does:
+<img width="280" alt="iatk_menu" src="https://user-images.githubusercontent.com/11532065/36952172-53002612-2060-11e8-9341-9546a3224092.PNG"> <img width="280" alt="iatk_menu" src="https://user-images.githubusercontent.com/11532065/36952173-533755e2-2060-11e8-99ec-6b2aa150c325.PNG"> <img width="280" alt="scatterplot" src="https://user-images.githubusercontent.com/11532065/36952174-537145a4-2060-11e8-8f2d-bb7e783d13d9.PNG">
+
+From a CSV/TSV spreadsheet, build and explore multivariate/multidimensional data in Virtual Reality.
+
+Here is a video demo of ImAxes:
 
 <a href="https://www.youtube.com/watch?v=hxqJJ934Reg
 " target="_blank"><img src="https://img.youtube.com/vi/hxqJJ934Reg/0.jpg" alt="ImAxes"

@@ -68,7 +68,8 @@ We plan to:
   * Make ImAxes work with (multivariate) graph data
   * Integrate map visualisations
   * Add data selection interaction
-  * Better handling of dataset loading in built versions. 
+  * Better handling of dataset loading in built versions
+  * Integrate more control over color mapping: choose color palette / colors in the palette.
 
 ## Referencing ImAxes
 If you plan to use this software for publication, please cite the paper:

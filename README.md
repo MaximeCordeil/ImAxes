@@ -69,7 +69,8 @@ We plan to:
   * Integrate map visualisations
   * Add data selection interaction
   * Better handling of dataset loading in built versions
-  * Integrate more control over color mapping: choose color palette / colors in the palette.
+  * Integrate more control over color mapping: choose color palette / colors in the palette
+  * Save the scene and visualisation configuration
 
 ## Referencing ImAxes
 If you plan to use this software for publication, please cite the paper:

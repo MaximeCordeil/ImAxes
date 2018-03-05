@@ -25,7 +25,7 @@ ImAxes allows you to load data with a CSV or a TSV file format. The CSV/TSV data
   * **must be clean! if you have an empty line, or a line with incorrect data values, ImAxes is very likely to throw parsing exceptions**
   * **should not exceed 65,534 entries**
 
-Your dataset file should look like something like this:
+Your dataset file should look like this:
 
 ![snipetdata](https://user-images.githubusercontent.com/11532065/36827716-5ea25eb2-1d69-11e8-8da4-f073c88d3923.PNG)
 
@@ -51,7 +51,7 @@ To create a metadata file:
 2. Name your metadata file (e.g. datasetname-metadata
 3. Click on the file
 4. In the inspector specify the numbers of bins in the *Size* field (it corresponds to the number of dimensions in your dataset)
-5. Populate each *Element i* (i: 0 -> nbDimensions-1) bin with the bin size 
+5. Populate each *Element i* (i: 0 -> nbDimensions-1) bin with the desired bin size 
 
 ### Run ImAxes in the Unity editor
 Once you have attached a clean CSV/TSV file to the SceneManage (and optionnally a metadata file), you can run ImAxes in the editor by simply clicking the play button. 

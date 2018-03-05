@@ -18,7 +18,7 @@ ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6
 ## Hardware and compatibility
 ImAxes works on Windows PCs. You will need a solid *gaming* confirmation, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.
 
-The HTC Vive and the Oculus Rift CV1 with Oculus touch controllers are currently supported.
+The HTC Vive and Micrsofot-compatible MR devices, and the Oculus Rift CV1 with Oculus touch controllers are currently supported.
 
 ## Launching Imaxes
 ImAxes allows you to load data with a CSV or a TSV file format. The CSV/TSV dataset file:
@@ -54,14 +54,39 @@ To create a metadata file:
 5. Populate each *Element i* (i: 0 -> nbDimensions-1) bin with the desired bin size 
 
 ### Run ImAxes in the Unity editor
-Once you have attached a clean CSV/TSV file to the SceneManage (and optionnally a metadata file), you can run ImAxes in the editor by simply clicking the play button. 
+Once you have attached a clean CSV/TSV file to the SceneManage (and optionnally a metadata file), you can run ImAxes in the editor by simply clicking the play button.
 
 ### Building and launching ImAxes
 You can build and launch the HTCVive or the OculusTouch scene. Make sure you have attached the dataset file in the SceneManager gameobject.
 
+## Using ImAxes
+
+### Create visualisations
+Visualisations are created by pulling out axes from the *axes shelf* and by assembling them in space:
+
+  * Hold 2 axes parallel to each other, you get a parallel coordinate.
+  * Make them perpendicular and touch, you get a 2D scatterplot
+  * Add a third perpendicular axis, you get a 3D scatterplot
+  * Extend visualisation by extending the axes ...
+
+### Changing the visualisation styles
+Press the *Menu* button on the HTC vive controller (or you Mixed-realiy device) and you will this menu popup.
+*[image menu]*
+
+You can change the color scheme:
+  * bind a palette to a categorical dimension
+  * bind a gradient color (change min/max colors) to a continuous variable
+*[image menu]*
+
+You can change the visualisation style:
+  * If you have a time series dataset (or a trail set dataset) *and* your data are ordered properly by id in the CSV/TSV source file, you can change the visualisation to show connected dots like this:
+*[image menu]*
+
+
 ## Roadmap
 This is a *beta version of ImAxes*, it means that it is not bug-free and does not contain all the data visualisation features for now.
 We plan to:
+  * Add menu in the Oculus Touch scene
   * Make ImAxes work with Unity 2017.x
   * Make ImAxes collaborative (multi user)
   * Have a generic version for a variety of Mixed Reality devices (e.g. Hololens, Meta 2...)

@@ -16,7 +16,7 @@ Here is a video demo of ImAxes:
 ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6](https://unity3d.com/get-unity/download/archive)
 
 ## Hardware and compatibility
-ImAxes works on Windows PCs. You will need a solid *gaming* confirmation, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.
+ImAxes works on Windows PCs. You will need a solid *gaming* configuration, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.
 
 The HTC Vive and Micrsofot-compatible MR devices, and the Oculus Rift CV1 with Oculus touch controllers are currently supported.
 
@@ -29,7 +29,10 @@ Your dataset file should look like this:
 
 ![snipetdata](https://user-images.githubusercontent.com/11532065/36827716-5ea25eb2-1d69-11e8-8da4-f073c88d3923.PNG)
 
-Each colomun correspond to a dimension of the data.
+Each column corresponds to a dimension of the data. Once you have launched ImAxes you will see the corresponding dimensions as virtual axes in space like this:
+
+![imaxesshelf](https://user-images.githubusercontent.com/11532065/37009522-72eea238-213b-11e8-836f-b82cabc8afe9.PNG)
+
 
 The project contains two template scenes:
   * a ViveScene, to be used with the HTC Vive

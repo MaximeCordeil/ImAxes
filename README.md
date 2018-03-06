@@ -35,15 +35,15 @@ Each column corresponds to a dimension of the data. Once you have launched ImAxe
 
 
 The project contains two template scenes:
-  * a ViveScene, to be used with the HTC Vive
-  * an OculusTouchScene, to be used with the Oculus CV1
+  * a ViveScene, to be used with the HTC Vive and Mixed-Reality compatible devices
+  * an OculusTouchScene, to be used with the Oculus CV1 and Oculus Touch controllers
 
 Both scenes have a SceneManager Unity gameobject in the hierarchy. Click this object [1] and in the inspector window, you can drag and drop your CSV/TSV file into the *Source Data* field [2]. You can also create a *metadata* file for your dataset and drag and drop it into the *Metadata* field.
 
 ![datasource](https://user-images.githubusercontent.com/11532065/36767569-28938eb6-1c8f-11e8-8aa5-984aab9202a7.PNG)
 
 ### The metadata file
-The metadata file is used to specify the data binning for the histograms corresponding to each data dimension. It is optional and if you do not create one the histograms will not have bins.
+The metadata file is used to specify the data binning for the histograms corresponding to each data dimension. It is optional and if you do not create one the histograms will have default bins.
 
 To create a metadata file:
 

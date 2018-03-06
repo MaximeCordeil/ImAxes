@@ -1,4 +1,4 @@
-# ImAxes
+# ImAxes (1.0 beta)
 ImAxes is an immersive data visualisation tool for multidimensional data exploration and analysis in virtual reality.
 [link to the original paper](https://www.researchgate.net/publication/318876157_ImAxes_Immersive_Axes_as_Embodied_Affordances_for_Interactive_Multivariate_Data_Visualisation)
 

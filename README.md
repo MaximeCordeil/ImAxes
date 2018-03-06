@@ -51,13 +51,13 @@ To create a metadata file:
 
 <img src="https://user-images.githubusercontent.com/11532065/36769170-bf0b159c-1c96-11e8-824a-6d20df94ea6d.jpg" width="40%">
 
-2. Name your metadata file (e.g. datasetname-metadata
+2. Name your metadata file (e.g. datasetname-metadata)
 3. Click on the file
 4. In the inspector specify the numbers of bins in the *Size* field (it corresponds to the number of dimensions in your dataset)
-5. Populate each *Element i* (i: 0 -> nbDimensions-1) bin with the desired bin size 
+5. Populate each *Element i* (i: 0 -> nbDimensions-1) bin with the desired bin size for the dimension
 
 ### Run ImAxes in the Unity editor
-Once you have attached a clean CSV/TSV file to the SceneManage (and optionnally a metadata file), you can run ImAxes in the editor by simply clicking the play button.
+Once you have attached a clean CSV/TSV file to the SceneManager (and optionnally a metadata file), you can run ImAxes in the editor by simply clicking the play button.
 
 ### Building and launching ImAxes
 You can build and launch the HTCVive or the OculusTouch scene. Make sure you have attached the dataset file in the SceneManager gameobject.
@@ -68,23 +68,27 @@ You can build and launch the HTCVive or the OculusTouch scene. Make sure you hav
 Visualisations are created by pulling out axes from the *axes shelf* and by assembling them in space:
 
   * Hold 2 axes parallel to each other, you get a parallel coordinate.
-  * Make them perpendicular and touch, you get a 2D scatterplot
+  * Make 2 axes perpendicular and connect the ends, you get a 2D scatterplot
   * Add a third perpendicular axis, you get a 3D scatterplot
-  * Extend visualisation by extending the axes ...
+  * Extend visualisation by adding more axes and you will obtain matrices
+  * Place visualisations close to each other to connect them
+
+Check the [video](https://www.youtube.com/watch?v=hxqJJ934Reg) to learn the interactions.
 
 ### Changing the visualisation styles
-Press the *Menu* button on the HTC vive controller (or you Mixed-realiy device) and you will this menu popup.
+Press the *Menu* button on the HTC vive controller (or you Mixed-realiy device) and you will see this menu popup.
+
 *[image menu]*
 
 You can change the color scheme:
   * bind a palette to a categorical dimension
   * bind a gradient color (change min/max colors) to a continuous variable
+ 
 *[image menu]*
 
 You can change the visualisation style:
   * If you have a time series dataset (or a trail set dataset) *and* your data are ordered properly by id in the CSV/TSV source file, you can change the visualisation to show connected dots like this:
 *[image menu]*
-
 
 ## Roadmap
 This is a *beta version of ImAxes*, it means that it is not bug-free and does not contain all the data visualisation features for now.
@@ -127,4 +131,3 @@ ImAxes is mainly designed and developped by Maxime Cordeil (Monash University) a
 Contributors: ImAxes is the fruit of a collaborative research project with 
   * Assoc. Prof Tim Dwyer, Prof. Kim Marriott (Monash University)
   * Prof. Bruce H. Thomas (University of South Australia).
-

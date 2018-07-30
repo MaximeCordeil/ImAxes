@@ -26,8 +26,8 @@ public class DetailsOnDemand : MonoBehaviour
     string zDimension = "";
 
     Vector3 poitionInWorld = Vector3.one;
-    Tuple<Vector3, Vector3> tuplePCPWorld;
-    Tuple<Vector3, Vector3> tuplePCPData;
+    Staxes.Tuple<Vector3, Vector3> tuplePCPWorld;
+    Staxes.Tuple<Vector3, Vector3> tuplePCPData;
 
     Transform parentTransform;
     public LineRenderer leaderInformation;
@@ -63,12 +63,12 @@ public class DetailsOnDemand : MonoBehaviour
         br = _br;
     }
 
-    public void setDataPCP(Tuple<Vector3, Vector3> _tuplePCPData)
+    public void setDataPCP(Staxes.Tuple<Vector3, Vector3> _tuplePCPData)
     {
         tuplePCPData = _tuplePCPData;
     }
 
-    public void setTuplePCPWorld(Tuple<Vector3, Vector3> tupleV3PCP)
+    public void setTuplePCPWorld(Staxes.Tuple<Vector3, Vector3> tupleV3PCP)
     {
         tuplePCPWorld = tupleV3PCP;
     }

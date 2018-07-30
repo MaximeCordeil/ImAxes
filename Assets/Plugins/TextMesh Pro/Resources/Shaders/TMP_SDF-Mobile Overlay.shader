@@ -1,9 +1,3 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Copyright (C) 2014 - 2016 Stephan Schaem - All Rights Reserved
-// This code can only be used under the standard Unity Asset Store End User License Agreement
-// A Copy of the EULA APPENDIX 1 is available at http://unity3d.com/company/legal/as_terms
-
 // Simplified SDF shader:
 // - No Shading Option (bevel / bump / env map)
 // - No Glow Option
@@ -44,7 +38,7 @@ Properties {
 	_VertexOffsetX		("Vertex OffsetX", float) = 0
 	_VertexOffsetY		("Vertex OffsetY", float) = 0
 
-	_ClipRect			("Clip Rect", vector) = (-10000, -10000, 10000, 10000)
+	_ClipRect			("Clip Rect", vector) = (-32767, -32767, 32767, 32767)
 	_MaskSoftnessX		("Mask SoftnessX", float) = 0
 	_MaskSoftnessY		("Mask SoftnessY", float) = 0
 	
@@ -90,6 +84,9 @@ SubShader {
 		#pragma shader_feature __ OUTLINE_ON
 		#pragma shader_feature __ UNDERLAY_ON UNDERLAY_INNER
 
+		#pragma multi_compile __ UNITY_UI_CLIP_RECT
+		#pragma multi_compile __ UNITY_UI_ALPHACLIP
+
 		#include "UnityCG.cginc"
 		#include "UnityUI.cginc"
 		#include "TMPro_Properties.cginc"
@@ -132,8 +129,8 @@ SubShader {
 			scale *= abs(input.texcoord1.y) * _GradientScale * 1.5;
 			if(UNITY_MATRIX_P[3][3] == 0) scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(input.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
 
-			float weight = lerp(_WeightNormal, _WeightBold, bold) / _GradientScale;
-			weight += _FaceDilate * _ScaleRatioA * 0.5;
+			float weight = lerp(_WeightNormal, _WeightBold, bold) / 4.0;
+			weight = (weight + _FaceDilate) * _ScaleRatioA * 0.5;
 
 			float layerScale = scale;
 
@@ -208,21 +205,18 @@ SubShader {
 			c += float4(_UnderlayColor.rgb * _UnderlayColor.a, _UnderlayColor.a) * (1 - saturate(d - input.underlayParam.y)) * sd * (1 - c.a);
 		#endif
 
-		#if UNITY_VERSION < 530
-			// Unity 5.2 2D Rect Mask Support
-			if (_UseClipRect)
-			{
-				half2 m = saturate((_ClipRect.zw - _ClipRect.xy - abs(input.mask.xy)) * input.mask.zw);
-				c *= m.x * m.y;
-			}
-		#else
-			// Alternative implementation to UnityGet2DClipping with support for softness.
+		// Alternative implementation to UnityGet2DClipping with support for softness.
+		#if UNITY_UI_CLIP_RECT
 			half2 m = saturate((_ClipRect.zw - _ClipRect.xy - abs(input.mask.xy)) * input.mask.zw);
 			c *= m.x * m.y;
 		#endif
 
 		#if (UNDERLAY_ON | UNDERLAY_INNER)
 			c *= input.texcoord1.z;
+		#endif
+
+    #if UNITY_UI_ALPHACLIP
+			clip(c.a - 0.001);
 		#endif
 
 			return c;

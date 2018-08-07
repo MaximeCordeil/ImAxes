@@ -15,6 +15,8 @@ Here is a video demo of ImAxes:
 ## Installation instructions
 ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6](https://unity3d.com/get-unity/download/archive)
 
+** << Udpate >> : Now ImAxes works with Unity 2018!! check it out: https://github.com/MaximeCordeil/ImAxes/tree/ImAxes2018 big thanks to our student Benjamin Lee for this **
+
 ## Hardware and compatibility
 ImAxes works on Windows PCs. You will need a solid *gaming* configuration, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.
 

@@ -127,7 +127,7 @@ If you plan to use this software for publication, please cite the paper:
  keywords = {immersion, immersive analytics, immersive visualization, information visualization, multidimensional data visualization, virtual reality},
 }
 
-## Developpers and contributors
+## Developers and contributors
 ImAxes is mainly designed and developped by [Maxime Cordeil](http://ialab.it.monash.edu/~maxc/) (Monash University) and Andrew Cunningham (University of South Australia).
 
 Contributors: ImAxes an [Immersive Analytics](http://ialab.it.monash.edu/) collaborative research project with 

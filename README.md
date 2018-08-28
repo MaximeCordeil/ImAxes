@@ -20,16 +20,16 @@ ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6
 ## Hardware and compatibility
 ImAxes works on Windows PCs. You will need a solid *gaming* configuration, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.
 
-The HTC Vive and Micrsofot-compatible MR devices, and the Oculus Rift CV1 with Oculus touch controllers are currently supported.
+The HTC Vive and Microsoft-compatible MR devices, and the Oculus Rift CV1 with Oculus touch controllers are currently supported.
 
-## Launching Imaxes
+## Launching ImAxes
 ImAxes allows you to load data with a CSV or a TSV file format. The CSV/TSV dataset file:
   * **must be clean! if you have an empty line, or a line with incorrect data values, ImAxes is very likely to throw parsing exceptions**
   * **should not exceed 65,534 entries**
 
 Your dataset file should look like this:
 
-![snipetdata](https://user-images.githubusercontent.com/11532065/36827716-5ea25eb2-1d69-11e8-8da4-f073c88d3923.PNG)
+![snippetdata](https://user-images.githubusercontent.com/11532065/36827716-5ea25eb2-1d69-11e8-8da4-f073c88d3923.PNG)
 
 Each column corresponds to a dimension of the data. Once you have launched ImAxes you will see the corresponding dimensions as virtual axes in space like this:
 

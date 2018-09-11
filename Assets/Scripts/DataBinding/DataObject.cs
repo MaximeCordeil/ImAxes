@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 
 namespace DataBinding
@@ -15,6 +16,8 @@ namespace DataBinding
         float[,] dataArray;
         int dataPoints;
         int nbDimensions;
+
+        float[,] originalDataValues;
 
         public int NbDimensions
         {
@@ -54,6 +57,7 @@ namespace DataBinding
         }
         DimensionMetadata[] metadata;
 
+        public Dictionary<string, List<float>> sortedDimensions = new Dictionary<string,List<float>>();
 
         public DataObject(string data, DataObjectMetadata metadata=null)
         {
@@ -200,6 +204,14 @@ namespace DataBinding
 
             normaliseArray(metadataPreset);
 
+            //build the dictionnary of sorted dimensions
+            for(int i=0;i<identifiers.Length;i++)
+            {
+                List<float> sortedDimension = getDimension(identifiers[i]).ToList();
+                sortedDimension.Sort();
+                sortedDimensions.Add(identifiers[i], sortedDimension);
+            }
+
         }
         
         /// <summary>
@@ -209,6 +221,9 @@ namespace DataBinding
         {
             //1 make a copy of the parsed array
             float[,] normArray = new float[dataArray.GetUpperBound(0)+1, dataArray.GetUpperBound(1)+ 1];
+
+            originalDataValues = new float[dataArray.GetUpperBound(0) + 1, dataArray.GetUpperBound(1) + 1];
+
             //for each dimensions (column) normalise all data
             for (int i = 0; i <= normArray.GetUpperBound(1); i++)
             {
@@ -249,10 +264,15 @@ namespace DataBinding
                 SetCol<float>(normArray, i, normalisedDimension);
 
             }
-
+            originalDataValues = dataArray;
             dataArray = normArray;
 
 
+        }
+
+        public int getNearestDataIndex(float value, int dimension)
+        {
+            return nearestValue(sortedDimensions[indexToDimension(dimension)], value);
         }
 
         /// <summary>
@@ -263,13 +283,15 @@ namespace DataBinding
         /// <returns></returns>
         public object getOriginalValue(float value, int dimension)
         {
-            float originalValue = normaliseValue(value, 0f, 1f, dimensionsRange[dimension].x, dimensionsRange[dimension].y);
+            
+            int NearestValue = nearestValue(sortedDimensions[indexToDimension(dimension)], value);
+            float originalValue = getOriginalDimension(indexToDimension(dimension))[NearestValue];// // ( GetCol(originalDataValues, NearestValue);// normaliseValue(NearestValue, 0f, 1f, dimensionsRange[dimension].x, dimensionsRange[dimension].y);
 
-            if (TypeDimensionDictionary[dimension] == "string")
-            {
-                return textualDimensions[originalValue];
-            }
-            else
+            //if (TypeDimensionDictionary[dimension] == "string")
+            //{
+            //    return textualDimensions[originalValue];
+            //}
+            //else
                 return originalValue;
         }
 
@@ -381,6 +403,23 @@ namespace DataBinding
 
         }
 
+        public float[] getOriginalDimension(string name)
+        {
+            // 1 bind name to position in array
+            int selectCol = -1;
+            for (int i = 0; i < identifiers.Length; i++)
+            {
+                if (identifiers[i] == name)
+                    selectCol = i;
+            }
+            if (selectCol < 0)
+                return null;
+            else
+            {
+                return GetCol(originalDataValues, selectCol);
+            }
+        }
+
         public int dimensionToIndex(string dimension)
         {
             int id = -1;
@@ -441,6 +480,23 @@ namespace DataBinding
 
         // ------------------------- DATA ANALYTICS HELPER FUNCTIONS -----------------------
 
+        public int nearestValue(List<float> list, float find)
+        {            
+            int index = list.BinarySearch(find);
+            if (0 <= index)
+               return index;// Console.Out.WriteLine("Found value {0} at list[{1}]", find, index);
+            else
+            {
+                index = ~index;
+                if (0 < index)
+                return index-1;//Console.Out.WriteLine("list[{0}] = {1}", index - 1, list[index - 1]);
+                else return index;//
+//                Console.Out.WriteLine("list[{0}] = {1}", index, list[index]);
+                //Console.Out.WriteLine("value {0} should be inserted at index {1}", find, index);
+                // to insert
+  //              list.Insert(index, find);
+            }
+        }
         /// <summary>
         /// Gets the number of categories that a *categorical* data dimension contains
         /// </summary>

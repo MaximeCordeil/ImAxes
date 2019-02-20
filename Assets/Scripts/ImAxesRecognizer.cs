@@ -550,13 +550,7 @@ public class ImAxesRecognizer : MonoBehaviour
                             SP[i].ShowHistogram(false);
                             SP[j].ShowHistogram(false);
 
-                            GameObject lvGO = new GameObject();
-                            lvGO.name = _name;
-                            LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
-                            lv.V1 = SP[i];
-                            lv.V2 = SP[j];
-
-                            linkedVisualisationDictionary.Add(_name, lvGO);
+                            LinkVisualisations(_name, SP[i], SP[j]);
                         }
                      
                     }
@@ -571,13 +565,7 @@ public class ImAxesRecognizer : MonoBehaviour
                             if (SP[i].viewType == Visualization.ViewType.Histogram) SP[i].ShowHistogram(false);
                             if (SP[j].viewType == Visualization.ViewType.Histogram) SP[j].ShowHistogram(false);
 
-                            GameObject lvGO = new GameObject();
-                            lvGO.name = _name;
-                            LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
-                            lv.V1 = SP[i];
-                            lv.V2 = SP[j];
-
-                            linkedVisualisationDictionary.Add(_name, lvGO);
+                            LinkVisualisations(_name, SP[i], SP[j]);
                         }
                     }
                     else
@@ -589,13 +577,7 @@ public class ImAxesRecognizer : MonoBehaviour
                             if (SP[i].viewType == Visualization.ViewType.Histogram) SP[i].ShowHistogram(false);
                             if (SP[j].viewType == Visualization.ViewType.Histogram) SP[j].ShowHistogram(false);
 
-                            GameObject lvGO = new GameObject();
-                            lvGO.name = _name;
-                            LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
-                            lv.V1 = SP[i];
-                            lv.V2 = SP[j];
-
-                            linkedVisualisationDictionary.Add(_name, lvGO);
+                            LinkVisualisations(_name, SP[i], SP[j]);
                         }
                     }
                 }
@@ -668,6 +650,53 @@ public class ImAxesRecognizer : MonoBehaviour
                                 + "SP3: " + SP.Count(x => x.viewType == Visualization.ViewType.Scatterplot3D) + "\n"
 //                                + "SP2_SPLOM: " + SPLOMS2D.Count + "\n"
                                 + "SP3_SPLOM: " + SPLOMS3D.Count + "\n";
+    }
+
+    void LinkVisualisations(string _name, Visualization v1, Visualization v2)
+    {
+        GameObject lvGO = new GameObject();
+        lvGO.name = _name;
+        LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
+
+        var sc = lvGO.AddComponent<SphereCollider>();
+        sc.radius = 0.1f;
+        sc.isTrigger = true;
+
+        lv.V1 = v1;
+        lv.V2 = v2;
+        linkedVisualisationDictionary.Add(_name, lvGO);
+    }
+
+    public List<Visualization> WalkLinkedVisualisations(LinkedVisualisations src)
+    {
+        var toProcess = new Stack<LinkedVisualisations>();
+        toProcess.Push(src);
+
+        var connectedVis = new List<Visualization>();
+
+        var processed = new List<LinkedVisualisations>();
+
+        while (toProcess.Count > 0)
+        {
+            var link = toProcess.Pop();
+            processed.Add(link);
+
+            connectedVis.Add(link.V1);
+            connectedVis.Add(link.V2);
+
+            foreach (var srcvis in connectedVis)
+            {
+                var connected = linkedVisualisationDictionary.Values.Select(x => x.GetComponent<LinkedVisualisations>())
+                                                                    .Where(x => !processed.Contains(x))
+                                                                    .Where(x => x.V1 == srcvis || x.V2 == srcvis);
+
+                foreach (var v in connected)
+                {
+                    toProcess.Push(v);
+                }
+            }
+        }
+        return connectedVis.Distinct().ToList();
     }
 
     List<string> toDestroy = new List<string>();

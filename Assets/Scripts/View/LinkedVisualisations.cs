@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Staxes;
@@ -39,9 +39,7 @@ public class LinkedVisualisations : MonoBehaviour, Grabbable
     void CreateMesh()
     {
         mymesh.Clear();
-
-        Enumerable.Range(0, 10).Select(x => 1).ToList();
-
+        
         if (v1.viewType == Visualization.ViewType.Histogram && v2.viewType != Visualization.ViewType.Histogram)
         {
             //1 get list of axes in v2 and test parallelism
@@ -175,75 +173,94 @@ public class LinkedVisualisations : MonoBehaviour, Grabbable
         {
             // position the linked visualization between axis
             Vector3 p = new Vector3();
-            p = (v1.axes[0].transform.position + v2.axes[0].transform.position) / 2;
-            transform.position = p;
+            try
+            {
+                p = (v1.axes[0].transform.position + v2.axes[0].transform.position) / 2;
+                transform.position = p;
 
-            linkRenderer.material.SetVector("_ftl1", transform.InverseTransformPoint(v1.ftl));
-			linkRenderer.material.SetVector("_fbl1", transform.InverseTransformPoint(v1.fbl));
-            linkRenderer.material.SetVector("_ftr1", transform.InverseTransformPoint(v1.ftr));
-            linkRenderer.material.SetVector("_fbr1", transform.InverseTransformPoint(v1.fbr));
+                linkRenderer.material.SetVector("_ftl1", transform.InverseTransformPoint(v1.ftl));
+                linkRenderer.material.SetVector("_fbl1", transform.InverseTransformPoint(v1.fbl));
+                linkRenderer.material.SetVector("_ftr1", transform.InverseTransformPoint(v1.ftr));
+                linkRenderer.material.SetVector("_fbr1", transform.InverseTransformPoint(v1.fbr));
 
-            linkRenderer.material.SetVector("_btl1", transform.InverseTransformPoint(v1.btl));
-            linkRenderer.material.SetVector("_bbl1", transform.InverseTransformPoint(v1.bbl));
-            linkRenderer.material.SetVector("_btr1", transform.InverseTransformPoint(v1.btr));
-            linkRenderer.material.SetVector("_bbr1", transform.InverseTransformPoint(v1.bbr));
-            
-            linkRenderer.material.SetVector("_ftr2", transform.InverseTransformPoint(v2.ftr));
-            linkRenderer.material.SetVector("_fbr2", transform.InverseTransformPoint(v2.fbr));
-            linkRenderer.material.SetVector("_ftl2", transform.InverseTransformPoint(v2.ftl));
-            linkRenderer.material.SetVector("_fbl2", transform.InverseTransformPoint(v2.fbl));
-            
-            linkRenderer.material.SetVector("_btr2", transform.InverseTransformPoint(v2.btr));
-            linkRenderer.material.SetVector("_bbr2", transform.InverseTransformPoint(v2.bbr));
-            linkRenderer.material.SetVector("_btl2", transform.InverseTransformPoint(v2.btl));
-            linkRenderer.material.SetVector("_bbl2", transform.InverseTransformPoint(v2.bbl));
+                linkRenderer.material.SetVector("_btl1", transform.InverseTransformPoint(v1.btl));
+                linkRenderer.material.SetVector("_bbl1", transform.InverseTransformPoint(v1.bbl));
+                linkRenderer.material.SetVector("_btr1", transform.InverseTransformPoint(v1.btr));
+                linkRenderer.material.SetVector("_bbr1", transform.InverseTransformPoint(v1.bbr));
 
-            linkRenderer.material.SetFloat("_MinXFilter1", v1.minXFilter);
-            linkRenderer.material.SetFloat("_MaxXFilter1", v1.maxXFilter);
-            linkRenderer.material.SetFloat("_MinYFilter1", v1.minYFilter);
-            linkRenderer.material.SetFloat("_MaxYFilter1", v1.maxYFilter);
-            linkRenderer.material.SetFloat("_MinZFilter1", v1.minZFilter);
-            linkRenderer.material.SetFloat("_MaxZFilter1", v1.maxZFilter);
+                linkRenderer.material.SetVector("_ftr2", transform.InverseTransformPoint(v2.ftr));
+                linkRenderer.material.SetVector("_fbr2", transform.InverseTransformPoint(v2.fbr));
+                linkRenderer.material.SetVector("_ftl2", transform.InverseTransformPoint(v2.ftl));
+                linkRenderer.material.SetVector("_fbl2", transform.InverseTransformPoint(v2.fbl));
 
-            linkRenderer.material.SetFloat("_MinXFilter2", v2.minXFilter);
-            linkRenderer.material.SetFloat("_MaxXFilter2", v2.maxXFilter);
-            linkRenderer.material.SetFloat("_MinYFilter2", v2.minYFilter);
-            linkRenderer.material.SetFloat("_MaxYFilter2", v2.maxYFilter);
-            linkRenderer.material.SetFloat("_MinZFilter2", v2.minZFilter);
-            linkRenderer.material.SetFloat("_MaxZFilter2", v2.maxZFilter);
+                linkRenderer.material.SetVector("_btr2", transform.InverseTransformPoint(v2.btr));
+                linkRenderer.material.SetVector("_bbr2", transform.InverseTransformPoint(v2.bbr));
+                linkRenderer.material.SetVector("_btl2", transform.InverseTransformPoint(v2.btl));
+                linkRenderer.material.SetVector("_bbl2", transform.InverseTransformPoint(v2.bbl));
 
-            linkRenderer.material.SetFloat("_MinNormX1", v1.minXNormalizer);
-            linkRenderer.material.SetFloat("_MaxNormX1", v1.maxXNormalizer);
-            linkRenderer.material.SetFloat("_MinNormY1", v1.minYNormalizer);
-            linkRenderer.material.SetFloat("_MaxNormY1", v1.maxYNormalizer);
-            linkRenderer.material.SetFloat("_MinNormZ1", v1.minZNormalizer);
-            linkRenderer.material.SetFloat("_MaxNormZ1", v1.maxZNormalizer);
+                linkRenderer.material.SetFloat("_MinXFilter1", v1.minXFilter);
+                linkRenderer.material.SetFloat("_MaxXFilter1", v1.maxXFilter);
+                linkRenderer.material.SetFloat("_MinYFilter1", v1.minYFilter);
+                linkRenderer.material.SetFloat("_MaxYFilter1", v1.maxYFilter);
+                linkRenderer.material.SetFloat("_MinZFilter1", v1.minZFilter);
+                linkRenderer.material.SetFloat("_MaxZFilter1", v1.maxZFilter);
 
-            linkRenderer.material.SetFloat("_MinNormX2", v2.minXNormalizer);
-            linkRenderer.material.SetFloat("_MaxNormX2", v2.maxXNormalizer);
-            linkRenderer.material.SetFloat("_MinNormY2", v2.minYNormalizer);
-            linkRenderer.material.SetFloat("_MaxNormY2", v2.maxYNormalizer);
-            linkRenderer.material.SetFloat("_MinNormZ2", v2.minZNormalizer);
-            linkRenderer.material.SetFloat("_MaxNormZ2", v2.maxZNormalizer);
+                linkRenderer.material.SetFloat("_MinXFilter2", v2.minXFilter);
+                linkRenderer.material.SetFloat("_MaxXFilter2", v2.maxXFilter);
+                linkRenderer.material.SetFloat("_MinYFilter2", v2.minYFilter);
+                linkRenderer.material.SetFloat("_MaxYFilter2", v2.maxYFilter);
+                linkRenderer.material.SetFloat("_MinZFilter2", v2.minZFilter);
+                linkRenderer.material.SetFloat("_MaxZFilter2", v2.maxZFilter);
 
+                linkRenderer.material.SetFloat("_MinNormX1", v1.minXNormalizer);
+                linkRenderer.material.SetFloat("_MaxNormX1", v1.maxXNormalizer);
+                linkRenderer.material.SetFloat("_MinNormY1", v1.minYNormalizer);
+                linkRenderer.material.SetFloat("_MaxNormY1", v1.maxYNormalizer);
+                linkRenderer.material.SetFloat("_MinNormZ1", v1.minZNormalizer);
+                linkRenderer.material.SetFloat("_MaxNormZ1", v1.maxZNormalizer);
+
+                linkRenderer.material.SetFloat("_MinNormX2", v2.minXNormalizer);
+                linkRenderer.material.SetFloat("_MaxNormX2", v2.maxXNormalizer);
+                linkRenderer.material.SetFloat("_MinNormY2", v2.minYNormalizer);
+                linkRenderer.material.SetFloat("_MaxNormY2", v2.maxYNormalizer);
+                linkRenderer.material.SetFloat("_MinNormZ2", v2.minZNormalizer);
+                linkRenderer.material.SetFloat("_MaxNormZ2", v2.maxZNormalizer);
+
+            }
+            catch
+            {
+                try
+                {
+                    Destroy(v1.gameObject);
+                    Destroy(v2.gameObject);
+                }
+                catch { }
+            }
+
+        }
+        else
+        {
+            try
+            {
+                Destroy(v1.gameObject);
+                Destroy(v2.gameObject);
+            } catch { }
         }
 
     }
 
     public bool OnGrab(WandController controller)
     {
-        v1.transform.parent = controller.transform;
-        v2.transform.parent = controller.transform;
-        transform.parent = controller.transform;
-        return true;
+        foreach (var vis in FindObjectOfType<ImAxesRecognizer>().WalkLinkedVisualisations(this))
+        {
+            controller.PropergateOnGrab(vis.gameObject);
+        }
+
+        return false;
     }
 
     public void OnRelease(WandController controller)
     {
-        v1.transform.parent = null;
-        v2.transform.parent = null;
-
-        transform.parent = null;
     }
 
     public void OnDrag(WandController controller)
@@ -257,7 +274,7 @@ public class LinkedVisualisations : MonoBehaviour, Grabbable
 
     public int GetPriority()
     {
-        throw new System.NotImplementedException();
+        return 50;
     }
 
     public bool Contains(Axis a)

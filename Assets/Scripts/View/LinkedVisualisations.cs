@@ -267,10 +267,20 @@ public class LinkedVisualisations : MonoBehaviour, Grabbable
     { }
 
     public void OnEnter(WandController controller)
-    { }
+    {
+        foreach (var vis in FindObjectOfType<ImAxesRecognizer>().WalkLinkedVisualisations(this))
+        {
+            vis.OnEnter(controller);
+        }
+    }
 
     public void OnExit(WandController controller)
-    { }
+    {
+        foreach (var vis in FindObjectOfType<ImAxesRecognizer>().WalkLinkedVisualisations(this))
+        {
+            vis.OnExit(controller);
+        }
+    }
 
     public int GetPriority()
     {

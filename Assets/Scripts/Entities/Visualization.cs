@@ -1321,14 +1321,20 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
     public void OnDrag(WandController controller)
     { }
 
-    void Grabbable.OnEnter(WandController controller)
+    public void OnEnter(WandController controller)
     {
-        //   sizePanel.SetActive(true);
+        foreach (var axis in axes)
+        {
+            axis.OnEnter(controller);
+        }
     }
 
-    void Grabbable.OnExit(WandController controller)
+    public void OnExit(WandController controller)
     {
-        //     sizePanel.SetActive(false);
+        foreach (var axis in axes)
+        {
+            axis.OnExit(controller);
+        }
     }
 
     public void OnDetailOnDemand(WandController controller, Vector3 worldPosition, Vector3 localPosition, bool is3D)

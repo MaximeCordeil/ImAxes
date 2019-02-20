@@ -599,10 +599,7 @@ public class ImAxesRecognizer : MonoBehaviour
             Visualization v1 = item.GetComponent<LinkedVisualisations>().V1;
             Visualization v2 = item.GetComponent<LinkedVisualisations>().V2;
 
-            if (v1 == null
-              || v2 == null ||
-                Vector3.Distance(item.GetComponent<LinkedVisualisations>().V1.transform.position,
-                item.GetComponent<LinkedVisualisations>().V2.transform.position) > PCP_DISTANCE + 0.05f)
+            if (v1 == null || v2 == null || Vector3.Distance(v1.transform.position, v2.transform.position) > PCP_DISTANCE + 0.05f)
             {
                 toDestroy.Add(item.name);
             }

@@ -1,4 +1,4 @@
-﻿using Staxes;
+using Staxes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,8 +26,8 @@ public class DetailsOnDemand : MonoBehaviour
     string zDimension = "";
 
     Vector3 poitionInWorld = Vector3.one;
-    Staxes.Tuple<Vector3, Vector3> tuplePCPWorld;
-    Staxes.Tuple<Vector3, Vector3> tuplePCPData;
+    System.Tuple<Vector3, Vector3> tuplePCPWorld;
+    System.Tuple<Vector3, Vector3> tuplePCPData;
 
     Transform parentTransform;
     public LineRenderer leaderInformation;
@@ -63,12 +63,12 @@ public class DetailsOnDemand : MonoBehaviour
         br = _br;
     }
 
-    public void setDataPCP(Staxes.Tuple<Vector3, Vector3> _tuplePCPData)
+    public void setDataPCP(System.Tuple<Vector3, Vector3> _tuplePCPData)
     {
         tuplePCPData = _tuplePCPData;
     }
 
-    public void setTuplePCPWorld(Staxes.Tuple<Vector3, Vector3> tupleV3PCP)
+    public void setTuplePCPWorld(System.Tuple<Vector3, Vector3> tupleV3PCP)
     {
         tuplePCPWorld = tupleV3PCP;
     }
@@ -92,6 +92,14 @@ public class DetailsOnDemand : MonoBehaviour
     public void setLocalPointerPosition(Vector3 _localPointerPosition)
     {
         localPointerPosition = _localPointerPosition;
+    }
+
+    private void Awake()
+    {
+        tempTransformObject = new GameObject("Brush Transform");
+        tempTransformObject.transform.parent = transform;
+        tempTransformObject.transform.localPosition = Vector3.zero;
+        tempTransformObject.transform.localScale = new Vector3(0.2660912f, 0.2660912f, 0.2660912f) / 2;
     }
 
     void Start()
@@ -129,9 +137,10 @@ public class DetailsOnDemand : MonoBehaviour
         leaderInformation = gameObject.AddComponent<LineRenderer>();
 
         leaderInformation.material = new Material(Shader.Find("Particles/Additive"));
-        leaderInformation.widthMultiplier = 0.0015f;
+        //leaderInformation.widthMultiplier = 0.0015f;
         leaderInformation.positionCount = 2;
         leaderInformation.useWorldSpace = true;
+        leaderInformation.widthCurve = AnimationCurve.Linear(0, 0.0015f, 1, 0.0015f);
 
         // A simple 2 color gradient with a fixed alpha of 1.0f.
         float alpha = 1.0f;
@@ -145,214 +154,213 @@ public class DetailsOnDemand : MonoBehaviour
         //leaderInformation.colorGradient = gradient;
         //labelDetails[0].transform.position = 2f * (Vector3.one);
     }
-
-    void Update()
-    {
-
-    }
-
+    
     float precisionSearch = 10E-6f;
 
-        public void OnDetailOnDemand2D()
+    public void OnDetailOnDemand2D()
+    {
+        textMesh.SetActive(true);
+        labelDetails.SetActive(true);
+
+        Vector2 rangeX = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(xDimension)];
+        Vector2 rangeY = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(yDimension)];
+        string values = "";
+
+        if (pointerPosition != null && labelDetails != null && textMesh != null)
         {
-            labelDetails.SetActive(true);
-
-            Vector2 rangeX = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(xDimension)];
-            Vector2 rangeY = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(yDimension)];
-            string values = "";
-
-            if (pointerPosition != null && labelDetails != null && textMesh != null)
+            if (!isParallelView)
             {
-                if (!isParallelView)
+                textMesh.transform.position = (pointerPosition);
+
+
+                float x = localPointerPosition.x / 0.2660912f;
+                float y = localPointerPosition.y / 0.2660912f;
+                float z = localPointerPosition.z / 0.2660912f;
+
+                //find the closest point in the list
+                Vector2 pointerPosition2D = new Vector2(x + 0.5f, y + 0.5f);
+                List<float> distances = new List<float>();
+
+                for (int i = 0; i < SceneManager.Instance.dataObject.getDimension(0).Length; i++)
                 {
-                    textMesh.transform.position = (pointerPosition);
-               
+                    distances.Add(Vector2.Distance(pointerPosition2D, new Vector2(SceneManager.Instance.dataObject.getDimension(xDimension)[i], SceneManager.Instance.dataObject.getDimension(yDimension)[i])));
+                }
+                int index = distances.FindIndex(d => d < distances.Min() + precisionSearch && d > distances.Min() - precisionSearch);
 
-                    float x = localPointerPosition.x / 0.2660912f;
-                    float y = localPointerPosition.y / 0.2660912f;
-                    float z = localPointerPosition.z / 0.2660912f;
+                values = string.Format(@"{0}:{1} {2} {3}:{4}",
+                    xDimension,
+                    SceneManager.Instance.dataObject.getOriginalDimension(xDimension)[index],
+                    Environment.NewLine,
+                    yDimension,
+                    SceneManager.Instance.dataObject.getOriginalDimension(yDimension)[index]
+                    );
 
-                    //find the closest point in the list
-                    Vector2 pointerPosition2D = new Vector2(x + 0.5f, y + 0.5f);
-                    List<float> distances = new List<float>();
-
-                    for (int i = 0; i < SceneManager.Instance.dataObject.getDimension(0).Length; i++)
-                    {
-                        distances.Add(Vector2.Distance(pointerPosition2D, new Vector2(SceneManager.Instance.dataObject.getDimension(xDimension)[i], SceneManager.Instance.dataObject.getDimension(yDimension)[i])));
-                    }
-                    int index = distances.FindIndex(d => d < distances.Min() + precisionSearch && d > distances.Min() - precisionSearch);
-               
-                    values = string.Format(@"{0}:{1} {2} {3}:{4}",
-                        xDimension,
-                        SceneManager.Instance.dataObject.getOriginalDimension(xDimension)[index],
-                        Environment.NewLine,
-                        yDimension,
-                        SceneManager.Instance.dataObject.getOriginalDimension(yDimension)[index]
-                        );
-
-                    leaderInformation.SetPosition(0, pointerPosition);
+                leaderInformation.SetPosition(0, pointerPosition);
                     leaderInformation.SetPosition(1,
                       (transform.TransformPoint((SceneManager.Instance.dataObject.getDimension(xDimension)[index] - 0.5f) * 0.2660912f,
                        (SceneManager.Instance.dataObject.getDimension(yDimension)[index] - 0.5f) * 0.2660912f, 0f)));
+                    leaderInformation.widthCurve = AnimationCurve.Linear(0, 0.0015f, 1, 0.0015f);
 
-                }
-                else
-                {
-                    textMesh.transform.position = (pointerPosition);
-                    //get the axis from the PCP
-                    values = "PCP";
-                    // details on demand for PCP
-                    if (tuplePCPData.Item1.x < 0f)
-                    {
-                        values = "PCP";// UtilMath.normaliseValue(tuplePCPWorld.Item1.x, -0.5f, 0.5f, rangeX.x, rangeX.y).ToString();
-                    }
-                    else
-                    {
-
-                    }
-
-                }
-
-                textMesh.GetComponentInChildren<TextMesh>().text = values;
-                textMesh.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward,
-                Camera.main.transform.rotation * Vector3.up);
-
-                labelDetails.transform.Translate(labelDetails.transform.localScale.x / 2f,
-                                                      -labelDetails.transform.localScale.y / 2f, 0.005f);
             }
+            else
+            {
+                textMesh.transform.position = (pointerPosition);
+                //get the axis from the PCP
+                values = "PCP";
+                // details on demand for PCP
+                if (tuplePCPData.Item1.x < 0f)
+                {
+                    values = "PCP";// UtilMath.normaliseValue(tuplePCPWorld.Item1.x, -0.5f, 0.5f, rangeX.x, rangeX.y).ToString();
+                }
+            }
+
+            textMesh.GetComponentInChildren<TextMesh>().text = values;
+            textMesh.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward,
+            Camera.main.transform.rotation * Vector3.up);
+
+            labelDetails.transform.Translate(labelDetails.transform.localScale.x / 2f,
+                                                  -labelDetails.transform.localScale.y / 2f, 0.005f);
         }
+    }
+    
+    GameObject tempTransformObject = null;
 
     public void OnDetailOnDemand3D()
     {
-        //goTest.transform.localScale = Vector3.one * 0.01f;
-        //goTest2.transform.localScale = Vector3.one * 0.01f;
-        //goTest3.transform.localScale = Vector3.one * 0.01f;
+        textMesh.SetActive(true);
+        string[] dimensionVisualisation = transform.name.Split('-');
 
-        //float axisLength = 0.2660912f;
+        xDimension = dimensionVisualisation[0];
+        yDimension = dimensionVisualisation[1];
+        zDimension = dimensionVisualisation[2];
+        zDimension = zDimension.Split(' ')[0];
+        
+        labelDetails.SetActive(true);
+        
+        Vector2 rangeX = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(xDimension)];
+        Vector2 rangeY = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(yDimension)];
+        Vector2 rangeZ = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(zDimension)];
 
-        //Vector3 globalToLocal = v.transform.InverseTransformPoint(globalPosition);
+        if (pointerPosition != null && labelDetails != null && textMesh != null)
+        {
+            if (!isParallelView)
+            {
+                textMesh.transform.position = (pointerPosition);
 
-        //Axis axisV = v.ReferenceAxis1.vertical;
-        //Axis axisH = v.ReferenceAxis1.horizontal;
-        //Axis axisD = v.ReferenceAxis1.depth;
+                string values = "";
 
-        //goTest.transform.position = axisV.transform.position - axisV.transform.TransformVector(Vector3.down * 0.5f);
-        //goTest2.transform.position = axisH.transform.position - axisH.transform.TransformVector(Vector3.down * 0.5f);
-        //goTest3.transform.position = axisD.transform.position - axisD.transform.TransformVector(Vector3.down * 0.5f);
+                // create a transform for the visualisation space
+                var vup = visualizationReference.fbl - visualizationReference.ftl;
+                var right = visualizationReference.fbr - visualizationReference.fbl;
 
-        //string values = string.Format(@"{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10}",
-        //             localPosition.x,
-        //             Environment.NewLine,
-        //             localPosition.y,
-        //             Environment.NewLine,
-        //             localPosition.z,
-        //            Environment.NewLine,
-        //            axisV.transform.localPosition.x,
-        //             Environment.NewLine,
-        //             axisV.transform.localPosition.y,
-        //             Environment.NewLine,
-        //             axisV.transform.localPosition.z
-        //             );
+                right.Normalize();
+                vup.Normalize();
+                vup = -vup;
 
-        //textMesh.transform.position = (pointerPosition);
-        //textMesh.GetComponentInChildren<TextMesh>().text = values;
-        //textMesh.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward,
-        //Camera.main.transform.rotation * Vector3.up);
+                var cp = Vector3.Cross(right, vup);
 
+                var forward = visualizationReference.fbl - visualizationReference.bbl;
+
+                bool isFlipped = false;
+
+                if (Vector3.Dot(cp, forward) > 0)
+                {
+                    isFlipped = true;
+                    forward = forward.normalized;
+                }
+                else
+                {
+                    forward = -forward.normalized;
+                }
+
+                Transform vt = tempTransformObject.transform;
+                vt.rotation = Quaternion.LookRotation(forward, vup);
+
+                Vector3 positionInLocal3DSP = vt.InverseTransformPoint(pointerPosition);
+
+                float x = (positionInLocal3DSP.x + 1) / 2;
+                float y = (positionInLocal3DSP.y + 1) / 2;
+                float z = (positionInLocal3DSP.z + 1) / 2;
+
+                if (isFlipped)
+                {
+                    z = 1 - z;
+                }
+
+                //find the closest point in the list
+                Vector3 pointerPosition3D = new Vector3(x, y, z);
+                List<float> distances = new List<float>();
+
+                float minDistance = float.MaxValue;
+                int minIndex = -1;
+                for (int i = 0; i < SceneManager.Instance.dataObject.getDimension(0).Length; i++)
+                {
+                    var m = Vector3.SqrMagnitude(pointerPosition3D -
+                        new Vector3(
+                        SceneManager.Instance.dataObject.getDimension(xDimension)[i],
+                        SceneManager.Instance.dataObject.getDimension(yDimension)[i],
+                        SceneManager.Instance.dataObject.getDimension(zDimension)[i]));
+
+                    if (m < minDistance)
+                    {
+                        minDistance = m;
+                        minIndex = i;
+                    }
+                }
+
+                int index = minIndex;
+
+                values = string.Format(@"{0}:{1} {2} {3}:{4} {5} {6}:{7} {8}",
+                    xDimension,
+                    SceneManager.Instance.dataObject.getOriginalDimension(xDimension)[index],
+                    Environment.NewLine,
+                    yDimension,
+                    SceneManager.Instance.dataObject.getOriginalDimension(yDimension)[index],
+                    Environment.NewLine,
+                    zDimension,
+                    SceneManager.Instance.dataObject.getOriginalDimension(zDimension)[index],
+                    Environment.NewLine);
+
+                float xd = SceneManager.Instance.dataObject.getDimension(xDimension)[index];
+                float yd = SceneManager.Instance.dataObject.getDimension(yDimension)[index];
+                float zd = SceneManager.Instance.dataObject.getDimension(zDimension)[index];
+
+                if (isFlipped)
+                {
+                    zd = 1 - zd;
+                }
+
+                leaderInformation.SetPosition(0, pointerPosition);
+                leaderInformation.SetPosition(1,
+               (vt.TransformPoint(
+                (xd - 0.5f) / vt.localScale.x * 0.2660914f,
+                (yd - 0.5f) / vt.localScale.y * 0.2660914f,
+                (zd - 0.5f) / vt.localScale.z * 0.2660914f
+                )));
+                leaderInformation.widthCurve = AnimationCurve.Linear(0, 0.0015f, 1, 0.0015f);
+
+                textMesh.GetComponentInChildren<TextMesh>().text = values;
+                textMesh.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward,
+            Vector3.up);// Camera.main.transform.rotation * Vector3.up);
+
+            }
+            else
+            {
+                textMesh.transform.position =
+                        labelDetails.transform.position =
+                        tuplePCPWorld.Item1 - (tuplePCPWorld.Item1 - Center);
+
+                // details on demand for PCP
+                if (tuplePCPData.Item1.x < 0f)
+                {
+                    float valueLeft = UtilMath.normaliseValue(tuplePCPWorld.Item1.x, -0.5f, 0.5f, rangeX.x, rangeX.y);
+                }
+            }
+
+            labelDetails.transform.Translate(labelDetails.transform.localScale.x / 2f,
+                                                  -labelDetails.transform.localScale.y / 2f, 0.005f);
+        }
     }
-
-    //public void OnDetailOnDemand3D()
-    //{
-    //    string[] dimensionVisualisation = transform.name.Split('-');
-
-    //    xDimension = dimensionVisualisation[0];
-    //    yDimension = dimensionVisualisation[1];
-    //    zDimension = dimensionVisualisation[2];
-    //    zDimension = zDimension.Split(' ')[0];
-    //    //Vector3 pointInVisu = transform.TransformPoint(pointerPosition);
-    //    labelDetails.SetActive(true);
-    //    //  GetComponent<LineRenderer>().enabled = true;
-
-    //    Vector2 rangeX = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(xDimension)];
-    //    Vector2 rangeY = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(yDimension)];
-    //    Vector2 rangeZ = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(zDimension)];
-
-    //    if (pointerPosition != null && labelDetails != null && textMesh != null)
-    //    {
-    //        if (!isParallelView)
-    //        {
-    //            textMesh.transform.position = (pointerPosition);
-
-    //            string values = "";
-
-    //            Vector3 positionInLocal3DSP = transform.InverseTransformPoint(pointerPosition);
-
-    //            float x = positionInLocal3DSP.x / 0.2660912f;
-    //            float y = positionInLocal3DSP.y / 0.2660912f;
-    //            float z = positionInLocal3DSP.z / 0.2660912f;
-
-    //            //find the closest point in the list
-    //            Vector3 pointerPosition3D = new Vector3(x + 0.5f, y+0.5f , z+0.5f );
-    //            List<float> distances = new List<float>();
-
-    //            for (int i = 0; i < SceneManager.Instance.dataObject.getDimension(0).Length; i++)
-    //            {
-    //                distances.Add(Vector3.Distance(pointerPosition3D,
-    //                    new Vector3(
-    //                    SceneManager.Instance.dataObject.getDimension(xDimension)[i],
-    //                    SceneManager.Instance.dataObject.getDimension(yDimension)[i],
-    //                    SceneManager.Instance.dataObject.getDimension(zDimension)[i])));
-    //            }
-
-    //            int index = distances.FindIndex(d => d < distances.Min() + precisionSearch && d > distances.Min() - precisionSearch);
-
-    //            values = string.Format(@"{0}:{1} {2} {3}:{4} {5} {6}:{7} {8} {9}:{10}:{11}" ,
-    //                xDimension,
-    //                SceneManager.Instance.dataObject.getOriginalDimension(xDimension)[index],
-    //                Environment.NewLine,
-    //                yDimension,
-    //                SceneManager.Instance.dataObject.getOriginalDimension(yDimension)[index],
-    //                Environment.NewLine,
-    //                zDimension,
-    //                SceneManager.Instance.dataObject.getOriginalDimension(zDimension)[index],
-    //                Environment.NewLine,
-    //                x,
-    //                y,
-    //                z
-    //                );
-
-    //            leaderInformation.SetPosition(0, pointerPosition);
-    //            leaderInformation.SetPosition(1,
-    //           (transform.TransformPoint((SceneManager.Instance.dataObject.getDimension(zDimension)[index] - 0.5f) * 0.2660912f,
-    //            (SceneManager.Instance.dataObject.getDimension(yDimension)[index] - 0.5f) * 0.2660912f,
-    //            (SceneManager.Instance.dataObject.getDimension(xDimension)[index] - 0.5f) * 0.2660912f)));
-                 
-    //            textMesh.GetComponentInChildren<TextMesh>().text = values;
-    //            textMesh.transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward,
-    //        Camera.main.transform.rotation * Vector3.up);
-
-    //        }
-    //        else
-    //        {
-    //            textMesh.transform.position =
-    //                    labelDetails.transform.position =
-    //                    tuplePCPWorld.Item1 - (tuplePCPWorld.Item1 - Center);
-
-    //            // details on demand for PCP
-    //            if (tuplePCPData.Item1.x < 0f)
-    //            {
-    //                float valueLeft = UtilMath.normaliseValue(tuplePCPWorld.Item1.x, -0.5f, 0.5f, rangeX.x, rangeX.y);
-    //            }
-    //            else
-    //            {
-    //            }
-
-    //        }
-
-    //        labelDetails.transform.Translate(labelDetails.transform.localScale.x / 2f,
-    //                                              -labelDetails.transform.localScale.y / 2f, 0.005f);
-    //    }
-    //}
 
     public object getValueFromDimension(float value, int dimension)
     {
@@ -367,12 +375,13 @@ public class DetailsOnDemand : MonoBehaviour
             return SceneManager.Instance.dataObject.getOriginalValue(value, dimension);
     }
 
-
     internal void OnDetailOnDemandEnd()
     {
         textMesh.SetActive(false);
         labelDetails.SetActive(false);
-        //   GetComponent<LineRenderer>().enabled = false;
+
+        leaderInformation.SetPosition(0, Vector3.zero);
+        leaderInformation.SetPosition(1, Vector3.zero);
     }
 
     Vector3 transformPointToVisualisation(Vector3 point)

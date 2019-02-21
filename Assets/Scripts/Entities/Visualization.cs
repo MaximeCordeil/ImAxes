@@ -1354,13 +1354,13 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
         {
             isDetailOnDemand = false;
             DetailsOnDemandComponent.OnDetailOnDemandEnd();
-
         }
     }
 
     public void OnDetailOnDemandRelease(WandController controller)
     {
         isDetailOnDemand = false;
+        DetailsOnDemandComponent.OnDetailOnDemandEnd();
     }
 
     string[] memory = new string[5];

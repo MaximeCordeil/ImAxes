@@ -157,6 +157,18 @@ public class DetailsOnDemand : MonoBehaviour
     
     float precisionSearch = 10E-6f;
 
+    // takes a dimension name and an index of a datapoint, and returns a string value for that dimension 
+    string StringValFromDataObj(DataBinding.DataObject dataObj, string dimensionName, int index)
+    {
+        float xval = dataObj.getOriginalDimension(dimensionName)[index];
+        string xvalstr = xval.ToString();
+        if (dataObj.TypeDimensionDictionary1[dataObj.dimensionToIndex(dimensionName)] == "string")
+        {
+            xvalstr = dataObj.TextualDimensions[xval];
+        };
+        return xvalstr;
+    }
+
     public void OnDetailOnDemand2D()
     {
         textMesh.SetActive(true);
@@ -187,13 +199,17 @@ public class DetailsOnDemand : MonoBehaviour
                 }
                 int index = distances.FindIndex(d => d < distances.Min() + precisionSearch && d > distances.Min() - precisionSearch);
 
+                var dataObj = SceneManager.Instance.dataObject;
+
+                string xvalstr = StringValFromDataObj(dataObj, xDimension, index);
+                string yvalstr = StringValFromDataObj(dataObj, yDimension, index);
+
                 values = string.Format(@"{0}:{1} {2} {3}:{4}",
                     xDimension,
-                    SceneManager.Instance.dataObject.getOriginalDimension(xDimension)[index],
+                    xvalstr,
                     Environment.NewLine,
                     yDimension,
-                    SceneManager.Instance.dataObject.getOriginalDimension(yDimension)[index]
-                    );
+                    yvalstr);
 
                 leaderInformation.SetPosition(0, pointerPosition);
                     leaderInformation.SetPosition(1,
@@ -310,20 +326,22 @@ public class DetailsOnDemand : MonoBehaviour
 
                 int index = minIndex;
 
-                values = string.Format(@"{0}:{1} {2} {3}:{4} {5} {6}:{7} {8}",
-                    xDimension,
-                    SceneManager.Instance.dataObject.getOriginalDimension(xDimension)[index],
-                    Environment.NewLine,
-                    yDimension,
-                    SceneManager.Instance.dataObject.getOriginalDimension(yDimension)[index],
-                    Environment.NewLine,
-                    zDimension,
-                    SceneManager.Instance.dataObject.getOriginalDimension(zDimension)[index],
-                    Environment.NewLine);
+                var dataObj = SceneManager.Instance.dataObject;
 
-                float xd = SceneManager.Instance.dataObject.getDimension(xDimension)[index];
-                float yd = SceneManager.Instance.dataObject.getDimension(yDimension)[index];
-                float zd = SceneManager.Instance.dataObject.getDimension(zDimension)[index];
+                string xvalstr = StringValFromDataObj(dataObj, xDimension, index);
+                string yvalstr = StringValFromDataObj(dataObj, yDimension, index);
+                string zvalstr = StringValFromDataObj(dataObj, zDimension, index);
+
+                values = string.Format(@"{0}:{1} {2} {3}:{4} {5} {6}:{7}",
+                    xDimension, xvalstr,
+                    Environment.NewLine,
+                    yDimension, yvalstr,
+                    Environment.NewLine,
+                    zDimension, zvalstr);
+
+                float xd = dataObj.getDimension(xDimension)[index];
+                float yd = dataObj.getDimension(yDimension)[index];
+                float zd = dataObj.getDimension(zDimension)[index];
 
                 if (isFlipped)
                 {

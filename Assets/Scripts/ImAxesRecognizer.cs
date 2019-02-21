@@ -656,7 +656,7 @@ public class ImAxesRecognizer : MonoBehaviour
         LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
 
         var sc = lvGO.AddComponent<SphereCollider>();
-        sc.radius = 0.1f;
+        sc.radius = 0.06f;
         sc.isTrigger = true;
 
         lv.V1 = v1;

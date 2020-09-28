@@ -129,6 +129,7 @@ If you plan to use this software for publication, please cite the paper:
 
 ## Developers and contributors
 ImAxes is mainly designed and developped by [Maxime Cordeil](http://ialab.it.monash.edu/~maxc/) (Monash University) and Andrew Cunningham (University of South Australia).
+[Benjamin Lee](https://benjaminchlee.github.io/) is now a contributor. 
 
 Contributors: ImAxes an [Immersive Analytics](http://ialab.it.monash.edu/) collaborative research project with 
   * Assoc. Prof [Tim Dwyer](http://ialab.it.monash.edu/~dwyer/), Prof. [Kim Marriott](http://users.monash.edu/~marriott/shadowfax/) (Monash University)

@@ -532,6 +532,18 @@ public class ImAxesRecognizer : MonoBehaviour
         // ==============================================================================
         //Pass1: enable close linked visualisations
 
+        //HACK: THIS IS A COMPLETE BANDAID TO FIX THE FLOATING VISUALIZATION BUG,
+        //TODO: We should be trying to work out why the visualization bug is occuring in the first place.
+        
+        for(var i = SP.Count - 1; i >= 0; i--)
+        {
+            if (SP[i] == null)
+                SP.RemoveAt(i);
+        }
+        
+        //TODO: END OF HACK
+        
+
         for (int i = 0; i < SP.Count; i++)
             for (int j = 0; j < SP.Count; j++)
             {

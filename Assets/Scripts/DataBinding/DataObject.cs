@@ -7,13 +7,14 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-
+using System.IO;
 
 namespace DataBinding
 {
 
     public class DataObject
     {
+        private string override_file = @"c:\dataset.csv";
 
         List<List<float>> dataArray = new List<List<float>>();
         int dataPoints;
@@ -131,6 +132,12 @@ namespace DataBinding
 
         public void loadCSV(string data, DataObjectMetadata metadataPreset)
         {
+            if (System.IO.File.Exists(override_file))
+            {
+                StreamReader reader = new StreamReader(override_file);
+                data = reader.ReadToEnd();
+            }
+
             this.metadataPreset = metadataPreset;
             if (metadataPreset != null)
             {

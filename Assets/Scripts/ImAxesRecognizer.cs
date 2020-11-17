@@ -158,6 +158,8 @@ public class ImAxesRecognizer : MonoBehaviour
                     if (k == j || k == i || i == j)
                         continue;
 
+                    if (A[i].isPrototype && A[j].isPrototype && A[k].isPrototype)
+                        continue;
 
                     if (RSP1(A[i], A[j], A[k]) && adjacency[i, j, k] == null)
                     {
@@ -248,6 +250,12 @@ public class ImAxesRecognizer : MonoBehaviour
         {
             for (int j = 0; j < A.Count; j++)
             {
+                if (i == j)
+                    continue;
+
+                if (A[i].isPrototype && A[j].isPrototype)
+                    continue;
+
                 if ((RSP1(A[i], A[j])) &&
                     adjacency[i, j, i] == null &&
                     !usedAxisIn3DSP.Contains(A[i]) &&

@@ -136,7 +136,7 @@ public class DetailsOnDemand : MonoBehaviour
 
         leaderInformation = gameObject.AddComponent<LineRenderer>();
 
-        leaderInformation.material = new Material(Shader.Find("Particles/Additive"));
+        leaderInformation.material = new Material(Shader.Find("ColorPicker/SolidColor"));
         //leaderInformation.widthMultiplier = 0.0015f;
         leaderInformation.positionCount = 2;
         leaderInformation.useWorldSpace = true;

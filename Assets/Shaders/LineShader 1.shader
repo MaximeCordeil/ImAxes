@@ -40,8 +40,8 @@ Shader "Custom/Lines"
 				#pragma fragment FS_Main
 				//#pragma geometry GS_Main
 				#include "UnityCG.cginc" 
-				#include "Distort.cginc"
-				#include "Helper.cginc"
+				#include "ImAxes/Distort.cginc"
+				#include "ImAxes/Helper.cginc"
 
 				// **************************************************************
 				// Data structures												*

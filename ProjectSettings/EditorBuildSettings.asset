@@ -5,24 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/ExperimentSetupScene.unity
-    guid: ad280ebd01173b941811153bed633bd9
-  - enabled: 0
-    path: Assets/Scenes/ViveTestScene.unity
-    guid: 74a8a58810461f4408168f3a35ec1bcc
-  - enabled: 0
-    path: Assets/Scenes/TutorialScene.unity
-    guid: 10a302ed6e7f27245b8735dc8d6d1947
   - enabled: 1
-    path: Assets/Scenes/AndreaSetupScene.unity
-    guid: 9a1b4fd6def640b46b4e1e00d9b1df76
-  - enabled: 0
-    path: 
-    guid: 1d61efd13c480a84e9c7b42e55858f37
-  - enabled: 0
-    path: Assets/Scenes/AndreaTutorialScene.unity
-    guid: 8cd1906f606d1704ba02470530e6e8ea
-  - enabled: 1
-    path: Assets/Scenes/AndreaExperimentScene.unity
-    guid: a024af8976fd6274da50ee3e93ae5411
+    path: Assets/Scenes/HTCViveScene.unity
+    guid: 3aa6b15e6c6213647b54ea8d8919b530
+  m_configObjects: {}

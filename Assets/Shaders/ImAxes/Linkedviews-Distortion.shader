@@ -126,9 +126,9 @@ Shader "Staxestk/Linked-Views-Material"
 		if(v.normal.z == 0.0)
 		{
 		normalisedPosition = float3(
-						normaliseValue(v.position.x, _MinNormX1, _MaxNormX1 ,-0.5, 0.5),
-						normaliseValue(v.position.y, _MinNormY1, _MaxNormY1 ,-0.5, 0.5),
-						normaliseValue(v.position.z, _MinNormZ1, _MaxNormZ1 ,-0.5, 0.5));
+						normaliseValue(v.position.x, _MinNormX1, _MaxNormX1 ,-0.45, 0.45),
+						normaliseValue(v.position.y, _MinNormY1, _MaxNormY1 ,-0.45, 0.45),
+						normaliseValue(v.position.z, _MinNormZ1, _MaxNormZ1 ,-0.45, 0.45));
 
 		if (v.position.x <= _MinXFilter1 ||
 			v.position.x >= _MaxXFilter1 || 
@@ -137,12 +137,12 @@ Shader "Staxestk/Linked-Views-Material"
 			v.position.z <= _MinZFilter1 || 
 			v.position.z >= _MaxZFilter1 ||
 			
-			normalisedPosition.x < -0.5 ||
-			normalisedPosition.x > 0.5 || 
-			normalisedPosition.y < -0.5 || 
-			normalisedPosition.y > 0.5 || 
-			normalisedPosition.z < -0.5 || 
-			normalisedPosition.z > 0.5					
+			normalisedPosition.x < -0.45 ||
+			normalisedPosition.x > 0.45 || 
+			normalisedPosition.y < -0.45 || 
+			normalisedPosition.y > 0.45 || 
+			normalisedPosition.z < -0.45 || 
+			normalisedPosition.z > 0.45					
 			)
 			{
 			o.filtered = true;
@@ -153,9 +153,9 @@ Shader "Staxestk/Linked-Views-Material"
 		else if(v.normal.z == 1.0)
 		{
 		normalisedPosition = float3(
-						normaliseValue(v.position.x, _MinNormX2, _MaxNormX2 ,-0.5, 0.5),
-						normaliseValue(v.position.y, _MinNormY2, _MaxNormY2 ,-0.5, 0.5),
-						normaliseValue(v.position.z, _MinNormZ2, _MaxNormZ2 ,-0.5, 0.5));
+						normaliseValue(v.position.x, _MinNormX2, _MaxNormX2 ,-0.45, 0.45),
+						normaliseValue(v.position.y, _MinNormY2, _MaxNormY2 ,-0.45, 0.45),
+						normaliseValue(v.position.z, _MinNormZ2, _MaxNormZ2 ,-0.45, 0.45));
 
 		if (v.position.x <= _MinXFilter2 ||
 			v.position.x >= _MaxXFilter2 || 
@@ -164,12 +164,12 @@ Shader "Staxestk/Linked-Views-Material"
 			v.position.z <= _MinZFilter2 || 
 			v.position.z >= _MaxZFilter2 ||
 
-			normalisedPosition.x < -0.5 ||
-			normalisedPosition.x > 0.5 || 
-			normalisedPosition.y < -0.5 || 
-			normalisedPosition.y > 0.5 || 
-			normalisedPosition.z < -0.5 || 
-			normalisedPosition.z > 0.5)
+			normalisedPosition.x < -0.45 ||
+			normalisedPosition.x > 0.45 || 
+			normalisedPosition.y < -0.45 || 
+			normalisedPosition.y > 0.45 || 
+			normalisedPosition.z < -0.45 || 
+			normalisedPosition.z > 0.45)
 			{
 			o.filtered = true;
 			//o.color.w=0;			

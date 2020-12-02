@@ -37,7 +37,7 @@ Shader "Staxestk/Sprites"
 			#pragma multi_compile _ PIXELSNAP_ON
 			#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
 			#include "UnityCG.cginc"
-			#include "Distort.cginc"	
+			#include "ImAxes/Distort.cginc"	
 
 			struct appdata_t
 			{

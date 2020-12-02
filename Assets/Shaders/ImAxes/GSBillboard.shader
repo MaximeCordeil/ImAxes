@@ -134,9 +134,9 @@ Shader "Custom/Outline Dots"
 
 					//TODO LATER: THIS REMAPS THE RANGE OF VALUES
 					float3 normalisedPosition = float3(
-						normaliseValue(v.position.x, _MinNormX, _MaxNormX ,-0.5, 0.5),
-						normaliseValue(v.position.y, _MinNormY, _MaxNormY ,-0.5, 0.5),
-						normaliseValue(v.position.z, _MinNormZ, _MaxNormZ ,-0.5, 0.5));
+						normaliseValue(v.position.x, _MinNormX, _MaxNormX ,-0.45, 0.45),
+						normaliseValue(v.position.y, _MinNormY, _MaxNormY ,-0.45, 0.45),
+						normaliseValue(v.position.z, _MinNormZ, _MaxNormZ ,-0.45, 0.45));
 
 //					output.pos = ObjectToWorldDistort3d(v.position);// normalisedPosition);
 					output.pos = ObjectToWorldDistort3d(normalisedPosition);

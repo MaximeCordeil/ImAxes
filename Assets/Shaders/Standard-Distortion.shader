@@ -36,7 +36,7 @@ Shader "Staxestk/Standard"
 		#pragma multi_compile_fog
 
 		#include "UnityCG.cginc"
-		#include "Distort.cginc"
+		#include "ImAxes/Distort.cginc"
 
 	struct appdata
 	{

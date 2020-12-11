@@ -141,30 +141,14 @@ public class ImAxesRecognizer : MonoBehaviour
         // ======================== PASS0: PARSING SPs ==================================
         // ==============================================================================
 
-        for (int i =0; i< A.Count; i++)
-        {
-            if (A[i] == null)
-            {
-                A.Remove(A[i]);
-            }
-        }
-        
         foreach (var axis in A)
         {
             if(axis!=null)
             axis.UpdateCoords();
         }
 
-        foreach(var axis in A)
-        {
-            if (axis == null)
-            {
-                A.Remove(axis);
-            }
-        }
         // Pass 0: Producing SPs
         // Stage 1: produce SPs of degree 3
-
         for (int i = 0; i < A.Count; i++)
         {
             for (int j = 0; j < A.Count; j++)
@@ -174,6 +158,8 @@ public class ImAxesRecognizer : MonoBehaviour
                     if (k == j || k == i || i == j)
                         continue;
 
+                    if (A[i].isPrototype && A[j].isPrototype && A[k].isPrototype)
+                        continue;
 
                     if (RSP1(A[i], A[j], A[k]) && adjacency[i, j, k] == null)
                     {
@@ -264,6 +250,12 @@ public class ImAxesRecognizer : MonoBehaviour
         {
             for (int j = 0; j < A.Count; j++)
             {
+                if (i == j)
+                    continue;
+
+                if (A[i].isPrototype && A[j].isPrototype)
+                    continue;
+
                 if ((RSP1(A[i], A[j])) &&
                     adjacency[i, j, i] == null &&
                     !usedAxisIn3DSP.Contains(A[i]) &&
@@ -547,15 +539,20 @@ public class ImAxesRecognizer : MonoBehaviour
         // ======================== PASS1: PARSING PCPs =================================
         // ==============================================================================
         //Pass1: enable close linked visualisations
-        for (int i = 0; i< SP.Count; i++)
-        {
-            if (SP[i] == null) /// added to allow visualisation game object to be destroyed externally
-            {
-                SP.Remove(SP[i]);
-            }
-        }
-        for (int i = 0; i < SP.Count; i++)
 
+        //HACK: THIS IS A COMPLETE BANDAID TO FIX THE FLOATING VISUALIZATION BUG,
+        //TODO: We should be trying to work out why the visualization bug is occuring in the first place.
+        
+        for(var i = SP.Count - 1; i >= 0; i--)
+        {
+            if (SP[i] == null)
+                SP.RemoveAt(i);
+        }
+        
+        //TODO: END OF HACK
+        
+
+        for (int i = 0; i < SP.Count; i++)
             for (int j = 0; j < SP.Count; j++)
             {
                 if (i != j)

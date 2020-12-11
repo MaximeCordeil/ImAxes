@@ -155,6 +155,8 @@ public class VisualisationFactory : MonoBehaviour
         {
             // normalize positions to range in -0.5...0.5
             float y = UtilMath.normaliseValue(i, 0, bins.Length - 1, 0.5f, -0.5f);
+            if (float.IsNaN(y))
+                y = 0;
             float x = UtilMath.normaliseValue(bins[i], minBin, maxBin, minNormalizer, maxNormalizer); // -0.5f, 0.5f);
             Vector3 v = new Vector3(x, y, 0f);
             l.Add(v);

@@ -248,6 +248,11 @@ public class LinkedVisualisations : MonoBehaviour
         }
 
     }
+
+    public int GetPriority()
+    {
+        return 50;
+    }
     public bool Contains(Axis a)
     {
         return (V1 != null && V2 != null && (V1.axes.Contains(a) || V2.axes.Contains(a))) ;

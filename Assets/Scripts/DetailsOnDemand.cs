@@ -136,7 +136,7 @@ public class DetailsOnDemand : MonoBehaviour
 
         leaderInformation = gameObject.AddComponent<LineRenderer>();
 
-        leaderInformation.material = new Material(Shader.Find("Particles/Additive"));
+        leaderInformation.material = new Material(Shader.Find("ColorPicker/SolidColor"));
         //leaderInformation.widthMultiplier = 0.0015f;
         leaderInformation.positionCount = 2;
         leaderInformation.useWorldSpace = true;
@@ -154,10 +154,10 @@ public class DetailsOnDemand : MonoBehaviour
         //leaderInformation.colorGradient = gradient;
         //labelDetails[0].transform.position = 2f * (Vector3.one);
     }
-    
+
     float precisionSearch = 10E-6f;
 
-    // takes a dimension name and an index of a datapoint, and returns a string value for that dimension 
+    // takes a dimension name and an index of a datapoint, and returns a string value for that dimension
     string StringValFromDataObj(DataBinding.DataObject dataObj, string dimensionName, int index)
     {
         float xval = dataObj.getOriginalDimension(dimensionName)[index];
@@ -238,7 +238,7 @@ public class DetailsOnDemand : MonoBehaviour
                                                   -labelDetails.transform.localScale.y / 2f, 0.005f);
         }
     }
-    
+
     GameObject tempTransformObject = null;
 
     public void OnDetailOnDemand3D()
@@ -250,9 +250,9 @@ public class DetailsOnDemand : MonoBehaviour
         yDimension = dimensionVisualisation[1];
         zDimension = dimensionVisualisation[2];
         zDimension = zDimension.Split(' ')[0];
-        
+
         labelDetails.SetActive(true);
-        
+
         Vector2 rangeX = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(xDimension)];
         Vector2 rangeY = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(yDimension)];
         Vector2 rangeZ = SceneManager.Instance.dataObject.DimensionsRange[SceneManager.Instance.dataObject.dimensionToIndex(zDimension)];

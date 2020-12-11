@@ -12,6 +12,8 @@ This ImAxes-HoloLens 2 branch is an **experimental** version of ImAxes. It conta
 
 Note that **these changes break almost all existing interactions and brushing capabilities**, including access to the min-max normaliser and range handles. All other visualisation functions which leverages the ImAxesRecogniser should still remain functional.
 
+Also note that this means **this branch no longer works with SteamVR or Oculus OpenVR**. It should technically work with Windows Mixed Reality VR headsets but this has not been tested.
+
 The changes can be tested directly on your computer with MRTK's input simulation service. It is already configured in the *HoloLensScene.unity* scene. Instructions on how to use the simulator can be found [here](https://microsoft.github.io/MixedRealityToolkit-Unity/Documentation/InputSimulation/InputSimulationService.html?q=simulation).
 
 To build to the HoloLens 2, you can follow [Microsoft's instructions for building an application to the HoloLens 2](https://docs.microsoft.com/en-au/windows/mixed-reality/develop/unity/tutorials/mr-learning-base-02#building-your-application-to-your-hololens-2) after having [installed all the prerequisite tools](https://docs.microsoft.com/en-au/windows/mixed-reality/develop/install-the-tools?tabs=unity).

@@ -1,4 +1,17 @@
-# ImAxes (1.0 beta)
+# ImAxes (HoloLens 2 build)
+>:warning: **IMPORTANT**
+
+This ImAxes-HoloLens 2 branch is an **experimental** version of ImAxes. It contains the following changes:
+* Replaced SteamVR with MRTK v2.5.1
+* Builds for UWP (HoloLens 2) instead of PC
+* Updated visualisation shaders to support single-passed instanced rendering
+* Included simple manipulation handling for axes objects (overrides prototype cloning behaviour)
+* Included Vicon tracking files and scripts for embodied axes from Jim Smiley
+* Included bluetooth serial connectivity for embodied axes from Jim Smiley
+
+Note that **these changes break almost all existing interactions and brushing capabilities**, including access to the min-max normaliser and range handles. All other visualisation functions which leverages the ImAxesRecogniser should still remain functional.
+>:warning: **END**
+
 ImAxes is an immersive data visualisation tool for multidimensional data exploration and analysis in virtual reality.
 [link to the original paper](https://www.researchgate.net/publication/318876157_ImAxes_Immersive_Axes_as_Embodied_Affordances_for_Interactive_Multivariate_Data_Visualisation)
 
@@ -85,7 +98,7 @@ Press the *Menu* button on the HTC vive controller (or you Mixed-realiy device) 
 You can change the color scheme:
   * bind a palette to a categorical dimension
   * bind a gradient color (change min/max colors) to a continuous variable
- 
+
 *[image menu]*
 
 You can change the visualisation style:
@@ -129,8 +142,8 @@ If you plan to use this software for publication, please cite the paper:
 
 ## Developers and contributors
 ImAxes is mainly designed and developped by [Maxime Cordeil](http://ialab.it.monash.edu/~maxc/) (Monash University) and Andrew Cunningham (University of South Australia).
-[Benjamin Lee](https://benjaminchlee.github.io/) is now a contributor. 
+[Benjamin Lee](https://benjaminchlee.github.io/) is now a contributor.
 
-Contributors: ImAxes an [Immersive Analytics](http://ialab.it.monash.edu/) collaborative research project with 
+Contributors: ImAxes an [Immersive Analytics](http://ialab.it.monash.edu/) collaborative research project with
   * Assoc. Prof [Tim Dwyer](http://ialab.it.monash.edu/~dwyer/), Prof. [Kim Marriott](http://users.monash.edu/~marriott/shadowfax/) (Monash University)
   * Prof. Bruce H. Thomas (University of South Australia).

@@ -15,8 +15,8 @@ public class ImAxesRecognizer : MonoBehaviour
     public float ADJACENCY_DISTANCE = 0.25f;
 
     int stopTest = 0;
-    
-    //New Staxes Scene Parsing 
+
+    //New Staxes Scene Parsing
 
     List<Axis> A = new List<Axis>();
 
@@ -44,7 +44,7 @@ public class ImAxesRecognizer : MonoBehaviour
 
     //RULES SP =====================
 
-    //RSP1:     
+    //RSP1:
     bool RSP1(Axis a, Axis b)
     {
         return (a.isPerependicular(b) &&
@@ -56,14 +56,14 @@ public class ImAxesRecognizer : MonoBehaviour
     bool RSP1(Axis a, Axis b, Axis c)
     {
         return
-            
+
            a.isPerependicular(b)
            && a.isPerependicular(c)
            && b.isPerependicular(c)
            &&
-            ((Vector3.Distance(b.MinPosition, a.MinPosition) < SP_DISTANCE && (Vector3.Distance(b.MinPosition, c.MinPosition) < SP_DISTANCE))         
+            ((Vector3.Distance(b.MinPosition, a.MinPosition) < SP_DISTANCE && (Vector3.Distance(b.MinPosition, c.MinPosition) < SP_DISTANCE))
             || ((Vector3.Distance(b.MinPosition, a.MinPosition) < SP_DISTANCE && (Vector3.Distance(b.MinPosition, c.MaxPosition) < SP_DISTANCE)))
-            || ((Vector3.Distance(b.MaxPosition, a.MinPosition) < SP_DISTANCE && (Vector3.Distance(b.MaxPosition, c.MaxPosition) < SP_DISTANCE)))           
+            || ((Vector3.Distance(b.MaxPosition, a.MinPosition) < SP_DISTANCE && (Vector3.Distance(b.MaxPosition, c.MaxPosition) < SP_DISTANCE)))
             || ((Vector3.Distance(b.MaxPosition, a.MinPosition) < SP_DISTANCE && (Vector3.Distance(b.MaxPosition, c.MinPosition) < SP_DISTANCE)))
             || ((Vector3.Distance(b.MinPosition, a.MaxPosition) < SP_DISTANCE && (Vector3.Distance(b.MinPosition, c.MinPosition) < SP_DISTANCE)))
             || ((Vector3.Distance(b.MinPosition, a.MaxPosition) < SP_DISTANCE && (Vector3.Distance(b.MinPosition, c.MaxPosition) < SP_DISTANCE)))
@@ -108,7 +108,7 @@ public class ImAxesRecognizer : MonoBehaviour
     {
         List<Axis> list = new List<Axis>();
 
-        //Step 1: find a 
+        //Step 1: find a
 
         return list;
     }
@@ -157,10 +157,10 @@ public class ImAxesRecognizer : MonoBehaviour
                 {
                     if (k == j || k == i || i == j)
                         continue;
-
+                    /* Temporary
                     if (A[i].isPrototype && A[j].isPrototype && A[k].isPrototype)
                         continue;
-
+                    */
                     if (RSP1(A[i], A[j], A[k]) && adjacency[i, j, k] == null)
                     {
                         //create a 3D SPLOM
@@ -216,11 +216,11 @@ public class ImAxesRecognizer : MonoBehaviour
                         if (v != null)
                         {
                             // >>>>>>>>>>> HERE WHEN A 2D SP BECOMES A 3D SP <<<<<<<<<<<<
-                            //Clean the memory lists                       
+                            //Clean the memory lists
                             SPLOM3D sp = this.SPLOMS3D.Find(x => x.BaseVisualization == v);
                             if (sp != null)
                             {
-                                this.SPLOMS3D.Remove(sp);                                
+                                this.SPLOMS3D.Remove(sp);
                                 //sp.showAllHistogramsOnClear();
                                 sp.ClearSplom(ref SP);
                                 Destroy(sp.gameObject);
@@ -244,18 +244,19 @@ public class ImAxesRecognizer : MonoBehaviour
         }
 
         // Pass 0:
-        // Stage 2: produce SPs of degree 2 
+        // Stage 2: produce SPs of degree 2
         // RULE: Degree 3 consumes lower degrees
         for (int i = 0; i < A.Count; i++)
         {
             for (int j = 0; j < A.Count; j++)
             {
+                /* Temporary
                 if (i == j)
                     continue;
 
                 if (A[i].isPrototype && A[j].isPrototype)
                     continue;
-
+                */
                 if ((RSP1(A[i], A[j])) &&
                     adjacency[i, j, i] == null &&
                     !usedAxisIn3DSP.Contains(A[i]) &&
@@ -290,13 +291,13 @@ public class ImAxesRecognizer : MonoBehaviour
 
                     SP.Add(vis);
                     //create a 2D SPLOM if only A[i] and A[j] do not belong to 3D SPLOM LIST
-                    //add it to 3D SPLOM LIST                    
+                    //add it to 3D SPLOM LIST
 
                 }
                 else if (usedAxisIn3DSP.Contains(A[i]) &&
                     usedAxisIn3DSP.Contains(A[j]) && adjacency[i, j, i] != null)
                 {
-                    
+
                     //destroy the visualisation
                     Visualization v = adjacency[i, j, i];
                     adjacency[i, j, i] = null;
@@ -304,7 +305,7 @@ public class ImAxesRecognizer : MonoBehaviour
                     if (v != null)
                     {
                        // >>>>>>>>>>> HERE WHEN A 2D SP BECOMES A 3D SP <<<<<<<<<<<<
-                        //Clean the memory lists                       
+                        //Clean the memory lists
                         SPLOM3D sp = SPLOMS3D.Find(x => x.BaseVisualization == v);
                         if (sp != null)
                         {
@@ -339,7 +340,7 @@ public class ImAxesRecognizer : MonoBehaviour
                         sp.ClearSplom(ref SP);
                         Destroy(sp.gameObject);
                     }
-                   
+
                     adjacency[i, j, i] = null;
 
                     if (v != null)
@@ -362,8 +363,8 @@ public class ImAxesRecognizer : MonoBehaviour
         // Stage 2: produce 1D Sps
         for (int i = 0; i < A.Count; i++)
         {
-            // if A[i] does not belong to any higher order visualisation, 
-            // enable histogram and 
+            // if A[i] does not belong to any higher order visualisation,
+            // enable histogram and
             if (!SP.Any(x => x.axes.Count == 1 && x.axes[0] == A[i])
                 && !usedAxisIn2DSP.Contains(A[i])
                 && !usedAxisIn3DSP.Contains(A[i]))
@@ -383,7 +384,7 @@ public class ImAxesRecognizer : MonoBehaviour
             // Pass 0:
             // Stage 4: produce Scatterplot 3D Matrices
             if ((SP[i].viewType == Visualization.ViewType.Scatterplot3D// SPLOM3Ds build on scatterplots 3D
-                || SP[i].viewType == Visualization.ViewType.Scatterplot2D)                                                                    // && SP[i].IsBaseSPLOM                               //  
+                || SP[i].viewType == Visualization.ViewType.Scatterplot2D)                                                                    // && SP[i].IsBaseSPLOM                               //
                 && !SPLOMS3D.Any(x => x.BaseVisualization == SP[i]) && !SP[i].IsSPLOMElement) //
 
             {
@@ -400,7 +401,7 @@ public class ImAxesRecognizer : MonoBehaviour
                 newSplom.initialiseBaseScatterplot(SP[i], x3D, y3D, z3D);
                 newSplom.VisualizationPrefab = visualizationPrefab;
                 SPLOMS3D.Add(newSplom);
-                
+
             }
 
         }
@@ -425,7 +426,7 @@ public class ImAxesRecognizer : MonoBehaviour
             Axis newXAxis = null;
             Axis newYAxis = null;
             Axis newZAxis = null;
-            
+
             foreach (var axis in A)
             {
                 if (x3D!=null && Vector3.Distance(x3D.MaxPosition, axis.MinPosition) < SP_DISTANCE / 4f && x3D.IsColinear(axis)
@@ -542,15 +543,15 @@ public class ImAxesRecognizer : MonoBehaviour
 
         //HACK: THIS IS A COMPLETE BANDAID TO FIX THE FLOATING VISUALIZATION BUG,
         //TODO: We should be trying to work out why the visualization bug is occuring in the first place.
-        
+
         for(var i = SP.Count - 1; i >= 0; i--)
         {
             if (SP[i] == null)
                 SP.RemoveAt(i);
         }
-        
+
         //TODO: END OF HACK
-        
+
 
         for (int i = 0; i < SP.Count; i++)
             for (int j = 0; j < SP.Count; j++)
@@ -572,11 +573,11 @@ public class ImAxesRecognizer : MonoBehaviour
 
                             LinkVisualisations(_name, SP[i], SP[j]);
                         }
-                     
+
                     }
                     else if (SP[i].viewType == Visualization.ViewType.Histogram && SP[j].viewType != Visualization.ViewType.Histogram)
                     {
-                         
+
                         if (SP[i].axes[0].transform.position != SP[j].transform.position
                             && Vector3.Distance(SP[i].axes[0].transform.position, SP[j].transform.position) < PCP_DISTANCE
                             && !linkedVisualisationDictionary.ContainsKey(_name) && !linkedVisualisationDictionary.ContainsKey(_nameReverse))
@@ -765,5 +766,5 @@ public class ImAxesRecognizer : MonoBehaviour
             }
         }
     }
-    
+
 }

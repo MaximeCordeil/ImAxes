@@ -4,10 +4,11 @@ using DG.Tweening;
 using System;
 using Staxes;
 using System.Linq;
+using System.Collections;
 
 // a visualization prefab will auto-configure which visuzalization to present depending on the number of attached axes and
 // orientation of those axes
-public class Visualization : MonoBehaviour, Grabbable, Brushable
+public class Visualization : MonoBehaviour
 {
     public struct ReferenceAxis
     {
@@ -69,6 +70,7 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
     bool isDetailOnDemand;
 
     bool isDirty;
+    public bool isClone;
 
     GameObject theSPLOMReference = null;
 
@@ -149,7 +151,7 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
     }
 
     void Start()
-    {   
+    {
         //add the tag
         tag = "Visualisation";
         string myName = "";
@@ -166,9 +168,43 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
         EventManager.StartListening(ApplicationConfiguration.OnColoredAttributeChanged, OnAttributeChanged);
         EventManager.StartListening(ApplicationConfiguration.OnLinkedAttributeChanged, OnAttributeChanged);
         EventManager.StartListening(ApplicationConfiguration.OnScatterplotAttributeChanged, OnAttributeChanged);
-        
+
         //ignore raycasts for brushing/details on demand
         GetComponent<SphereCollider>().gameObject.layer = 2;
+
+            StartCoroutine(delayedMiniClone());
+          //  GameObject clone = Instantiate(this.gameObject);
+           // Visualization cloneVis = clone.GetComponent<Visualization>();
+           // cloneVis.isClone = true;
+
+    }
+    IEnumerator delayedMiniClone()
+    {
+        yield return new WaitForSeconds(2); // Makes sure all the meshes are initialised etc.
+                                            // if (!isClone)
+                                            //{
+                                            //   GameObject clone = Instantiate(this.gameObject);
+                                            //  Visualization cloneVis = clone.GetComponent<Visualization>();
+                                            // cloneVis.isClone = true;
+                                            //}
+                                            //else
+                                            //{
+                                            // Create copy of mesh and add to a static list of meshes.
+                                            // then destroy this entire object. Or could just create mesh Now!
+                                            // }
+        MeshFilter meshFilter = GetComponentInChildren<MeshFilter>();
+        Mesh clonedMesh = new Mesh();
+        Mesh originalMesh = meshFilter.sharedMesh;
+        clonedMesh.name = "clone" + name;
+        clonedMesh.vertices = originalMesh.vertices;
+        clonedMesh.triangles = originalMesh.triangles;
+        clonedMesh.normals = originalMesh.normals;
+        clonedMesh.uv = originalMesh.uv;
+        MiniVis.meshes.Add(clonedMesh);
+
+
+
+
     }
 
     void OnDestroy()
@@ -176,7 +212,7 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
         EventManager.StopListening(ApplicationConfiguration.OnSlideChangePointSize, OnChangePointSize);
         EventManager.StopListening(ApplicationConfiguration.OnColoredAttributeChanged, OnAttributeChanged);
         EventManager.StopListening(ApplicationConfiguration.OnLinkedAttributeChanged, OnAttributeChanged);
-        EventManager.StopListening(ApplicationConfiguration.OnScatterplotAttributeChanged, OnAttributeChanged);    
+        EventManager.StopListening(ApplicationConfiguration.OnScatterplotAttributeChanged, OnAttributeChanged);
 
         foreach (Axis axis in axes)
         {
@@ -344,7 +380,7 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
 
         if (axes.Count == 1)
         {
-            Tuple<GameObject, Vector3[]> histT = VisualisationFactory.Instance.CreateBarHistogramView(SceneManager.Instance.dataObject,
+            Staxes.Tuple<GameObject, Vector3[]> histT = VisualisationFactory.Instance.CreateBarHistogramView(SceneManager.Instance.dataObject,
                 axes[0].axisId,
                 (int)HISTOGRAM_BIN_SIZE,
                 false,
@@ -370,7 +406,7 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
             referenceAxis.horizontal = axisH;
             referenceAxis.vertical = axisV;
 
-            Tuple<GameObject, View> parallelT = VisualisationFactory.Instance.CreateSingle2DView(SceneManager.Instance.dataObject, axes[0].axisId, axes[1].axisId, -1, VisualisationAttributes.Instance.LinkedAttribute,
+            Staxes.Tuple<GameObject, View> parallelT = VisualisationFactory.Instance.CreateSingle2DView(SceneManager.Instance.dataObject, axes[0].axisId, axes[1].axisId, -1, VisualisationAttributes.Instance.LinkedAttribute,
                 MeshTopology.Lines, VisualisationFactory.Instance.linesGraphMaterial, true);
             GameObject parallel = parallelT.Item1;
             parallel.transform.SetParent(parallelCoordsObject.transform, false);
@@ -379,12 +415,12 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
             parallelT.Item1.layer = LayerMask.NameToLayer("View");
             parallelT.Item1.tag = "View";
             parallelT.Item1.name += " parallel";
-            parallelT.Item2.setColors(VisualisationAttributes.Instance.colors, true);            
+            parallelT.Item2.setColors(VisualisationAttributes.Instance.colors, true);
             DetailsOnDemandComponent = parallelT.Item1.AddComponent<DetailsOnDemand>();
             DetailsOnDemandComponent.VisualizationReference = this;
             parallelT.Item1.GetComponentInChildren<DetailsOnDemand>().setTransformParent(transform);
 
-            Tuple<GameObject, View> scatter2DT = VisualisationFactory.Instance.CreateSingle2DView(SceneManager.Instance.dataObject, axisH.axisId, axisV.axisId, -1, VisualisationAttributes.Instance.LinkedAttribute, MeshTopology.Points,
+            Staxes.Tuple<GameObject, View> scatter2DT = VisualisationFactory.Instance.CreateSingle2DView(SceneManager.Instance.dataObject, axisH.axisId, axisV.axisId, -1, VisualisationAttributes.Instance.LinkedAttribute, MeshTopology.Points,
                 VisualisationAttributes.Instance.LinkedAttribute < 0 ? VisualisationFactory.Instance.pointCloudMaterial : VisualisationFactory.Instance.connectedPointLineMaterial);
             GameObject scatter2 = scatter2DT.Item1;
 
@@ -438,7 +474,7 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
             if (horizontal != null && axisV != null && depth != null)
             {
 
-                Tuple<GameObject, View> scatter3DT = VisualisationFactory.Instance.CreateSingle2DView(SceneManager.Instance.dataObject,
+                Staxes.Tuple<GameObject, View> scatter3DT = VisualisationFactory.Instance.CreateSingle2DView(SceneManager.Instance.dataObject,
                     referenceAxis.horizontal.axisId, referenceAxis.vertical.axisId, referenceAxis.depth.axisId, VisualisationAttributes.Instance.LinkedAttribute, MeshTopology.Points,
                     VisualisationAttributes.Instance.LinkedAttribute < 0 ? VisualisationFactory.Instance.pointCloudMaterial : VisualisationFactory.Instance.connectedPointLineMaterial, false);
 
@@ -561,6 +597,10 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
 
     void LateUpdate()
     {
+        if (this.transform.position.y <0f)
+        {
+            Destroy(this.gameObject);
+        }
         UpdateViewType();
 
         switch (viewType)
@@ -1277,86 +1317,6 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
         UpdateVisualizations();
     }
 
-    public void OnBrush(WandController controller, Vector3 hitPoint, bool is3D)
-    {
-        isBrushing = true;
-        // swapToBrushing();
-        BrushingAndLinking.isBrushing = isBrushing;
-
-        BrushingAndLinking.brushPosition = hitPoint;
-    }
-
-    public void OnBrushRelease(WandController controller)
-    {
-        isBrushing = false;
-        BrushingAndLinking.isBrushing = isBrushing;
-
-        //  swapToNotBrushing();
-    }
-
-    public bool OnGrab(WandController controller)
-    {
-        if (theSPLOMReference == null)
-        {
-            foreach (var axis in axes)
-            {
-                controller.PropergateOnGrab(axis.gameObject);
-            }
-        }
-        else
-        {
-            controller.PropergateOnGrab(theSPLOMReference.gameObject);
-        }
-
-        return false;
-    }
-
-    public void OnRelease(WandController controller)
-    {
-        if (OnStaxesAction != null)
-            fireOnStaxesEvent("RELEASED");
-        isDirty = true;
-    }
-
-    public void OnDrag(WandController controller)
-    { }
-
-    void Grabbable.OnEnter(WandController controller)
-    {
-        //   sizePanel.SetActive(true);
-    }
-
-    void Grabbable.OnExit(WandController controller)
-    {
-        //     sizePanel.SetActive(false);
-    }
-
-    public void OnDetailOnDemand(WandController controller, Vector3 worldPosition, Vector3 localPosition, bool is3D)
-    {
-        if (worldPosition != null)
-        {
-            isDetailOnDemand = true;
-            if (DetailsOnDemandComponent != null)
-            {
-                DetailsOnDemandComponent.setPointerPosition(worldPosition);
-                DetailsOnDemandComponent.setLocalPointerPosition(localPosition);
-                if (is3D) DetailsOnDemandComponent.OnDetailOnDemand3D(); else DetailsOnDemandComponent.OnDetailOnDemand2D();
-            }
-            detailOnDemandPosition = worldPosition;// sphereWandPostion;
-        }
-        else
-        {
-            isDetailOnDemand = false;
-            DetailsOnDemandComponent.OnDetailOnDemandEnd();
-
-        }
-    }
-
-    public void OnDetailOnDemandRelease(WandController controller)
-    {
-        isDetailOnDemand = false;
-    }
-
     string[] memory = new string[5];
 
     void fireOnStaxesEvent(string eventType)
@@ -1376,7 +1336,7 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
                     UtilMath.printPositionCSV(transform.position,4),
                     UtilMath.printRotationCSV(transform.rotation,4)
                  };
-        //if changing visualisation, declare that we have deleted the previous 
+        //if changing visualisation, declare that we have deleted the previous
         if (memory[1] == actions[1] && memory[2] == actions[2])
         {
             memory[2] = "DELETED";
@@ -1418,9 +1378,5 @@ public class Visualization : MonoBehaviour, Grabbable, Brushable
     public int GetPriority()
     {
         return 20;
-    }
-
-    public void OnDetailOnDemand(WandController controller, Vector3 position, Vector3 localPosition)
-    {
     }
 }

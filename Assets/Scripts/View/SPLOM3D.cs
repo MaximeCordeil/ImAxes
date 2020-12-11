@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Linq;
 using Staxes;
 
-public class SPLOM3D : MonoBehaviour, Grabbable
+public class SPLOM3D : MonoBehaviour
 {
     Dictionary<Tuple<int, int, int>, List<GameObject>> ghostAxes = new Dictionary<Tuple<int, int, int>, List<GameObject>>();
 
@@ -212,7 +212,7 @@ public class SPLOM3D : MonoBehaviour, Grabbable
         XAxes.Add(x);
         previousX = x;
         Update3DSPLOM(ref SP_ImAxes);
-        //hide the histogram on the Axis                
+        //hide the histogram on the Axis
         Visualization v = SP_ImAxes.Single(vis => vis.axes.Count == 1 && vis.axes[0] == x);
         v.ShowHistogram(false);
     }
@@ -222,7 +222,7 @@ public class SPLOM3D : MonoBehaviour, Grabbable
         YAxes.Add(y);
         previousY = y;
         Update3DSPLOM(ref SP_ImAxes);
-        //hide the histogram on the Axis                
+        //hide the histogram on the Axis
         Visualization v = SP_ImAxes.Single(vis => vis.axes.Count == 1 && vis.axes[0] == y);
         v.ShowHistogram(false);
     }
@@ -233,7 +233,7 @@ public class SPLOM3D : MonoBehaviour, Grabbable
         ZAxes.Add(z);
         previousZ = z;
         Update3DSPLOM(ref SP_ImAxes);
-        //hide the histogram on the Axis                
+        //hide the histogram on the Axis
         Visualization v = SP_ImAxes.Single(vis => vis.axes.Count == 1 && vis.axes[0] == z);
         v.ShowHistogram(false);
     }
@@ -247,9 +247,9 @@ public class SPLOM3D : MonoBehaviour, Grabbable
 
         if (yidx > 0)
         {
-            Tuple<int, int, int> indexInsplom = new Tuple<int, int, int>(0, yidx, 0);            
+            Tuple<int, int, int> indexInsplom = new Tuple<int, int, int>(0, yidx, 0);
             var result = ghostAxes[indexInsplom];
-            axis.AnimateTo(result[1].transform.position, result[1].transform.rotation);            
+            axis.AnimateTo(result[1].transform.position, result[1].transform.rotation);
         }
         else if (xidx > 0)
         {
@@ -410,37 +410,4 @@ public class SPLOM3D : MonoBehaviour, Grabbable
     {
         return 0;
     }
-
-    public bool OnGrab(WandController controller)
-    {
-        foreach (var item in XAxes)
-        {
-            controller.PropergateOnGrab(item.gameObject);
-        }
-        foreach (var item in YAxes)
-        {
-            controller.PropergateOnGrab(item.gameObject);
-        }
-        foreach (var item in ZAxes)
-        {
-            controller.PropergateOnGrab(item.gameObject);
-        }
-        foreach (var item in ghostAxes)
-        {
-            item.Value.ForEach(x => { if (x != null) controller.PropergateOnGrab(x.gameObject); });
-        }
-        return false;
-    }
-
-    public void OnRelease(WandController controller)
-    { }
-
-    public void OnDrag(WandController controller)
-    { }
-
-    public void OnEnter(WandController controller)
-    { }
-
-    public void OnExit(WandController controller)
-    { }
 }

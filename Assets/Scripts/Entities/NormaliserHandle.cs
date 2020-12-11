@@ -5,14 +5,14 @@ using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
 
-public class NormaliserHandle : MonoBehaviour, Grabbable {
+public class NormaliserHandle : MonoBehaviour {
 
     [SerializeField]
     UnityEvent OnEntered;
 
     [SerializeField]
     UnityEvent OnExited;
-    
+
     Axis parentAxis;
 
     Vector3 initialScale = Vector3.one;
@@ -31,46 +31,7 @@ public class NormaliserHandle : MonoBehaviour, Grabbable {
         initX = transform.position.x;
 
     }
-	
-	// Update is called once per frame
-	void Update () { }
 
-    public void OnEnter(WandController controller)
-    {
-        OnEntered.Invoke();
-        
-        transform.localScale = rescaled;
-    }
-
-    public void OnExit(WandController controller)
-    {
-        OnExited.Invoke();
-        transform.localScale = initialScale;
-
-    }
-
-    public bool OnGrab(WandController controller)
-    {
-        return true;
-    }
-
-    public void OnRelease(WandController controller)
-    {
-    }
-
-    public void OnDrag(WandController controller)
-    {
-        float offset = parentAxis.CalculateLinearMapping(controller.transform);
-        Vector3 newP = Vector3.Lerp(parentAxis.MinPosition, parentAxis.MaxPosition, offset);
-        transform.position = newP;
-        parentAxis.isDirty = true;
-
-    }
-
-    public int GetPriority()
-    {
-        return 15;
-    }
 
     public void ProximityEnter()
     {

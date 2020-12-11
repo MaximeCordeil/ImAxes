@@ -141,14 +141,30 @@ public class ImAxesRecognizer : MonoBehaviour
         // ======================== PASS0: PARSING SPs ==================================
         // ==============================================================================
 
+        for (int i =0; i< A.Count; i++)
+        {
+            if (A[i] == null)
+            {
+                A.Remove(A[i]);
+            }
+        }
+        
         foreach (var axis in A)
         {
             if(axis!=null)
             axis.UpdateCoords();
         }
 
+        foreach(var axis in A)
+        {
+            if (axis == null)
+            {
+                A.Remove(axis);
+            }
+        }
         // Pass 0: Producing SPs
         // Stage 1: produce SPs of degree 3
+
         for (int i = 0; i < A.Count; i++)
         {
             for (int j = 0; j < A.Count; j++)
@@ -531,8 +547,15 @@ public class ImAxesRecognizer : MonoBehaviour
         // ======================== PASS1: PARSING PCPs =================================
         // ==============================================================================
         //Pass1: enable close linked visualisations
-
+        for (int i = 0; i< SP.Count; i++)
+        {
+            if (SP[i] == null) /// added to allow visualisation game object to be destroyed externally
+            {
+                SP.Remove(SP[i]);
+            }
+        }
         for (int i = 0; i < SP.Count; i++)
+
             for (int j = 0; j < SP.Count; j++)
             {
                 if (i != j)
@@ -550,13 +573,7 @@ public class ImAxesRecognizer : MonoBehaviour
                             SP[i].ShowHistogram(false);
                             SP[j].ShowHistogram(false);
 
-                            GameObject lvGO = new GameObject();
-                            lvGO.name = _name;
-                            LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
-                            lv.V1 = SP[i];
-                            lv.V2 = SP[j];
-
-                            linkedVisualisationDictionary.Add(_name, lvGO);
+                            LinkVisualisations(_name, SP[i], SP[j]);
                         }
                      
                     }
@@ -571,13 +588,7 @@ public class ImAxesRecognizer : MonoBehaviour
                             if (SP[i].viewType == Visualization.ViewType.Histogram) SP[i].ShowHistogram(false);
                             if (SP[j].viewType == Visualization.ViewType.Histogram) SP[j].ShowHistogram(false);
 
-                            GameObject lvGO = new GameObject();
-                            lvGO.name = _name;
-                            LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
-                            lv.V1 = SP[i];
-                            lv.V2 = SP[j];
-
-                            linkedVisualisationDictionary.Add(_name, lvGO);
+                            LinkVisualisations(_name, SP[i], SP[j]);
                         }
                     }
                     else
@@ -589,13 +600,7 @@ public class ImAxesRecognizer : MonoBehaviour
                             if (SP[i].viewType == Visualization.ViewType.Histogram) SP[i].ShowHistogram(false);
                             if (SP[j].viewType == Visualization.ViewType.Histogram) SP[j].ShowHistogram(false);
 
-                            GameObject lvGO = new GameObject();
-                            lvGO.name = _name;
-                            LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
-                            lv.V1 = SP[i];
-                            lv.V2 = SP[j];
-
-                            linkedVisualisationDictionary.Add(_name, lvGO);
+                            LinkVisualisations(_name, SP[i], SP[j]);
                         }
                     }
                 }
@@ -617,10 +622,7 @@ public class ImAxesRecognizer : MonoBehaviour
             Visualization v1 = item.GetComponent<LinkedVisualisations>().V1;
             Visualization v2 = item.GetComponent<LinkedVisualisations>().V2;
 
-            if (v1 == null
-              || v2 == null ||
-                Vector3.Distance(item.GetComponent<LinkedVisualisations>().V1.transform.position,
-                item.GetComponent<LinkedVisualisations>().V2.transform.position) > PCP_DISTANCE + 0.05f)
+            if (v1 == null || v2 == null || Vector3.Distance(v1.transform.position, v2.transform.position) > PCP_DISTANCE + 0.05f)
             {
                 toDestroy.Add(item.name);
             }
@@ -668,6 +670,53 @@ public class ImAxesRecognizer : MonoBehaviour
                                 + "SP3: " + SP.Count(x => x.viewType == Visualization.ViewType.Scatterplot3D) + "\n"
 //                                + "SP2_SPLOM: " + SPLOMS2D.Count + "\n"
                                 + "SP3_SPLOM: " + SPLOMS3D.Count + "\n";
+    }
+
+    void LinkVisualisations(string _name, Visualization v1, Visualization v2)
+    {
+        GameObject lvGO = new GameObject();
+        lvGO.name = _name;
+        LinkedVisualisations lv = lvGO.AddComponent<LinkedVisualisations>();
+
+        var sc = lvGO.AddComponent<SphereCollider>();
+        sc.radius = 0.06f;
+        sc.isTrigger = true;
+
+        lv.V1 = v1;
+        lv.V2 = v2;
+        linkedVisualisationDictionary.Add(_name, lvGO);
+    }
+
+    public List<Visualization> WalkLinkedVisualisations(LinkedVisualisations src)
+    {
+        var toProcess = new Stack<LinkedVisualisations>();
+        toProcess.Push(src);
+
+        var connectedVis = new List<Visualization>();
+
+        var processed = new List<LinkedVisualisations>();
+
+        while (toProcess.Count > 0)
+        {
+            var link = toProcess.Pop();
+            processed.Add(link);
+
+            connectedVis.Add(link.V1);
+            connectedVis.Add(link.V2);
+
+            foreach (var srcvis in connectedVis)
+            {
+                var connected = linkedVisualisationDictionary.Values.Select(x => x.GetComponent<LinkedVisualisations>())
+                                                                    .Where(x => !processed.Contains(x))
+                                                                    .Where(x => x.V1 == srcvis || x.V2 == srcvis);
+
+                foreach (var v in connected)
+                {
+                    toProcess.Push(v);
+                }
+            }
+        }
+        return connectedVis.Distinct().ToList();
     }
 
     List<string> toDestroy = new List<string>();

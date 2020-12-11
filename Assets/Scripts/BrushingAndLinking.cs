@@ -270,7 +270,7 @@ public class BrushingAndLinking : MonoBehaviour, UIComponent
         return brushedIndices;
     }
 
-    public static Tuple<Vector3, Vector3> DetailOnDemandPCP(Vector3[] data, Vector3 point, float distance, Vector3 bl, Vector3 br, Vector3 tl, Transform parentTransform)
+    public static Staxes.Tuple<Vector3, Vector3> DetailOnDemandPCP(Vector3[] data, Vector3 point, float distance, Vector3 bl, Vector3 br, Vector3 tl, Transform parentTransform)
     {
         float[] distances = new float[data.Length];
 
@@ -281,9 +281,9 @@ public class BrushingAndLinking : MonoBehaviour, UIComponent
         float minDist = distances.Min();
         int index = Array.IndexOf(distances, minDist);
         if (index % 2 == 0)
-            return new Tuple<Vector3, Vector3>(data[index], data[index + 1]);
+            return new Staxes.Tuple<Vector3, Vector3>(data[index], data[index + 1]);
         else
-            return new Tuple<Vector3, Vector3>(data[index], data[index - 1]);
+            return new Staxes.Tuple<Vector3, Vector3>(data[index], data[index - 1]);
     }
 
     public static Vector3 DetailOnDemandScatterplots(Vector3[] data, Vector3 point, float distance,

@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using DG.Tweening;
 
 
-public class AxisRangeWidget : MonoBehaviour, Grabbable {
+public class AxisRangeWidget : MonoBehaviour {
 
     [SerializeField]
     float axisOffset = 2.0f;
@@ -25,7 +25,7 @@ public class AxisRangeWidget : MonoBehaviour, Grabbable {
     [Serializable]
     public class OnValueChanged : UnityEvent<float> { };
     public OnValueChanged onValueChanged;
-        
+
 
     // Use this for initialization
     void Start () {
@@ -35,42 +35,7 @@ public class AxisRangeWidget : MonoBehaviour, Grabbable {
         rescaled.x *= 2f;
         rescaled.z *= 2f;
     }
-	
-	// Update is called once per frame
-	void Update () { }
 
-    public void OnEnter(WandController controller)
-    {
-        OnEntered.Invoke();
-    }
-
-    public void OnExit(WandController controller)
-    {
-        OnExited.Invoke();
-    }
-
-    public bool OnGrab(WandController controller)
-    {
-        return true;
-    }
-
-    public void OnRelease(WandController controller)
-    { }
-
-    public void OnDrag(WandController controller)
-    {
-
-
-        float offset = parentAxis.CalculateLinearMapping(controller.transform);
-        Vector3 axisOffset = new Vector3(transform.localPosition.x, 0, 0);
-        transform.localPosition = Vector3.Lerp(new Vector3(transform.localPosition.x, -0.5f, 0),
-                                               new Vector3(transform.localPosition.x, 0.5f, 0), 
-                                          offset);
-        parentAxis.isDirty = true;
-
-        onValueChanged.Invoke(transform.localPosition.y);
-    }
-	
     public int GetPriority()
     {
         return 10;
@@ -80,13 +45,13 @@ public class AxisRangeWidget : MonoBehaviour, Grabbable {
     {
         transform.DOKill(true);
         transform.DOLocalMoveX(-axisOffset, 0.35f).SetEase(Ease.OutBack);
-        transform.DOScale(rescaled, 0.35f).SetEase(Ease.OutBack);
+      //  transform.DOScale(rescaled, 0.35f).SetEase(Ease.OutBack);  killed scale for wireless axisuse
     }
 
     public void ProximityExit()
     {
         transform.DOKill(true);
         transform.DOLocalMoveX(0, 0.25f);
-        transform.DOScale(initialScale, 0.25f);
+       // transform.DOScale(initialScale, 0.25f);
     }
 }

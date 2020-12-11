@@ -9,7 +9,7 @@ using UnityEngine.Events;
 using System.Linq;
 using System.IO;
 
-public class Axis : MonoBehaviour, Grabbable {
+public class Axis : MonoBehaviour {
 
     [SerializeField] TextMeshPro label;
     [SerializeField] TextMeshPro minimumValueDimensionLabel;
@@ -19,7 +19,7 @@ public class Axis : MonoBehaviour, Grabbable {
 
     public bool isPrototype;
 
-    //temporary hack 
+    //temporary hack
 
     Vector3 originPosition;
     Quaternion originRotation;
@@ -38,14 +38,21 @@ public class Axis : MonoBehaviour, Grabbable {
     [SerializeField] UnityEvent OnExited;
 
     public HashSet<Axis> ConnectedAxis = new HashSet<Axis>();
-
+    public static Quaternion AxisRot = new Quaternion();
     public float MinFilter;
+    public float StartMinFilter;
     public float MaxFilter;
+    public float StartMaxFilter;
 
     public float MinNormaliser;
     public float MaxNormaliser;
+    public float StarMinNorm;
+    public float StarMaxNorm;
+
 
     public bool isDirty;
+    public bool isClone;
+    public bool grabbed;
 
     public bool isInSplom;
 
@@ -59,24 +66,37 @@ public class Axis : MonoBehaviour, Grabbable {
     public NormalizeEvent OnNormalized = new NormalizeEvent();
 
     //ticker and file path (etc) for logging activity
-   
-    SteamVR_TrackedObject trackedObject;
+
+    //SteamVR_TrackedObject trackedObject;
     List<Vector3> tracking = new List<Vector3>();
-    
+
     Vector2 AttributeRange;
 
     float ticksScaleFactor = 1.0f;
 
     // ghost properties
     Axis ghostSourceAxis = null;
+    public static Axis CurrentAxis;
+    public static List<Axis> AxisList = new List<Axis>();
 
+    public void HideHandles()
+    {
+
+        minFilterObject.localScale = Vector3.zero;
+        maxFilterObject.localScale = Vector3.zero;
+        minNormaliserObject.localScale = Vector3.zero;
+        maxNormaliserObject.localScale = Vector3.zero;
+
+
+    }
 
     public void Init(DataBinding.DataObject srcData, int idx, bool isPrototype = false)
     {
+        print("INIT CALLED");
         SourceIndex = idx;
         axisId = idx;
-        name = "axis " + srcData.indexToDimension(idx);
-
+        name = srcData.indexToDimension(idx);// changed name here js, removed axis
+        tag = "axis";
 
         AttributeRange = srcData.DimensionsRange[axisId];
         label.text = srcData.Identifiers[idx];
@@ -86,16 +106,23 @@ public class Axis : MonoBehaviour, Grabbable {
 
         CalculateTicksScale(srcData);
         UpdateTicks();
+        AxisList.Add(this);
+    }
+    public Vector3 ReportPosition()
+    {
+        return minFilterObject.transform.position;
     }
 
     void UpdateRangeText()
     {
         string type = SceneManager.Instance.dataObject.TypeDimensionDictionary1[SourceIndex];
 
+
         if (type == "float")
         {
             minimumValueDimensionLabel.text = Mathf.Lerp(AttributeRange.x, AttributeRange.y, MinNormaliser + 0.5f).ToString("0.000");
             maximumValueDimensionLabel.text = Mathf.Lerp(AttributeRange.x, AttributeRange.y, MaxNormaliser + 0.5f).ToString("0.000");
+              //  print (Mathf.Lerp(AttributeRange.x, AttributeRange.y, MaxNormaliser + 0.5f).ToString("0.000"));
         }
 
         else if (type == "string")
@@ -171,11 +198,11 @@ public class Axis : MonoBehaviour, Grabbable {
     {
 
         //all colliders from this object should ignore raycast
-        Collider[] colliders = GetComponentsInChildren<Collider>();
-        foreach (var item in colliders)
-        {
-            item.gameObject.layer = 2;
-        }       
+        // Collider[] colliders = GetComponentsInChildren<Collider>();
+        // foreach (var item in colliders)
+        // {
+        //     item.gameObject.layer = 2;
+        // }
 
     }
 
@@ -187,33 +214,23 @@ public class Axis : MonoBehaviour, Grabbable {
             ghostSourceAxis.OnNormalized.RemoveListener(Ghost_OnNormalized);
         }
     }
-
-    public void Update()
+    public void CloneAll()
     {
-        if (isPrototype)
-        {
-            if (Vector3.Distance(originPosition, transform.position) > 0.25f)
-            {
-                isPrototype = false;
-                GameObject clone = Clone();
-                clone.GetComponent<Axis>().OnExited.Invoke();
-                clone.GetComponent<Axis>().ReturnToOrigin();
+        isPrototype = false;
+        GameObject clone = Clone();
+        clone.GetComponent<Axis>().OnExited.Invoke();
+        clone.GetComponent<Axis>().ReturnToOrigin();
 
-                SceneManager.Instance.AddAxis(clone.GetComponent<Axis>());
-                
-                foreach (var obj in GameObject.FindObjectsOfType<WandController>())
-                {
-                    if (obj.IsDragging())
-                        obj.Shake();
-                }
-            }
-        }
-        
+        SceneManager.Instance.AddAxis(clone.GetComponent<Axis>());
     }
 
     public void LateUpdate()
     {
         isDirty = false;
+        if (this.transform.position.y < 0f)
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     public void SetMinFilter(float val)
@@ -246,16 +263,28 @@ public class Axis : MonoBehaviour, Grabbable {
 
     public GameObject Clone()
     {
+
+       // AxisList.Add(this);
+
         GameObject clone = Instantiate(gameObject, transform.position, transform.rotation, null);
         Axis axis = clone.GetComponent<Axis>();
         axis.InitOrigin(originPosition, originRotation);
+        axis.AttributeRange = AttributeRange;
         axis.ticksRenderer.material = Instantiate(ticksRenderer.material) as Material;
+        isPrototype = false;
+       // GameObject clone = Clone();
+        clone.GetComponent<Axis>().OnExited.Invoke();
+      //  clone.GetComponent<Axis>().ReturnToOrigin();
+
+        SceneManager.Instance.AddAxis(clone.GetComponent<Axis>());
 
         return clone;
     }
 
     public GameObject Dup(GameObject go, Vector3 tp, Quaternion tr)
     {
+        print("DupCalled");
+        AxisList.Add(this);
         GameObject clone = Instantiate(go, tp, tr, null);
         Axis axis = clone.GetComponent<Axis>();
         axis.InitOrigin(originPosition, originRotation);
@@ -319,7 +348,9 @@ public class Axis : MonoBehaviour, Grabbable {
 
     public Vector3 Up
     {
+
         get { return transform.TransformDirection(Vector3.up); }
+
     }
 
     Vector3 _maxPos;
@@ -358,136 +389,6 @@ public class Axis : MonoBehaviour, Grabbable {
 
     #endregion
 
-    int Grabbable.GetPriority()
-    {
-        return 5;
-    }
-
-    public bool OnGrab(WandController controller)
-    {
-        if (!isTweening)
-        {
-            transform.parent = controller.transform;
-            transform.DOKill();
-        }
-        GetComponent<Rigidbody>().isKinematic = true;
-        isDirty = true;
-        return true;
-    }
-
-    public void OnRelease(WandController controller)
-    {
-        transform.parent = null;
-
-        if (!isPrototype)
-        {
-            // destroy the axis
-            if (controller.Velocity.magnitude > 0.2f)
-            {
-                Rigidbody body = GetComponent<Rigidbody>();
-                body.isKinematic = false;
-                body.useGravity = true;
-                body.AddForce(controller.Velocity * -1000);
-                gameObject.layer = LayerMask.NameToLayer("TransparentFX");
-
-                transform.DOScale(0.0f, 0.5f).SetEase(Ease.InBack);
-
-                return;
-            }
-        }
-        else
-        {
-            // return the axis to its position
-            ReturnToOrigin();
-        }
-
-        List<Visualization> lv = correspondingVisualizations();
-
-        foreach (var visu in lv)
-        {
-            if (visu.viewType == Visualization.ViewType.Scatterplot2D)
-            {
-                var haxis = visu.ReferenceAxis1.horizontal;
-                var vaxis = visu.ReferenceAxis1.vertical;
-
-                var vu = vaxis.Up;
-                var hu = haxis.Up;
-
-                Vector3.OrthoNormalize(ref vu, ref hu);
-
-                var q1 = Quaternion.LookRotation(-Vector3.Cross(vu, hu), vu);
-                var q2 = Quaternion.LookRotation(Vector3.Cross(vu, hu), hu);
-
-                // find out which direction the horizontal is facing
-                var urvec = Vector3.Cross(-Vector3.Cross(vu, hu), vu);
-                float d = Vector3.Dot(urvec, (haxis.transform.position - vaxis.transform.position));
-
-                // determine the position of the horizontal axis
-                Vector3 hpos = vaxis.transform.position +
-                    -vu * vaxis.transform.localScale.y * 0.5f +
-                    -Mathf.Sign(d) * hu * haxis.transform.localScale.y * 0.5f;
-
-                vaxis.AnimateTo(vaxis.transform.position, q1);
-                haxis.AnimateTo(hpos, q2);
-            }
-            else if (visu.viewType == Visualization.ViewType.Scatterplot3D)
-            {
-                if (visu != null && visu.ReferenceAxis1.vertical != null && visu.ReferenceAxis1.horizontal != null && visu.ReferenceAxis1.depth != null)
-                {
-                    var haxis = visu.ReferenceAxis1.horizontal;
-                    var vaxis = visu.ReferenceAxis1.vertical;
-                    var daxis = visu.ReferenceAxis1.depth;
-
-                    var vu = vaxis.Up;
-                    var hu = haxis.Up;
-                    var du = daxis.Up;
-
-                    Vector3.OrthoNormalize(ref vu, ref hu, ref du);
-
-                    var q1 = Quaternion.LookRotation(-du, vu);
-                    var q2 = Quaternion.LookRotation(du, hu);
-                    var q3 = Quaternion.LookRotation(-hu, du);
-
-                    Vector3 hpos = vaxis.transform.position +
-                        -vu * vaxis.transform.localScale.y * 0.5f +
-                        hu * haxis.transform.localScale.y * 0.5f;
-
-                    Vector3 dpos = vaxis.transform.position +
-                        -vu * vaxis.transform.localScale.y * 0.5f +
-                        du * daxis.transform.localScale.y * 0.5f;
-
-                    vaxis.AnimateTo(vaxis.transform.position, q1);
-                    haxis.AnimateTo(hpos, q2);
-                    daxis.AnimateTo(dpos, q3);                    
-                }
-            }
-        } // end for each 
-
-        // align this axis correctly to the SPLOM
-        foreach (SPLOM3D splom in CorrespondingSPLOMS())
-        {
-            splom.AlignAxisToSplom(this);
-        }
-
-        GetComponent<Rigidbody>().isKinematic = false;
-        isDirty = false;
-    }
-
-    public void OnDrag(WandController controller)
-    {
-        isDirty = true;
-    }
-
-    public void OnEnter(WandController controller)
-    {
-        OnEntered.Invoke();
-    }
-
-    public void OnExit(WandController controller)
-    {
-        OnExited.Invoke();
-    }
-
     void ReturnToOrigin()
     {
         Sequence seq = DOTween.Sequence();
@@ -523,7 +424,7 @@ public class Axis : MonoBehaviour, Grabbable {
 
     public void OnApplicationQuit()
     {
-        
+
     }
 
     public void Ghost(Axis sourceAxis)
@@ -558,7 +459,7 @@ public class Axis : MonoBehaviour, Grabbable {
     public void AnimateTo(Vector3 pos, Quaternion rot)
     {
         transform.DORotateQuaternion(rot, 0.4f).SetEase(Ease.OutBack);
-        transform.DOMove(pos, 0.4f).SetEase(Ease.OutBack);        
+        transform.DOMove(pos, 0.4f).SetEase(Ease.OutBack);
     }
 
 }

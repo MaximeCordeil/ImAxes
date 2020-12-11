@@ -10,7 +10,7 @@ public interface UIComponent
     void OnComponentValueChange(float value);
 }
 
-public class Slider : MonoBehaviour, Grabbable
+public class Slider : MonoBehaviour
 {
 
     public GameObject parentSlider;
@@ -38,50 +38,11 @@ public class Slider : MonoBehaviour, Grabbable
 
     // Update is called once per frame
     void Update () {
-		
+
 	}
 
     public int GetPriority()
     {
         return 0;
-    }
-
-    // Grabbable interface
-
-    public void OnDrag(WandController controller)
-    {
-        // float offset = CalculateLinearMapping(controller.transform, MaxPositionC, MinPositionC);
-
-        Vector3 previousP = transform.position;
-        Vector3 p = controller.transform.position;
-        if (p.x < MinPositionC) p.x = MinPositionC;
-        if (p.x > MaxPositionC) p.x = MaxPositionC;
-
-        p.y = previousP.y;
-        p.z = previousP.z;
-
-        transform.position = p;
-        float normalisedValue = p.x / (MaxPositionC - MinPositionC) - 0.5f;
-        label.text = textLabel + " " + normalisedValue;
-        //OnValueChange(normalisedValue);
-
-        EventManager.TriggerEvent(eventName, normalisedValue);
-    }
-
-    public bool OnGrab(WandController controller)
-    {
-        return true;
-    }
-
-    public void OnRelease(WandController controller)
-    {
-    }
-
-    public void OnEnter(WandController controller)
-    {
-    }
-
-    public void OnExit(WandController controller)
-    {
     }
 }

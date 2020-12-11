@@ -15,6 +15,10 @@ TagManager:
   - Menu
   - TutorialController
   - TutorialAxis
+  - Object
+  - projectile
+  - FxTemporaire
+  - axis
   layers:
   - Default
   - TransparentFX
@@ -27,6 +31,8 @@ TagManager:
   - View
   - AxisAnchor
   - Brushable
+  - floor
+  - wirelessAxis
   - 
   - 
   - 
@@ -45,9 +51,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - Spatial Awareness
   m_SortingLayers:
   - name: Default
     uniqueID: 0

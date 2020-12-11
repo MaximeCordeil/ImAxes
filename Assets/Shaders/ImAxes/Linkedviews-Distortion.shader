@@ -3,7 +3,7 @@ Shader "Staxestk/Linked-Views-Material"
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
-		
+
 		_ftl1("Front Top Left Axis 1", Vector) = (-1,1,0,0)
 		_ftr1("Front Top Right Axis 1", Vector) = (1,1,0,0)
 		_fbl1("Front Bottom Left Axis 1", Vector) = (-1,-1,0,0)
@@ -30,7 +30,7 @@ Shader "Staxestk/Linked-Views-Material"
 			Blend SrcAlpha OneMinusSrcAlpha
 			//Lighting On
 			Zwrite On
-			//ZTest NotEqual    
+			//ZTest NotEqual
             //Cull Front
 		LOD 200
 
@@ -44,6 +44,7 @@ Shader "Staxestk/Linked-Views-Material"
 		#pragma fragment frag
 				// make fog work
 		#pragma multi_compile_fog
+		#pragma multi_compile_instancing
 
 		#include "UnityCG.cginc"
 		#include "DistortLinked.cginc"
@@ -55,6 +56,8 @@ Shader "Staxestk/Linked-Views-Material"
 		float2 uv : TEXCOORD0;
 		float4 color: COLOR;
 		float3 normal	: NORMAL;
+
+		UNITY_VERTEX_INPUT_INSTANCE_ID
 	};
 
 	struct gs_in
@@ -64,60 +67,100 @@ Shader "Staxestk/Linked-Views-Material"
 		float2 uv		:	TEXCOORD0;
 		bool filtered	:	BOOL;
 		bool isBrushed	:	BOOL;
+
+		UNITY_VERTEX_INPUT_INSTANCE_ID
+		UNITY_VERTEX_OUTPUT_STEREO
 	};
 
-	struct v2f
+	struct g2f
 	{
 		float2 uv : TEXCOORD0;
 		float4 vertex : SV_POSITION;
 		float4 color: COLOR;
+
+		UNITY_VERTEX_OUTPUT_STEREO
 	};
+
+	struct f_output
+	{
+		float4 color : COLOR;
+		float depth : SV_Depth;
+	};
+
+
+	// **************************************************************
+	// Variables													*
+	// **************************************************************
+
+	UNITY_INSTANCING_BUFFER_START(Props)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinXFilter1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxXFilter1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinYFilter1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxYFilter1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinZFilter1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxZFilter1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinXFilter2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxXFilter2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinYFilter2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxYFilter2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinZFilter2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxZFilter2)
+
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinNormX1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxNormX1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinNormY1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxNormY1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinNormZ1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxNormZ1)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinNormX2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxNormX2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinNormY2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxNormY2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MinNormZ2)
+		UNITY_DEFINE_INSTANCED_PROP(float, _MaxNormZ2)
+	UNITY_INSTANCING_BUFFER_END(Props)
 
 	sampler2D _MainTex;
 	float4 _MainTex_ST;
 
-					
-	//*******************
-	// RANGE FILTERING
-	//*******************
-
-	float _MinXFilter1;
-	float _MaxXFilter1;
-	float _MinYFilter1;
-	float _MaxYFilter1;
-	float _MinZFilter1;
-	float _MaxZFilter1;
-
-	float _MinXFilter2;
-	float _MaxXFilter2;
-	float _MinYFilter2;
-	float _MaxYFilter2;
-	float _MinZFilter2;
-	float _MaxZFilter2;
-
-	// ********************
-	// Normalisation ranges
-	// ********************
-
-	float _MinNormX1;
-	float _MaxNormX1;
-	float _MinNormY1;
-	float _MaxNormY1;
-	float _MinNormZ1;
-	float _MaxNormZ1;
-
-	float _MinNormX2;
-	float _MaxNormX2;
-	float _MinNormY2;
-	float _MaxNormY2;
-	float _MinNormZ2;
-	float _MaxNormZ2;
 
 	// VERTEX SHADER
 	gs_in vert(appdata v)
 	{
-		float4 pos = v.position;
 		gs_in o;
+
+		UNITY_SETUP_INSTANCE_ID(v);
+		UNITY_INITIALIZE_OUTPUT(gs_in, o);
+		UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+		UNITY_TRANSFER_INSTANCE_ID(v, o);
+
+		// Access instanced variables
+		float MinXFilter1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinXFilter1);
+		float MaxXFilter1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxXFilter1);
+		float MinYFilter1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinYFilter1);
+		float MaxYFilter1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxYFilter1);
+		float MinZFilter1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinZFilter1);
+		float MaxZFilter1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxZFilter1);
+		float MinXFilter2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinXFilter2);
+		float MaxXFilter2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxXFilter2);
+		float MinYFilter2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinYFilter2);
+		float MaxYFilter2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxYFilter2);
+		float MinZFilter2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinZFilter2);
+		float MaxZFilter2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxZFilter2);
+		float MinNormX1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinNormX1);
+		float MaxNormX1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxNormX1);
+		float MinNormY1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinNormY1);
+		float MaxNormY1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxNormY1);
+		float MinNormZ1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinNormZ1);
+		float MaxNormZ1 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxNormZ1);
+		float MinNormX2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinNormX2);
+		float MaxNormX2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxNormX2);
+		float MinNormY2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinNormY2);
+		float MaxNormY2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxNormY2);
+		float MinNormZ2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MinNormZ2);
+		float MaxNormZ2 = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxNormZ2);
+
+		float4 pos = v.position;
 		o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 		o.color = v.color;
 
@@ -126,53 +169,53 @@ Shader "Staxestk/Linked-Views-Material"
 		if(v.normal.z == 0.0)
 		{
 		normalisedPosition = float3(
-						normaliseValue(v.position.x, _MinNormX1, _MaxNormX1 ,-0.5, 0.5),
-						normaliseValue(v.position.y, _MinNormY1, _MaxNormY1 ,-0.5, 0.5),
-						normaliseValue(v.position.z, _MinNormZ1, _MaxNormZ1 ,-0.5, 0.5));
+						normaliseValue(v.position.x, MinNormX1, MaxNormX1 ,-0.5, 0.5),
+						normaliseValue(v.position.y, MinNormY1, MaxNormY1 ,-0.5, 0.5),
+						normaliseValue(v.position.z, MinNormZ1, MaxNormZ1 ,-0.5, 0.5));
 
-		if (v.position.x <= _MinXFilter1 ||
-			v.position.x >= _MaxXFilter1 || 
-			v.position.y <= _MinYFilter1 || 
-			v.position.y >= _MaxYFilter1 || 
-			v.position.z <= _MinZFilter1 || 
-			v.position.z >= _MaxZFilter1 ||
-			
+		if (v.position.x <= MinXFilter1 ||
+			v.position.x >= MaxXFilter1 ||
+			v.position.y <= MinYFilter1 ||
+			v.position.y >= MaxYFilter1 ||
+			v.position.z <= MinZFilter1 ||
+			v.position.z >= MaxZFilter1 ||
+
 			normalisedPosition.x < -0.5 ||
-			normalisedPosition.x > 0.5 || 
-			normalisedPosition.y < -0.5 || 
-			normalisedPosition.y > 0.5 || 
-			normalisedPosition.z < -0.5 || 
-			normalisedPosition.z > 0.5					
+			normalisedPosition.x > 0.5 ||
+			normalisedPosition.y < -0.5 ||
+			normalisedPosition.y > 0.5 ||
+			normalisedPosition.z < -0.5 ||
+			normalisedPosition.z > 0.5
 			)
 			{
 			o.filtered = true;
-			//o.color.w=0;			
+			//o.color.w=0;
 			}
 			else o.filtered = false;
 		}
 		else if(v.normal.z == 1.0)
 		{
 		normalisedPosition = float3(
-						normaliseValue(v.position.x, _MinNormX2, _MaxNormX2 ,-0.5, 0.5),
-						normaliseValue(v.position.y, _MinNormY2, _MaxNormY2 ,-0.5, 0.5),
-						normaliseValue(v.position.z, _MinNormZ2, _MaxNormZ2 ,-0.5, 0.5));
+						normaliseValue(v.position.x, MinNormX2, MaxNormX2 ,-0.5, 0.5),
+						normaliseValue(v.position.y, MinNormY2, MaxNormY2 ,-0.5, 0.5),
+						normaliseValue(v.position.z, MinNormZ2, MaxNormZ2 ,-0.5, 0.5));
 
-		if (v.position.x <= _MinXFilter2 ||
-			v.position.x >= _MaxXFilter2 || 
-			v.position.y <= _MinYFilter2 || 
-			v.position.y >= _MaxYFilter2 || 
-			v.position.z <= _MinZFilter2 || 
-			v.position.z >= _MaxZFilter2 ||
+		if (v.position.x <= MinXFilter2 ||
+			v.position.x >= MaxXFilter2 ||
+			v.position.y <= MinYFilter2 ||
+			v.position.y >= MaxYFilter2 ||
+			v.position.z <= MinZFilter2 ||
+			v.position.z >= MaxZFilter2 ||
 
 			normalisedPosition.x < -0.5 ||
-			normalisedPosition.x > 0.5 || 
-			normalisedPosition.y < -0.5 || 
-			normalisedPosition.y > 0.5 || 
-			normalisedPosition.z < -0.5 || 
+			normalisedPosition.x > 0.5 ||
+			normalisedPosition.y < -0.5 ||
+			normalisedPosition.y > 0.5 ||
+			normalisedPosition.z < -0.5 ||
 			normalisedPosition.z > 0.5)
 			{
 			o.filtered = true;
-			//o.color.w=0;			
+			//o.color.w=0;
 			}else o.filtered = false;
 		}
 
@@ -184,33 +227,45 @@ Shader "Staxestk/Linked-Views-Material"
 
 	//GEOMETRY SHADER
 	[maxvertexcount(2)]
-	void geom (line gs_in l[2], inout LineStream<v2f> lineStream)
+	void geom (line gs_in l[2], inout LineStream<g2f> lineStream)
 	{
 		//bool filtered = false;
 		bool filtered = (l[0].filtered || l[1].filtered);
 
 		if(!filtered)
 		{
-		v2f In;		
-		In.color = l[0].color;
-		In.vertex = l[0].vertex;
-		In.uv = l[0].uv;
+			g2f In;
 
-		lineStream.Append(In);
+			UNITY_INITIALIZE_OUTPUT(g2f, In);
+			UNITY_SETUP_INSTANCE_ID(l[0]);
+			UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(l[0]);
 
-		In.color = l[1].color;
-		In.vertex = l[1].vertex;
-		In.uv = l[1].uv;
+			In.color = l[0].color;
+			In.vertex = l[0].vertex;
+			In.uv = l[0].uv;
+			UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(l[0], In);
+			lineStream.Append(In);
 
-		lineStream.Append(In);
+			In.color = l[1].color;
+			In.vertex = l[1].vertex;
+			In.uv = l[1].uv;
+			UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(l[0], In);
+
+			lineStream.Append(In);
 		}
-
 	}
 
 	//FRAGMENT SHADER
-	fixed4 frag(v2f i) : SV_Target
+	f_output frag(g2f i)
 	{
-		return i.color;	
+		f_output o;
+
+		UNITY_INITIALIZE_OUTPUT(f_output, o);
+		UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+		o.color = i.color;
+		o.depth = i.vertex.z;
+		return o;
 	}
 		ENDCG
 	}

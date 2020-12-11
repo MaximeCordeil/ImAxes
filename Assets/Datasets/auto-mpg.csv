@@ -1,4 +1,4 @@
-mpg,cylinders,displacement,horesepower,weight,acceleration,model,origin,name
+mpg,cylinders,displacement,horsepower,weight,acceleration,model,origin,name
 18,8,307,130,3504,12,70,1,chevrolet_chevelle_malibu
 15,8,350,165,3693,11.5,70,1,buick_skylark_320
 18,8,318,150,3436,11,70,1,plymouth_satellite

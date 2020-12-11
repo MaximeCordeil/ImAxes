@@ -2,6 +2,7 @@
 >:warning: **IMPORTANT**
 
 This ImAxes-HoloLens 2 branch is an **experimental** version of ImAxes. It contains the following changes:
+* **Updated to Unity 2019.4.11f1**
 * Replaced SteamVR with MRTK v2.5.1
 * Builds for UWP (HoloLens 2) instead of PC
 * Updated visualisation shaders to support single-passed instanced rendering
@@ -10,6 +11,13 @@ This ImAxes-HoloLens 2 branch is an **experimental** version of ImAxes. It conta
 * Included bluetooth serial connectivity for embodied axes from Jim Smiley
 
 Note that **these changes break almost all existing interactions and brushing capabilities**, including access to the min-max normaliser and range handles. All other visualisation functions which leverages the ImAxesRecogniser should still remain functional.
+
+The changes can be tested directly on your computer with MRTK's input simulation service. It is already configured in the *HoloLensScene.unity* scene. Instructions on how to use the simulator can be found [here](https://microsoft.github.io/MixedRealityToolkit-Unity/Documentation/InputSimulation/InputSimulationService.html?q=simulation).
+
+To build to the HoloLens 2, you can follow [Microsoft's instructions for building an application to the HoloLens 2](https://docs.microsoft.com/en-au/windows/mixed-reality/develop/unity/tutorials/mr-learning-base-02#building-your-application-to-your-hololens-2) after having [installed all the prerequisite tools](https://docs.microsoft.com/en-au/windows/mixed-reality/develop/install-the-tools?tabs=unity).
+
+That said, I personally find this process to be terribly time consuming and annoying. I instead recommend using MRTK's Build Window utility (Mixed Reality Toolkit > Utilities > Build Window) as it allows you to skip using Visual Studio entirely. You will need to manually deploy the built Appx file to the HoloLens 2 using the Windows Device Portal however. Unfortunately Microsoft doesn't actually have any documentation describing this process, so you will probably need to figure it out yourself.
+
 >:warning: **END**
 
 ImAxes is an immersive data visualisation tool for multidimensional data exploration and analysis in virtual reality.
@@ -25,15 +33,15 @@ Here is a video demo of ImAxes:
 " target="_blank"><img src="https://img.youtube.com/vi/hxqJJ934Reg/0.jpg" alt="ImAxes"
  width="240" height="180" border="10" /></a>
 
-## Installation instructions
-ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6](https://unity3d.com/get-unity/download/archive)
+~~## Installation instructions~~
+~~ImAxes comes as a Unity project. You only need to download the latest [Unity 5.6](https://unity3d.com/get-unity/download/archive)~~
 
-** << Udpate >> : Now ImAxes works with Unity 2018!! check it out: https://github.com/MaximeCordeil/ImAxes/tree/ImAxes2018 big thanks to our student Benjamin Lee for this **
+~~** << Udpate >> : Now ImAxes works with Unity 2018!! check it out: https://github.com/MaximeCordeil/ImAxes/tree/ImAxes2018 big thanks to our student Benjamin Lee for this **~~
 
-## Hardware and compatibility
-ImAxes works on Windows PCs. You will need a solid *gaming* configuration, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.
+~~## Hardware and compatibility~~
+~~ImAxes works on Windows PCs. You will need a solid *gaming* configuration, i.e. an Intel i7 processor and an Nvidia 10xx VR-ready graphics card.~~
 
-The HTC Vive and Microsoft-compatible MR devices, and the Oculus Rift CV1 with Oculus touch controllers are currently supported.
+~~The HTC Vive and Microsoft-compatible MR devices, and the Oculus Rift CV1 with Oculus touch controllers are currently supported.~~
 
 ## Launching ImAxes
 ImAxes allows you to load data with a CSV or a TSV file format. The CSV/TSV dataset file:

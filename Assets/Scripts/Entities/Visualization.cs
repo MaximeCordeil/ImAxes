@@ -597,10 +597,6 @@ public class Visualization : MonoBehaviour
 
     void LateUpdate()
     {
-        if (this.transform.position.y <0f)
-        {
-            Destroy(this.gameObject);
-        }
         UpdateViewType();
 
         switch (viewType)

@@ -25,6 +25,8 @@ public class SceneManager : MonoBehaviour
     [SerializeField]
     DataObjectMetadata metadata;
 
+    [SerializeField]
+    bool createAxisShelf = true;
 
     static SceneManager _instance;
     public static SceneManager Instance
@@ -55,18 +57,20 @@ public class SceneManager : MonoBehaviour
         VisualisationAttributes.Instance.colors = Colors.mapColorPalette(SceneManager.Instance.dataObject.getDimension(VisualisationAttributes.Instance.ColoredAttribute), indexCategoryToColor);
 
         // create the axis
-
-        for (int i = 0; i < dataObject.Identifiers.Length; ++i)
+        if (createAxisShelf)
         {
-            Vector3 v = new Vector3(1.352134f - (i % 7) * 0.35f, 1.506231f - (i / 7) / 2f, 0f);// -0.4875801f);
-            GameObject obj = (GameObject)Instantiate(axisPrefab);
-            obj.transform.position = v;
-            Axis axis = obj.GetComponent<Axis>();
-            axis.Init(dataObject, i, true);
-            axis.InitOrigin(v, obj.transform.rotation);
-            axis.tag = "Axis";
+            for (int i = 0; i < dataObject.Identifiers.Length; ++i)
+            {
+                Vector3 v = new Vector3(1.352134f - (i % 7) * 0.35f, 1.506231f - (i / 7) / 2f, 0f);// -0.4875801f);
+                GameObject obj = (GameObject)Instantiate(axisPrefab);
+                obj.transform.position = v;
+                Axis axis = obj.GetComponent<Axis>();
+                axis.Init(dataObject, i, true);
+                axis.InitOrigin(v, obj.transform.rotation);
+                axis.tag = "Axis";
 
-            AddAxis(axis);
+                AddAxis(axis);
+            }
         }
 
     }
@@ -83,6 +87,23 @@ public class SceneManager : MonoBehaviour
     {
         sceneAxes.Add(axis);
         OnAxisAdded.Invoke(axis);
+    }
+
+    public void DestroyAxis(Axis axis)
+    {
+        sceneAxes.Remove(axis);
+        Destroy(axis.gameObject);
+
+        foreach (Visualization vis in axis.correspondingVisualizations())
+        {
+            Destroy(vis.gameObject);
+
+            foreach (SPLOM3D splom3d in GameObject.FindObjectsOfType<SPLOM3D>())
+            {
+                if (splom3d.BaseVisualization == vis)
+                    Destroy(splom3d.gameObject);
+            }
+        }
     }
 
     //

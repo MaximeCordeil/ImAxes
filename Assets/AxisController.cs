@@ -9,7 +9,7 @@ public class AxisController : MonoBehaviour
     Axis axis;
     Axis LastAxis;
     GameObject CreatedAxis;
-
+    public int indx;
     public GameObject menuParent;
     public Transform target;
     public Transform creationTarget;
@@ -24,7 +24,7 @@ public class AxisController : MonoBehaviour
     Vector3 bottomPos;
     Vector3 topPos;
     bool firstCreated;
-    // Axis CurrentAxis;
+     Axis CurrentAxis;
     float initialMin;
     float initialMax;
     public float menuTextSpacing;
@@ -67,7 +67,7 @@ public class AxisController : MonoBehaviour
     public void SetAxisViaBeam(Axis selected)
     {
         
-        Axis.CurrentAxis = selected;
+        CurrentAxis = selected;
     }
     void OnTriggerEnter(Collider other)   
     {
@@ -90,15 +90,29 @@ public class AxisController : MonoBehaviour
     }
     void CreateAxis(bool rot)
     {
-        firstCreated = true;
-        Quaternion lastRot = Axis.CurrentAxis.transform.rotation;
-         Axis ProtoAxis = Axis.AxisList[rotIndex];
+
+        Axis ProtoAxis;
+        if (!firstCreated)
+        {
+             ProtoAxis = Axis.AxisList[indx];
+            firstCreated = true;
+        }
+        else
+        {
+             ProtoAxis = Axis.AxisList[rotIndex];
+        }
+       // Quaternion lastRot = Axis.CurrentAxis.transform.rotation;
+         
         GameObject newAxis = ProtoAxis.Clone();
-        newAxis.transform.rotation = lastRot;
+       // newAxis.transform.rotation = lastRot;
+        newAxis.transform.position = this.transform.position;
+        print(this.transform.position);
         axis = newAxis.GetComponent<Axis>();
+        axis.transform.parent = this.transform;
+        axis.transform.localPosition = new Vector3(0, 0, 0);
         axis.isClone = true;
-        miniVis.SetMesh(axis.axisId);
-        Axis.CurrentAxis = axis;
+       // miniVis.SetMesh(axis.axisId);
+       CurrentAxis = axis;
        
         
         SetSliders();
@@ -119,17 +133,16 @@ public class AxisController : MonoBehaviour
         
         
        
-            axis.transform.position = ClickedPosition;
-        Vector3 targetPostition = new Vector3(target.position.x, axis.transform.position.y, target.position.z);
+           // axis.transform.position = ClickedPosition;
+       // Vector3 targetPostition = new Vector3(target.position.x, axis.transform.position.y, target.position.z);
         if (!axis.IsHorizontal)
             {
-            axis.transform.LookAt(targetPostition);
+          //  axis.transform.LookAt(targetPostition);
         }
 
        
         
        
-        miniAxes.transform.position = axis.ReportPosition() - miniAxesOffset;
        
 
 
@@ -140,7 +153,7 @@ public class AxisController : MonoBehaviour
         {
       
 
-        click = Convert.ToBoolean(Wax.rotarypress);
+        click = Convert.ToBoolean(Wax.rotaryPress);
         topClick = Convert.ToBoolean(Wax.buttonPress);
 
         if (!found)
@@ -214,7 +227,7 @@ public class AxisController : MonoBehaviour
                                                                                // GetInitialAxis();
                     inTrig = false;
                     axis = Axis.AxisList[rotIndex];
-                    Axis.CurrentAxis = axis;
+                    CurrentAxis = axis;
                 }
 
 
@@ -251,18 +264,17 @@ public class AxisController : MonoBehaviour
             
 
         }
-        miniVis.SetMesh(axis.axisId);
+       // miniVis.SetMesh(axis.axisId);
         //if (!menuActive)
         //{
         // miniVis.SetMesh(rotIndex);
         LastAxis = axis;
-        GarbageDump -= 2f;
-            CreateAxis(true);
-        if (LastAxis.isClone)
-        {
-
-            LastAxis.transform.position = new Vector3(0, GarbageDump, 0);
-        }
+       
+         CreateAxis(true);
+        //if (LastAxis.isClone)
+        //{
+        SceneManager.Instance.DestroyAxis(LastAxis);
+        //}
         //}
     }
     void ShiftMenu(bool up)
@@ -295,7 +307,7 @@ public class AxisController : MonoBehaviour
     }
         void ControlAxis()
         {
-            if (Axis.CurrentAxis != null)
+            if (CurrentAxis != null)
             {  
                     if (axis.grabbed)
             {
@@ -319,9 +331,9 @@ public class AxisController : MonoBehaviour
                 // get the boxcollider of pointer to change Axis here.
 
 
-                if (axis != Axis.CurrentAxis) // will need to set currentAxis when rotary overtwrites axis selection.
+                if (axis != CurrentAxis) // will need to set currentAxis when rotary overtwrites axis selection.
                {
-                  axis = Axis.CurrentAxis;
+                  axis = CurrentAxis;
 
                    // print("New Axis Selected " + axis.axisId);
                     SetSliders();
@@ -419,16 +431,19 @@ public class AxisController : MonoBehaviour
 
         void GetInitialAxis()  
         {
+        print("INITAL AXIS CALLED");
           float menuTextY = -3.4f + (Axis.AxisList.Count/2 );
         topPos = new Vector3(0, 0, menuTextY);
         bottomPos = new Vector3(0, 0, menuTextY);
 
             GameObject theAxis = GameObject.FindWithTag("Axis");
+        print("theAxis is " +  theAxis.name);
 
-            if (theAxis != null)
+        if (theAxis != null)
             {
                 axis = theAxis.GetComponent<Axis>();
                 found = true;
+            /*
             for (int i = 0; i< Axis.AxisList.Count; i++ )
             {
                 menuTextY += menuTextSpacing;
@@ -437,7 +452,7 @@ public class AxisController : MonoBehaviour
                     menuTextY = menuTextY - Axis.AxisList.Count * menuTextSpacing;
                 }
                 GameObject newText = Instantiate(menuText);  // TODO line these up with rotIndex;
-                newText.name = Axis.AxisList[i].gameObject.name;
+                newText.name = Axis.AxisList[i].gameObject.name;w
                 TextMenuControl textScript = newText.GetComponent<TextMenuControl>();
                 textScript.index = i;
                     newText.transform.parent = menuParent.transform;
@@ -458,8 +473,11 @@ public class AxisController : MonoBehaviour
             Destroy(menuText);
             print("Top is " + topPos);
             print("Bottom is " + bottomPos);
+            */
 
-            Axis.CurrentAxis = axis;//Axis.AxisList[0];
+           // Axis.CurrentAxis = Axis.AxisList[indx];
+            CreateAxis(false);
+            print("CurrentAxis is " + axis.name);
         }
             else
             {

@@ -230,6 +230,8 @@ public class Axis : MonoBehaviour {
         if (this.transform.position.y < 0f)
         {
             Destroy(this.gameObject);
+            SceneManager.Instance.DestroyAxis(this);
+            return;
         }
     }
 

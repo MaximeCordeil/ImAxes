@@ -1,19 +1,21 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.IO.Ports;
 using System.Threading;
 using UnityEngine;
 
-public class WirelessAxes : MonoBehaviour
+public class WirelessAxes : MonoBehaviourPun
 {
-  
+    Vector3 oldPos = new Vector3();
+    Quaternion oldRot = new Quaternion();
     public string COM = "COM9";
     
 
     public int sliderOne;
     public int sliderTwo;
     public int rotary;
-    public int rotarypress;
+    public int rotaryPress;
     public int buttonPress;
     int oldSliderOne;
     int oldSliderTwo;
@@ -172,18 +174,17 @@ public class WirelessAxes : MonoBehaviour
 
                     string indata = sp.ReadLine();
 
-
                     string[] splits = indata.Split(' ');
-                    rotarypress = int.Parse(splits[3]);
-                    if (rotarypress == 1) rotarypress = 0;
-                    else rotarypress = 1;
+                    rotaryPress = int.Parse(splits[3]);
+                    if (rotaryPress == 1) rotaryPress = 0;
+                    else rotaryPress = 1;
                     buttonPress = int.Parse(splits[4]);
 
-                    if (rotarypress != 1 && buttonPress != 1)
+                    if (rotaryPress != 1 && buttonPress != 1)
                     {
                         sliderOne = int.Parse(splits[1]);
                         oldSliderOne = sliderOne;
-                        if (!followMode)        ////////////////////dodgy FollowModeCheat!
+                        if (!followMode)       
                         {
                             sliderTwo = int.Parse(splits[0]);
                             oldSliderTwo = sliderTwo;
@@ -204,11 +205,19 @@ public class WirelessAxes : MonoBehaviour
                         firstRead = true;
                         rotaryDifference = int.Parse(splits[2]);
 
+                        if (PhotonNetwork.IsConnected)
+                            photonView.RPC("InitialiseAxis", RpcTarget.All, rotaryDifference); //ADDED
                     }
                     rotary = int.Parse(splits[2]) - rotaryDifference;
 
-                    
-                  
+                    if (PhotonNetwork.IsConnected)
+                    {
+                        photonView.RPC("UpdateAxis", RpcTarget.All, sliderOne, sliderTwo, rotary, rotaryPress, buttonPress); //ADDED
+                    }
+                    else
+                    {
+                        //GetComponent<AxisController>().UpdateAxis(sliderOne, sliderTwo, rotary, rotaryPress, buttonPress);
+                    }
                 }
             }
             catch (SystemException f)
@@ -216,52 +225,18 @@ public class WirelessAxes : MonoBehaviour
                 print(f);
                 ReadThread.Abort();
             }
+
         }
     }
 
-
-
-    void Update()  // For easy testing only! can be deleted if wishing to tidy things up. 
+    void Update()
     {
-       
-       
-      // Remember to click back onto the game window for keystrokes to work. 
-        if (Input.GetKeyDown(KeyCode.Z))  /// Test haptics one.   // to do get into arduino code to get better haptic range. 
+        if (transform.position != oldPos || transform.rotation != oldRot)
         {
-            hapticPulse(1, hapticsValue1);
+            //oldRot = transform.rotation;
+           // oldPos = transform.position;
+         //   photonView.RPC("UpdateTransform", RpcTarget.Others, transform.position, transform.rotation); //ADDED
         }
-        if (Input.GetKeyDown(KeyCode.X))  // test haptics two. 
-        {
-            hapticPulse(2, hapticsValue2);
-        }
-        if (Input.GetKeyDown(KeyCode.C))  // test snapTo 
-        {
-            sendSlider(1, sendingSliderOne);
-        }
-        if (Input.GetKeyDown(KeyCode.V))  // test snapTo // Tested - slider two snap not working properly. 
-        {
-            sendSlider(2, sendingSliderTwo);  // 
-        }
-        if (Input.GetKeyDown(KeyCode.B))  // te
-        {
-            setLEDValue(LEDValue); //Led test good. 
-        }
-        if (Input.GetKeyDown(KeyCode.J))  // te
-        {
-            FollowModeChange(513); ; //
-        }
-        if (Input.GetKeyDown(KeyCode.F))  // te
-        {
-            FollowModeChange(followDist);
-        }
-        if (Input.GetKeyDown(KeyCode.S))  // te
-        {
-            setSteppedMode(130);
-        }
-
-        
-
-        
     }
 
    public void setSteppedMode(int steppedRange) // between 10 and 128 else turns stepped off

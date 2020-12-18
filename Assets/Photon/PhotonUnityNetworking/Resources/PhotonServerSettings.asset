@@ -38,7 +38,11 @@ MonoBehaviour:
   - DestroySpaceship
   - Fire
   - RespawnSpaceship
-  - NetPlayClipAtPoint
+  - UpdateAxis
+  - UpdateTransform
+  - InitialiseAxis
+  - UpdateClientAxis
+  - UpdateClientTransform
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

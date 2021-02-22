@@ -13,6 +13,8 @@ public class SceneManager : MonoBehaviour
 
     public class OnAxisAddedEvent : UnityEvent<Axis> { }
     public OnAxisAddedEvent OnAxisAdded = new OnAxisAddedEvent();
+    public class OnAxisDestroyedEvent : UnityEvent<Axis> { }
+    public OnAxisDestroyedEvent OnAxisDestroyed = new OnAxisDestroyedEvent();
 
     [SerializeField]
     GameObject axisPrefab;
@@ -27,13 +29,21 @@ public class SceneManager : MonoBehaviour
 
     [SerializeField]
     bool createAxisShelf = true;
+    
+    private static SceneManager _instance;
+    public static SceneManager Instance { get { return _instance; } }
 
-    static SceneManager _instance;
-    public static SceneManager Instance
+    private void Awake()
     {
-        get { return _instance ?? (_instance = FindObjectOfType<SceneManager>()); }
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
     }
-
 
     void Start()
     {
@@ -91,6 +101,8 @@ public class SceneManager : MonoBehaviour
 
     public void DestroyAxis(Axis axis)
     {
+        OnAxisDestroyed.Invoke(axis);
+
         sceneAxes.Remove(axis);
         Destroy(axis.gameObject);
 

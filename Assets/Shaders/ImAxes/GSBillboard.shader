@@ -53,7 +53,7 @@ Shader "Custom/Outline Dots"
 		        struct VS_INPUT {
           		    float4 position : POSITION;
             		float4 color: COLOR;
-					float3 normal:	NORMAL;
+					float3 normal:	NORMAL;  // [x: index ||| y: size ||| z: 0=notFiltered, 1=isFiltered]
 
                     UNITY_VERTEX_INPUT_INSTANCE_ID
         		};
@@ -175,23 +175,27 @@ Shader "Custom/Outline Dots"
 					output.isBrushed= 0.0;
 
 					//filtering
-					if (v.position.x <= MinX ||
+					if (v.normal.z == 1.0)
+					{
+						output.color.w = 0;
+					}
+					else if (v.position.x <= MinX ||
 					 v.position.x >= MaxX ||
 					 v.position.y <= MinY ||
 					 v.position.y >= MaxY ||
 					 v.position.z <= MinZ ||
-					 v.position.z >= MaxZ 	||
+					 v.position.z >= MaxZ ||
 
 					 normalisedPosition.x < -0.5 ||
 					 normalisedPosition.x > 0.5 ||
 					 normalisedPosition.y < -0.5 ||
 					 normalisedPosition.y > 0.5 ||
 					 normalisedPosition.z < -0.5 ||
-					 normalisedPosition.z > 0.5
-					 )
+					 normalisedPosition.z > 0.5)
 					{
 						output.color.w = 0;
 					}
+
 					output.normal = v.normal;
 					return output;
 				}

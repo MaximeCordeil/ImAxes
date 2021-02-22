@@ -55,7 +55,7 @@ Shader "Staxestk/Linked-Views-Material"
 		float4 position : POSITION;
 		float2 uv : TEXCOORD0;
 		float4 color: COLOR;
-		float3 normal	: NORMAL;
+		float3 normal	: NORMAL;  // [x: 0=notFiltered, 1=isFiltered ||| y: 0=notTruncated, 1=isTruncated ||| z: 0=v1, 1=v2]
 
 		UNITY_VERTEX_INPUT_INSTANCE_ID
 	};
@@ -67,6 +67,7 @@ Shader "Staxestk/Linked-Views-Material"
 		float2 uv		:	TEXCOORD0;
 		bool filtered	:	BOOL;
 		bool isBrushed	:	BOOL;
+		float isTruncated : FLOAT;
 
 		UNITY_VERTEX_INPUT_INSTANCE_ID
 		UNITY_VERTEX_OUTPUT_STEREO
@@ -166,61 +167,77 @@ Shader "Staxestk/Linked-Views-Material"
 
 		float3 normalisedPosition;
 
-		if(v.normal.z == 0.0)
+		// Check if vertex is filtered
+		if (v.normal.x == 0.0)
 		{
-		normalisedPosition = float3(
-						normaliseValue(v.position.x, MinNormX1, MaxNormX1 ,-0.45, 0.45),
-						normaliseValue(v.position.y, MinNormY1, MaxNormY1 ,-0.45, 0.45),
-						normaliseValue(v.position.z, MinNormZ1, MaxNormZ1 ,-0.45, 0.45));
-
-		if (v.position.x <= MinXFilter1 ||
-			v.position.x >= MaxXFilter1 ||
-			v.position.y <= MinYFilter1 ||
-			v.position.y >= MaxYFilter1 ||
-			v.position.z <= MinZFilter1 ||
-			v.position.z >= MaxZFilter1 ||
-
-			normalisedPosition.x < -0.45 ||
-			normalisedPosition.x > 0.45 ||
-			normalisedPosition.y < -0.45 ||
-			normalisedPosition.y > 0.45 ||
-			normalisedPosition.z < -0.45 ||
-			normalisedPosition.z > 0.45
-			)
+			// Check if vertex is v1 or v2
+			if (v.normal.z == 0.0)
 			{
-			o.filtered = true;
-			//o.color.w=0;
+				normalisedPosition = float3(
+					normaliseValue(v.position.x, MinNormX1, MaxNormX1, -0.45, 0.45),
+					normaliseValue(v.position.y, MinNormY1, MaxNormY1, -0.45, 0.45),
+					normaliseValue(v.position.z, MinNormZ1, MaxNormZ1, -0.45, 0.45));
+
+				if (v.position.x <= MinXFilter1 ||
+					v.position.x >= MaxXFilter1 ||
+					v.position.y <= MinYFilter1 ||
+					v.position.y >= MaxYFilter1 ||
+					v.position.z <= MinZFilter1 ||
+					v.position.z >= MaxZFilter1 ||
+
+					normalisedPosition.x < -0.45 ||
+					normalisedPosition.x > 0.45 ||
+					normalisedPosition.y < -0.45 ||
+					normalisedPosition.y > 0.45 ||
+					normalisedPosition.z < -0.45 ||
+					normalisedPosition.z > 0.45)
+				{
+					o.filtered = true;
+					//o.color.w=0;
+				}
+				else
+				{
+					o.filtered = false;
+				}
 			}
-			else o.filtered = false;
-		}
-		else if(v.normal.z == 1.0)
-		{
-		normalisedPosition = float3(
-						normaliseValue(v.position.x, MinNormX2, MaxNormX2 ,-0.45, 0.45),
-						normaliseValue(v.position.y, MinNormY2, MaxNormY2 ,-0.45, 0.45),
-						normaliseValue(v.position.z, MinNormZ2, MaxNormZ2 ,-0.45, 0.45));
-
-		if (v.position.x <= MinXFilter2 ||
-			v.position.x >= MaxXFilter2 ||
-			v.position.y <= MinYFilter2 ||
-			v.position.y >= MaxYFilter2 ||
-			v.position.z <= MinZFilter2 ||
-			v.position.z >= MaxZFilter2 ||
-
-			normalisedPosition.x < -0.45 ||
-			normalisedPosition.x > 0.45 ||
-			normalisedPosition.y < -0.45 ||
-			normalisedPosition.y > 0.45 ||
-			normalisedPosition.z < -0.45 ||
-			normalisedPosition.z > 0.45)
+			else if (v.normal.z == 1.0)
 			{
+				normalisedPosition = float3(
+					normaliseValue(v.position.x, MinNormX2, MaxNormX2, -0.45, 0.45),
+					normaliseValue(v.position.y, MinNormY2, MaxNormY2, -0.45, 0.45),
+					normaliseValue(v.position.z, MinNormZ2, MaxNormZ2, -0.45, 0.45));
+
+				if (v.position.x <= MinXFilter2 ||
+					v.position.x >= MaxXFilter2 ||
+					v.position.y <= MinYFilter2 ||
+					v.position.y >= MaxYFilter2 ||
+					v.position.z <= MinZFilter2 ||
+					v.position.z >= MaxZFilter2 ||
+
+					normalisedPosition.x < -0.45 ||
+					normalisedPosition.x > 0.45 ||
+					normalisedPosition.y < -0.45 ||
+					normalisedPosition.y > 0.45 ||
+					normalisedPosition.z < -0.45 ||
+					normalisedPosition.z > 0.45)
+				{
+					o.filtered = true;
+					//o.color.w=0;
+				}
+				else
+				{
+					o.filtered = false;
+				}
+			}
+		}
+		else if (v.normal.x == 1.0)
+		{
 			o.filtered = true;
-			//o.color.w=0;
-			}else o.filtered = false;
 		}
 
 		o.vertex = mul(UNITY_MATRIX_VP, ObjectToWorldDistort3d(normalisedPosition, v.normal.z > 0));
 		//o.vertex = UnityObjectToClipPos(pos);
+		o.isTruncated = v.normal.y;
 		o.isBrushed=false;
 		return o;
 	}
@@ -241,12 +258,16 @@ Shader "Staxestk/Linked-Views-Material"
 			UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(l[0]);
 
 			In.color = l[0].color;
+			if (l[0].isTruncated == 1.0) In.color.w = 0;
+			else In.color.w = 0.75;
 			In.vertex = l[0].vertex;
 			In.uv = l[0].uv;
 			UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(l[0], In);
 			lineStream.Append(In);
 
 			In.color = l[1].color;
+			if (l[1].isTruncated == 1.0) In.color.w = 0;
+			else In.color.w = 0.75;
 			In.vertex = l[1].vertex;
 			In.uv = l[1].uv;
 			UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(l[0], In);
@@ -263,7 +284,16 @@ Shader "Staxestk/Linked-Views-Material"
 		UNITY_INITIALIZE_OUTPUT(f_output, o);
 		UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-		o.color = i.color;
+		float t = i.color.w;
+		if (t < 0.4)
+			t = 0.0;
+		else if (t < 0.55)
+			t = normaliseValue(t, 0.4, 0.55, 0.0, 0.75);
+		else
+			t = 1.0;
+
+		o.color = lerp(float4(0, 0, 0, 0), float4(i.color.rgb, 1), t);
+		//o.color = i.color;
 		o.depth = i.vertex.z;
 		return o;
 	}

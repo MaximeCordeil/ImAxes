@@ -35,6 +35,14 @@ public class LinkedVisualisations : MonoBehaviour
 
     Renderer linkRenderer;
 
+    // Linked filtering variables
+    public List<Visualization> ConnectedVisualisations;
+    public List<LinkedVisualisations> ConnectedLinkedVisualisations;
+    public float[] SharedFilteredPoints;
+    public bool SharedFilteredPointsChanged;
+    private bool wasV1Truncated = false;
+    private bool wasV2Truncated = false;
+
     // create a mesk for the linked view
     void CreateMesh()
     {
@@ -166,11 +174,199 @@ public class LinkedVisualisations : MonoBehaviour
         EventManager.StopListening(ApplicationConfiguration.OnLinkedTransparencyChanged, OnColoredAttributeChanged);
     }
 
+    private void Update()
+    {
+        ConnectedVisualisations = null;
+        ConnectedLinkedVisualisations = null;
+    }
+
     // Update is called once per frame
     void LateUpdate()
     {
         if (v1 != null && v2 != null)
         {
+            // Update the connected visualisations list for this LinkedVisualisation only if it has not yet already
+            // been set by another Visualisation ir LinkedVisualisation. This essentially means that the first Visualisation
+            // or LinkedVisualisation in the chain which executes is the one which sets it for all other ones in the chain
+            if (ConnectedVisualisations == null)
+            {
+                var result = ImAxesRecognizer.Instance.GetChainedVisualisationsAndLinkedVisualisations(this);
+                ConnectedVisualisations = result.Item1;
+                ConnectedLinkedVisualisations = result.Item2;
+
+                // Combine the FilteredPoints of all ConnectedVisualisations if at least one of them has changed
+                bool updateFiltered = false;
+                foreach (var vis in ConnectedVisualisations)
+                {
+                    if (vis.FilteredPointsChanged)
+                    {
+                        updateFiltered = true;
+                        break;
+                    }
+                }
+
+                // Create a shared filtered array of all ConnectedVisualisations and set it to all Visualisations and LinkedVisualisations
+                if (updateFiltered)
+                {
+                    int dataCount = SceneManager.Instance.dataObject.DataPoints;
+                    SharedFilteredPoints = new float[dataCount];
+                    foreach (var vis in ConnectedVisualisations)
+                    {
+                        for (int i = 0; i < dataCount; i++)
+                        {
+                            if (vis.FilteredPoints[i] == 1)
+                                SharedFilteredPoints[i] = 1;
+                        }
+
+                        vis.FilteredPointsChanged = false;
+                    }
+
+                    foreach (var vis in ConnectedVisualisations)
+                    {
+                        vis.SharedFilteredPoints = SharedFilteredPoints;
+                        vis.SharedFilteredPointsChanged = true;
+                    }
+                    foreach (var linkedVis in ConnectedLinkedVisualisations)
+                    {
+                        linkedVis.SharedFilteredPoints = SharedFilteredPoints;
+                        linkedVis.SharedFilteredPointsChanged = true;
+                    }
+
+                    SharedFilteredPointsChanged = true;
+                }
+            }
+
+            // Set normals array
+            if (SharedFilteredPointsChanged)
+            {
+                List<Vector3> normals = new List<Vector3>();
+                mymesh.GetNormals(normals);
+
+                // Check if we should truncate the lines
+                bool isV1Truncated = false;
+                bool isV2Truncated = false;
+                float truncateV1 = 0;
+                float truncateV2 = 0;
+                switch (v1.viewType)
+                {
+                    // Never truncate histograms
+                    case Visualization.ViewType.Histogram:
+                        break;
+                    // Only truncate 2D scatterplots if it is horizontal
+                    case Visualization.ViewType.Scatterplot2D:
+                        float v1Angle = Vector3.Angle(V1.transform.forward, Vector3.up);
+                        isV1Truncated = !(45 < v1Angle && v1Angle < 135);
+                        truncateV1 = isV1Truncated ? 1 : 0;
+                        break;
+                    // Always truncate 3D scatterplots
+                    case Visualization.ViewType.Scatterplot3D:
+                        truncateV1 = 1;
+                        break;
+                }
+                switch (v2.viewType)
+                {
+                    // Never truncate histograms
+                    case Visualization.ViewType.Histogram:
+                        break;
+                    // Only truncate 2D scatterplots if it is horizontal
+                    case Visualization.ViewType.Scatterplot2D:
+                        float v2Angle = Vector3.Angle(V2.transform.forward, Vector3.up);
+                        isV2Truncated = !(45 < v2Angle && v2Angle < 135);
+                        truncateV2 = isV2Truncated ? 1 : 0;
+                        break;
+                    // Always truncate 3D scatterplots
+                    case Visualization.ViewType.Scatterplot3D:
+                        truncateV2 = 1;
+                        break;
+                }
+
+                // Linked visualisations are double length
+                int normalIndex = 0;
+                for (int i = 0; i < SceneManager.Instance.dataObject.DataPoints; i++)
+                {
+                    Vector3 norm1 = normals[normalIndex];
+                    Vector3 norm2 = normals[normalIndex + 1];
+
+                    norm1.x = SharedFilteredPoints[i];
+                    norm2.x = SharedFilteredPoints[i];
+
+                    norm1.y = truncateV1;
+                    norm2.y = truncateV2;
+
+                    normals[normalIndex] = norm1;
+                    normals[normalIndex + 1] = norm2;
+
+                    normalIndex += 2;
+                }
+                mymesh.SetNormals(normals);
+                SharedFilteredPointsChanged = false;
+
+                wasV1Truncated = isV1Truncated;
+                wasV2Truncated = isV2Truncated;
+            }
+            else
+            {
+                // Check if we should truncate the lines
+                bool isV1Truncated = false;
+                bool isV2Truncated = false;
+                float truncateV1 = 0;
+                float truncateV2 = 0;
+                switch (v1.viewType)
+                {
+                    // Never truncate histograms
+                    case Visualization.ViewType.Histogram:
+                        break;
+                    // Only truncate 2D scatterplots if it is horizontal
+                    case Visualization.ViewType.Scatterplot2D:
+                        float v1Angle = Vector3.Angle(V1.transform.forward, Vector3.up);
+                        isV1Truncated = !(45 < v1Angle && v1Angle < 135);
+                        truncateV1 = isV1Truncated ? 1 : 0;
+                        break;
+                    // Always truncate 3D scatterplots
+                    case Visualization.ViewType.Scatterplot3D:
+                        truncateV1 = 1;
+                        break;
+                }
+                switch (v2.viewType)
+                {
+                    // Never truncate histograms
+                    case Visualization.ViewType.Histogram:
+                        break;
+                    // Only truncate 2D scatterplots if it is horizontal
+                    case Visualization.ViewType.Scatterplot2D:
+                        float v2Angle = Vector3.Angle(V2.transform.forward, Vector3.up);
+                        isV2Truncated = !(45 < v2Angle && v2Angle < 135);
+                        truncateV2 = isV2Truncated ? 1 : 0;
+                        break;
+                    // Always truncate 3D scatterplots
+                    case Visualization.ViewType.Scatterplot3D:
+                        truncateV2 = 1;
+                        break;
+                }
+
+                // If either visualisation has swapped between is truncating and is not truncating, update the normals
+                if (isV1Truncated != wasV1Truncated || isV2Truncated != wasV2Truncated)
+                {
+                    List<Vector3> normals = new List<Vector3>();
+                    mymesh.GetNormals(normals);
+                    int normalIndex = 0;
+                    for (int i = 0; i < SceneManager.Instance.dataObject.DataPoints; i++)
+                    {
+                        Vector3 norm1 = normals[normalIndex];
+                        Vector3 norm2 = normals[normalIndex + 1];
+                        norm1.y = truncateV1;
+                        norm2.y = truncateV2;
+                        normals[normalIndex] = norm1;
+                        normals[normalIndex + 1] = norm2;
+                        normalIndex += 2;
+                    }
+                    mymesh.SetNormals(normals);
+
+                    wasV1Truncated = isV1Truncated;
+                    wasV2Truncated = isV2Truncated;
+                }
+            }
+
             // position the linked visualization between axis
             Vector3 p = new Vector3();
             try
@@ -197,7 +393,7 @@ public class LinkedVisualisations : MonoBehaviour
                 linkRenderer.material.SetVector("_bbr2", transform.InverseTransformPoint(v2.bbr));
                 linkRenderer.material.SetVector("_btl2", transform.InverseTransformPoint(v2.btl));
                 linkRenderer.material.SetVector("_bbl2", transform.InverseTransformPoint(v2.bbl));
-
+                
                 linkRenderer.material.SetFloat("_MinXFilter1", v1.minXFilter);
                 linkRenderer.material.SetFloat("_MaxXFilter1", v1.maxXFilter);
                 linkRenderer.material.SetFloat("_MinYFilter1", v1.minYFilter);
@@ -225,7 +421,6 @@ public class LinkedVisualisations : MonoBehaviour
                 linkRenderer.material.SetFloat("_MaxNormY2", v2.maxYNormalizer);
                 linkRenderer.material.SetFloat("_MinNormZ2", v2.minZNormalizer);
                 linkRenderer.material.SetFloat("_MaxNormZ2", v2.maxZNormalizer);
-
             }
             catch
             {

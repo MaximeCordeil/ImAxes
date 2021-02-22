@@ -19,7 +19,7 @@ MonoBehaviour:
     AppVersion: 
     UseNameServer: 0
     FixedRegion: 
-    Server: 192.168.0.25
+    Server: 192.168.0.145
     Port: 5055
     ProxyServer: 
     Protocol: 0
@@ -43,6 +43,15 @@ MonoBehaviour:
   - InitialiseAxis
   - UpdateClientAxis
   - UpdateClientTransform
+  - CalibrateHoloLens1RPC
+  - CalibrateHoloLens2RPC
+  - CalibrateHoloLensRPC
+  - ShiftRootPositionXRPC
+  - ShiftRootPositionYRPC
+  - ShiftRootPositionZRPC
+  - ShiftRootRotationXRPC
+  - ShiftRootRotationYRPC
+  - ShiftRootRotationZRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

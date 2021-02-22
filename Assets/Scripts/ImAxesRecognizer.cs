@@ -31,13 +31,34 @@ public class ImAxesRecognizer : MonoBehaviour
     public float PCP_DISTANCE = 0.00001f;
     public float SP_MIDPOINT_DISTANCE = 0.25f;
 
+    private static ImAxesRecognizer _instance;
+    public static ImAxesRecognizer Instance { get { return _instance; } }
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+
     void Start()
     {
         adjacency = new AdjacencyMatrix<Visualization>(SceneManager.Instance.sceneAxes.Count);
         SceneManager.Instance.OnAxisAdded.AddListener(OnAxisAdded);
+        SceneManager.Instance.OnAxisDestroyed.AddListener(OnAxisAdded);
     }
 
     void OnAxisAdded(Axis axis)
+    {
+        adjacency.Resize(SceneManager.Instance.sceneAxes.Count);
+    }
+
+    void OnAxisDestroyed(Axis axis)
     {
         adjacency.Resize(SceneManager.Instance.sceneAxes.Count);
     }
@@ -47,7 +68,7 @@ public class ImAxesRecognizer : MonoBehaviour
     //RSP1:
     bool RSP1(Axis a, Axis b)
     {
-        return (a.isPerependicular(b) &&
+        return (a.IsPerpendicular(b) &&
                 ((b.MinPosition - a.MaxPosition).sqrMagnitude < SP_DISTANCE_SQR
                     || (b.MinPosition - a.MinPosition).sqrMagnitude < SP_DISTANCE_SQR
                     || (b.MaxPosition - a.MaxPosition).sqrMagnitude < SP_DISTANCE_SQR));
@@ -57,9 +78,9 @@ public class ImAxesRecognizer : MonoBehaviour
     {
         return
 
-           a.isPerependicular(b)
-           && a.isPerependicular(c)
-           && b.isPerependicular(c)
+           a.IsPerpendicular(b)
+           && a.IsPerpendicular(c)
+           && b.IsPerpendicular(c)
            &&
             ((Vector3.Distance(b.MinPosition, a.MinPosition) < SP_DISTANCE && (Vector3.Distance(b.MinPosition, c.MinPosition) < SP_DISTANCE))
             || ((Vector3.Distance(b.MinPosition, a.MinPosition) < SP_DISTANCE && (Vector3.Distance(b.MinPosition, c.MaxPosition) < SP_DISTANCE)))
@@ -75,16 +96,16 @@ public class ImAxesRecognizer : MonoBehaviour
     bool RSP1_Distance(Axis a, Axis b, Axis c)
     {
         return a.Distance(b) > SP_MIDPOINT_DISTANCE || a.Distance(c) > SP_MIDPOINT_DISTANCE
-            || !a.isPerependicular(b) || a.IsParallel(b)
-            || !a.isPerependicular(c) || a.IsParallel(c)
-            || !b.isPerependicular(c) || b.IsParallel(c)
+            || !a.IsPerpendicular(b) || a.IsParallel(b)
+            || !a.IsPerpendicular(c) || a.IsParallel(c)
+            || !b.IsPerpendicular(c) || b.IsParallel(c)
              ;
     }
 
     bool RSP1_Distance(Axis a, Axis b)
     {
 
-        return a.Distance(b) > SP_MIDPOINT_DISTANCE || !a.isPerependicular(b) || a.IsParallel(b);
+        return a.Distance(b) > SP_MIDPOINT_DISTANCE || !a.IsPerpendicular(b) || a.IsParallel(b);
     }
 
     //bool RSP2(Axis a, Axis b)
@@ -581,7 +602,7 @@ public class ImAxesRecognizer : MonoBehaviour
                         if (SP[i].axes[0].transform.position != SP[j].transform.position
                             && Vector3.Distance(SP[i].axes[0].transform.position, SP[j].transform.position) < PCP_DISTANCE
                             && !linkedVisualisationDictionary.ContainsKey(_name) && !linkedVisualisationDictionary.ContainsKey(_nameReverse))
-                       //     && !SP[j].IsSPLOMElement)
+                        //     && !SP[j].IsSPLOMElement)
                         {
                             if (SP[i].viewType == Visualization.ViewType.Histogram) SP[i].ShowHistogram(false);
                             if (SP[j].viewType == Visualization.ViewType.Histogram) SP[j].ShowHistogram(false);
@@ -715,6 +736,86 @@ public class ImAxesRecognizer : MonoBehaviour
             }
         }
         return connectedVis.Distinct().ToList();
+    }
+
+    public System.Tuple<List<Visualization>, List<LinkedVisualisations>> GetChainedVisualisationsAndLinkedVisualisations(Visualization src)
+    {
+        var toProcess = new Stack<LinkedVisualisations>();
+
+        var srcLinkedVisualisations = linkedVisualisationDictionary.Values.Select(x => x.GetComponent<LinkedVisualisations>())
+                                                                    .Where(x => x.V1 == src || x.V2 == src);
+
+        if (srcLinkedVisualisations.Count() > 0)
+            toProcess.Push(srcLinkedVisualisations.First());
+
+        var connectedVis = new List<Visualization>();
+        connectedVis.Add(src);
+        var connectedLinkedVis = new List<LinkedVisualisations>();
+        var processed = new List<LinkedVisualisations>();
+
+        while (toProcess.Count > 0)
+        {
+            var link = toProcess.Pop();
+            processed.Add(link);
+
+            if (!connectedVis.Contains(link.V1)) connectedVis.Add(link.V1);
+            if (!connectedVis.Contains(link.V2)) connectedVis.Add(link.V2);
+
+            foreach (var srcvis in connectedVis)
+            {
+                var connected = linkedVisualisationDictionary.Values.Select(x => x.GetComponent<LinkedVisualisations>())
+                                                                    .Where(x => !processed.Contains(x))
+                                                                    .Where(x => x.V1 == srcvis || x.V2 == srcvis);
+
+                foreach (var v in connected)
+                {
+                    toProcess.Push(v);
+
+                    if (!connectedLinkedVis.Contains(v))
+                    {
+                        connectedLinkedVis.Add(v);
+                    }
+                }
+            }
+        }
+        return new System.Tuple<List<Visualization>, List<LinkedVisualisations>>(connectedVis, connectedLinkedVis);
+    }
+
+    public System.Tuple<List<Visualization>, List<LinkedVisualisations>> GetChainedVisualisationsAndLinkedVisualisations(LinkedVisualisations src)
+    {
+        var toProcess = new Stack<LinkedVisualisations>();
+        toProcess.Push(src);
+
+        var connectedVis = new List<Visualization>();
+        var connectedLinkedVis = new List<LinkedVisualisations>();
+        var processed = new List<LinkedVisualisations>();
+
+        while (toProcess.Count > 0)
+        {
+            var link = toProcess.Pop();
+            processed.Add(link);
+
+            if (!connectedVis.Contains(link.V1)) connectedVis.Add(link.V1);
+            if (!connectedVis.Contains(link.V2)) connectedVis.Add(link.V2);
+
+            foreach (var srcvis in connectedVis)
+            {
+                var connected = linkedVisualisationDictionary.Values.Select(x => x.GetComponent<LinkedVisualisations>())
+                                                                    .Where(x => !processed.Contains(x))
+                                                                    .Where(x => x.V1 == srcvis || x.V2 == srcvis);
+
+                foreach (var v in connected)
+                {
+                    toProcess.Push(v);
+
+                    if (!connectedLinkedVis.Contains(v))
+                    {
+                        connectedLinkedVis.Add(v);
+                    }
+                }
+            }
+        }
+        return new System.Tuple<List<Visualization>, List<LinkedVisualisations>>(connectedVis, connectedLinkedVis);
     }
 
     List<string> toDestroy = new List<string>();

@@ -43,3 +43,16 @@ The following packages were updated:
   com.unity.test-framework from version 1.1.16 to 1.1.19
   com.unity.xr.management from version 3.2.15 to 3.2.16
   com.unity.xr.windowsmr from version 2.3.0 to 2.4.1
+
+=== Mon Feb 22 14:45:08 2021
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.ads from version 3.5.2 to 3.6.1
+  com.unity.multiplayer-hlapi from version 1.0.6 to 1.0.8
+  com.unity.purchasing from version 2.1.1 to 2.2.1
+  com.unity.test-framework from version 1.1.19 to 1.1.20
+  com.unity.xr.management from version 3.2.16 to 3.2.17
+  com.unity.xr.windowsmr from version 2.4.1 to 2.5.2

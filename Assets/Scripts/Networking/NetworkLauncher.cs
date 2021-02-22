@@ -5,7 +5,6 @@ using System;
 
 public class NetworkLauncher : MonoBehaviourPunCallbacks
 {
-     
     [SerializeField] [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
     private byte maxPlayersPerRoom = 4;
     [SerializeField] [Tooltip("The level of logging to show from Photon.")]
@@ -13,20 +12,45 @@ public class NetworkLauncher : MonoBehaviourPunCallbacks
     [SerializeField] [Tooltip("The number of updates that should be sent/received to the server per second. Higher values will result in smoother gameplay at the cost of increased network traffic. Values above 20 may result " +
                               "in server timeouts if using cloud servers.")]
     public int sendRate = 30;
+    public bool autoconnect = true;
+    public string UserId = "";
 
-    void Awake() {
-        if (!PhotonNetwork.IsConnected)
+    public Player Hololens1Player;
+    public Player Hololens2Player;
+
+    static NetworkLauncher _instance;
+    public static NetworkLauncher Instance
+    {
+        get { return _instance ?? (_instance = FindObjectOfType<NetworkLauncher>()); }
+    }
+
+    void Awake()
+    {
+        if (!PhotonNetwork.IsConnected && autoconnect)
         {
-            string userId = Guid.NewGuid().ToString();
-            PhotonNetwork.AuthValues = new AuthenticationValues(userId);
-            PhotonNetwork.AutomaticallySyncScene = false;
-            PhotonNetwork.LogLevel = loglevel;
-            PhotonNetwork.SendRate = sendRate;
-            PhotonNetwork.SerializationRate = sendRate;
-            
-            PhotonNetwork.ConnectUsingSettings();
-            DontDestroyOnLoad(gameObject);
+            ConnectToServer();
         }
+    }
+
+    public void ConnectToServer(string userId = "")
+    {
+        this.UserId = userId;
+
+        if (userId == "")
+            userId = Guid.NewGuid().ToString();
+
+        // We use the player custom properties as a workaround because the user id set in AuthValues returns null for the master client
+        ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable();
+        properties["UserID"] = userId;
+        PhotonNetwork.SetPlayerCustomProperties(properties);
+        PhotonNetwork.AuthValues = new AuthenticationValues(userId);
+        PhotonNetwork.AutomaticallySyncScene = false;
+        PhotonNetwork.LogLevel = loglevel;
+        PhotonNetwork.SendRate = sendRate;
+        PhotonNetwork.SerializationRate = sendRate;
+
+        PhotonNetwork.ConnectUsingSettings();
+        DontDestroyOnLoad(gameObject);
     }
 
     public override void OnConnectedToMaster() {
@@ -71,10 +95,33 @@ public class NetworkLauncher : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) {
         Debug.Log("Player connected");
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (newPlayer.CustomProperties["UserID"].ToString() == "HoloLens1")
+            {
+                Hololens1Player = newPlayer;
+            }
+            else if (newPlayer.CustomProperties["UserID"].ToString() == "HoloLens2")
+            {
+                Hololens2Player = newPlayer;
+            }
+        }
     }
 
-    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer) {
-        Debug.Log("Player disconnected");
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            if (otherPlayer.CustomProperties["UserID"].ToString() == "HoloLens1")
+            {
+                Hololens1Player = null;
+            }
+            else if (otherPlayer.CustomProperties["UserID"].ToString() == "HoloLens2")
+            {
+                Hololens2Player = null;
+            }
+        }
     }
 
     public override void OnDisconnected(DisconnectCause cause) {

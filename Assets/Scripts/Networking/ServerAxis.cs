@@ -1,11 +1,12 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.IO.Ports;
 using System.Threading;
 using UnityEngine;
 
-public class ServerAxis : MonoBehaviourPun
+public class ServerAxis : MonoBehaviourPun, IPunObservable
 {
     [Header("Bluetooth Settings")]
     public string COM = "COM9";
@@ -31,11 +32,7 @@ public class ServerAxis : MonoBehaviourPun
     private bool connected;
     private bool axisInitialised;   // Added these - to reset rotary to zero on if axes not repowered.
     private int rotaryDifference;
-    private bool isUpdateQueued = false;
     private bool followMode;
-
-    private Vector3 prevPosition;
-    private Quaternion prevRotation;
 
     // Bluetooth variables
     private SerialPort sp;
@@ -55,29 +52,35 @@ public class ServerAxis : MonoBehaviourPun
         sp.Handshake = Handshake.None;
         sp.NewLine = "\n";  // Need this or ReadLine() fails
 
+        TryConnectToPort();
+    }
+
+    private void TryConnectToPort()
+    {
         try
         {
             sp.Open();
         }
         catch (SystemException f)
         {
-            print("FAILED TO OPEN PORT");
-
+            print("Failed to open port " + COM);
+            return;
         }
+
         if (sp.IsOpen)
         {
-            print("SerialOpen!");
+            print("Successfully opened port " + COM);
 
             ReadThread = new Thread(new ThreadStart(ReadSerial));
             ReadThread.Start();
             SetSteppedMode(0);
-        }
-        else
-        {
-           // StartCoroutine(CheckPort());
+            SetLEDValue(255);
         }
     }
 
+    /// <summary>
+    /// Reads the serial to determine the input values for the Axis. These values are then send via RPC in the Update() loop.
+    /// </summary>
     private void ReadSerial()
     {
         while (ReadThread.IsAlive)
@@ -86,13 +89,11 @@ public class ServerAxis : MonoBehaviourPun
             {
                 if (sp.BytesToRead > 1)
                 {
+                    // Read in the raw values from the serial
                     string indata = sp.ReadLine();
-
                     string[] splits = indata.Split(' ');
-
                     rotaryPress = (int.Parse(splits[3]) == 1) ? 0 : 1;
                     buttonPress = int.Parse(splits[4]);
-
                     if (rotaryPress != 1 && buttonPress != 1)
                     {
                         sliderOne = int.Parse(splits[1]);
@@ -121,7 +122,21 @@ public class ServerAxis : MonoBehaviourPun
                     }
                     rotary = int.Parse(splits[2]) - rotaryDifference;
 
-                    isUpdateQueued = true;
+                    // Now we can convert these raw values into input variables that the client axis can understand
+                    // Update direction which the rotary was spun, and increment dimension accordingly
+                    if (prevRotary > rotary)
+                    {
+                        dimensionIdx = (++dimensionIdx) % SceneManager.Instance.dataObject.NbDimensions;
+                    }
+                    else if (prevRotary < rotary)
+                    {
+                        dimensionIdx--;
+                        if (dimensionIdx < 0)
+                            dimensionIdx += SceneManager.Instance.dataObject.NbDimensions;
+                    }
+                    prevRotary = rotary;
+                    minNormaliser = Remap((float)sliderOne, 0f, 255f, -0.505f, 0.505f);
+                    maxNormaliser = Remap((float)sliderTwo, 0f, 255f, -0.505f, 0.505f);
                 }
             }
             catch (SystemException f)
@@ -134,45 +149,32 @@ public class ServerAxis : MonoBehaviourPun
 
     private void Update()
     {
-        if (prevPosition != transform.position || prevRotation != transform.rotation)
+#if UNITY_EDITOR
+        if (sp.IsOpen)
         {
-            if (PhotonNetwork.IsConnected)
-                photonView.RPC("UpdateClientTransform", RpcTarget.All, transform.position, transform.rotation); //ADDED
-            else
-                GetComponent<ClientAxis>().UpdateClientTransform(transform.position, transform.rotation);
-
-            prevPosition = transform.position;
-            prevRotation = transform.rotation;
+            // We update the axis properties just for the server. These values are sent to the clients in OnPhotonSerializeView().
+            if (PhotonNetwork.IsMasterClient)
+            {
+                gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minNormaliser, maxNormaliser);
+            }
         }
+#endif
     }
 
-    private void FixedUpdate()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        // We send messages to clients in FixedUpdate as these cannot be sent on threads other than the main one
-        if (isUpdateQueued)
+        // We write values to the stream in this script, which gets read by the ClientAxis.cs script instead
+        if (stream.IsWriting)
         {
-            // Update direction which the rotary was spun, and increment dimension accordingly
-            if (prevRotary > rotary)
-            {
-                dimensionIdx = (++dimensionIdx) % SceneManager.Instance.dataObject.NbDimensions;
-            }
-            else if (prevRotary < rotary)
-            {
-                dimensionIdx--;
-                if (dimensionIdx < 0)
-                    dimensionIdx += SceneManager.Instance.dataObject.NbDimensions;
-            }
-            prevRotary = rotary;
+            // Send the transform properties to the stream
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+            stream.SendNext(transform.localScale);
 
-            minNormaliser = Remap((float)sliderOne, 0f, 255f, -0.505f, 0.505f);
-            maxNormaliser = Remap((float)sliderTwo, 0f, 255f, -0.505f, 0.505f);
-
-            if (PhotonNetwork.IsConnected)
-                photonView.RPC("UpdateClientAxis", RpcTarget.All, dimensionIdx, minNormaliser, maxNormaliser); //ADDED
-            else
-                GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minNormaliser, maxNormaliser);
-
-            isUpdateQueued = false;
+            // Now send the axis properties to the stream
+            stream.SendNext(dimensionIdx);
+            stream.SendNext(minNormaliser);
+            stream.SendNext(maxNormaliser);
         }
     }
 
@@ -219,7 +221,11 @@ public class ServerAxis : MonoBehaviourPun
             NewSendMsg(1, value);
         }
     }
-
+    public void SetLEDValue(int value)  // 0 to 256
+    {
+        NewSendMsg(8, value);
+        //LEDValue = value;
+    }
     public void FollowModeChange(int distance)
     {
         if (distance < 512)
@@ -245,6 +251,7 @@ public class ServerAxis : MonoBehaviourPun
 
     private void OnApplicationQuit()
     {
+        SetLEDValue(0);
         ReadThread.Abort();
     }
 }

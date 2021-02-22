@@ -224,17 +224,6 @@ public class Axis : MonoBehaviour {
         SceneManager.Instance.AddAxis(clone.GetComponent<Axis>());
     }
 
-    public void LateUpdate()
-    {
-        isDirty = false;
-        if (this.transform.position.y < 0f)
-        {
-            Destroy(this.gameObject);
-            SceneManager.Instance.DestroyAxis(this);
-            return;
-        }
-    }
-
     public void SetMinFilter(float val)
     {
         MinFilter = val;
@@ -330,12 +319,15 @@ public class Axis : MonoBehaviour {
 
         }
     }
-    public bool isPerependicular(Axis axis)
+
+    public bool IsPerpendicular(Axis axis)
     {
-        return Vector3.Dot(Up, axis.Up) > -0.2f && Vector3.Dot(Up, axis.Up) < 0.2f;
+        // return Vector3.Dot(Up, axis.Up) > -0.2f && Vector3.Dot(Up, axis.Up) < 0.2f;
+        return Vector3.Dot(Up, axis.Up) > -0.4f && Vector3.Dot(Up, axis.Up) < 0.4f;
     }
 
-    public bool IsParallel(Axis axis) {
+    public bool IsParallel(Axis axis)
+    {
         return Vector3.Dot(Up, axis.Up) > 0.5f;
     }
 

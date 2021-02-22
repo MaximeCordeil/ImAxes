@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClientAxis : MonoBehaviourPun
+public class ClientAxis : MonoBehaviourPun, IPunObservable
 {
     private Axis axis;
     private Axis lastAxis;
@@ -15,13 +15,78 @@ public class ClientAxis : MonoBehaviourPun
     private int prevSliderTwo;
     private int prevRotary;
 
-    [PunRPC]
+    private Transform mainCamera;
+
+    // Filtering for smoothing
+    private OneEuroFilter<Vector3> positionFilter;
+    private OneEuroFilter<Quaternion> rotationFilter;
+    private OneEuroFilter<Vector3> scaleFilter;
+
+    private void Start()
+    {
+        mainCamera = Camera.main.transform;
+
+        positionFilter = new OneEuroFilter<Vector3>(4);
+        rotationFilter = new OneEuroFilter<Quaternion>(4);
+        scaleFilter = new OneEuroFilter<Vector3>(4);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        // Don't update anything if the scene is not yet calibrated
+        if (!HoloLensCalibrator.Instance.IsCalibrated)
+            return;
+
+        // We read values from the stream in this script, which were sent by the ServerAxis.cs script
+        if (!stream.IsWriting)
+        {
+            // Data for axis transform
+            UpdateClientTransform((Vector3)stream.ReceiveNext(),
+                                  (Quaternion)stream.ReceiveNext(),
+                                  (Vector3)stream.ReceiveNext()
+                                  );
+
+            // Data for axis properties
+            UpdateClientAxis((int)stream.ReceiveNext(),
+                             (float)stream.ReceiveNext(),
+                             (float)stream.ReceiveNext());
+        }
+    }
+
+    public void UpdateClientTransform(Vector3 newPos, Quaternion newRot, Vector3 newScale)
+    {
+        if (HoloLensCalibrator.Instance.Root != null)
+        {
+            Transform tmp = transform.parent;
+            transform.parent = HoloLensCalibrator.Instance.Root;
+
+            // Filter the positions to smooth it a bit
+            newPos = positionFilter.Filter(newPos);
+            newRot = rotationFilter.Filter(newRot);
+            newScale = scaleFilter.Filter(newScale);
+
+            transform.localPosition = newPos;
+            transform.localRotation = newRot;
+            transform.localScale = newScale;
+
+            transform.parent = tmp;
+        }
+    }
+
     public void UpdateClientAxis(int dimensionIdx, float minNormaliser, float maxNormaliser)
     {
-        // Create the axis if it does not yet exist
         if (axis == null)
         {
             CreateAxisObject(dimensionIdx);
+            currentDimensionIdx = dimensionIdx;
+        }
+
+        // Rotary settings
+        if (dimensionIdx != currentDimensionIdx)
+        {
+            DestroyAxisObject(axis);
+            CreateAxisObject(dimensionIdx);
+
             currentDimensionIdx = dimensionIdx;
         }
 
@@ -34,43 +99,26 @@ public class ClientAxis : MonoBehaviourPun
         {
             axis.SetMinNormalizer(minNormaliser);
         }
-
-        // Rotary settings
-        if (dimensionIdx != currentDimensionIdx)
-        {
-            DestroyAxisObject(axis);
-            CreateAxisObject(dimensionIdx);
-
-            currentDimensionIdx = dimensionIdx;
-        }
-    }
-
-    [PunRPC]
-    public void UpdateClientTransform(Vector3 newPos, Quaternion newRot) // TODO: change this to interpolate values for smoothing
-    {
-        transform.position = newPos;
-        transform.rotation = newRot;
     }
 
     private void CreateAxisObject(int idx)
     {
-        createdAxis = Instantiate(Resources.Load("Axis Variant 1")) as GameObject;
+        createdAxis = (GameObject) Instantiate(Resources.Load("AxisVariant2"));
         axis = createdAxis.GetComponent<Axis>();
         axis.Init(SceneManager.Instance.dataObject, idx, false);
         axis.tag = "Axis";
         axis.isClone = true;
         axis.HideHandles();
 
-        axis.transform.SetParent(transform);
-        axis.transform.localPosition = Vector3.zero;
-        axis.transform.localRotation = Quaternion.identity;
-
         SceneManager.Instance.AddAxis(axis);
+
+        createdAxis.transform.SetParent(transform);
+        createdAxis.transform.localPosition = new Vector3(0.024f, 0.134f, 0.04f);
+        createdAxis.transform.localEulerAngles = new Vector3(0, 270, 0);
     }
 
     private void DestroyAxisObject(Axis axis)
     {
         SceneManager.Instance.DestroyAxis(axis);
     }
-
 }

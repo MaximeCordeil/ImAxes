@@ -86,7 +86,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.1.20",
+      "version": "1.1.22",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -160,10 +160,13 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.windowsmr": {
-      "version": "2.5.2",
+      "version": "2.6.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.modules.subsystems": "1.0.0",
+        "com.unity.modules.vr": "1.0.0",
+        "com.unity.modules.xr": "1.0.0",
         "com.unity.xr.management": "3.2.17",
         "com.unity.xr.interactionsubsystems": "1.0.1",
         "com.unity.xr.arsubsystems": "2.1.3"

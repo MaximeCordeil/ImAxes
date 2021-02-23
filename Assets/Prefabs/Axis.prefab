@@ -2931,13 +2931,9 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   MinFilter: -0.505
-  StartMinFilter: 0
   MaxFilter: 0.505
-  StartMaxFilter: 0
   MinNormaliser: -0.505
   MaxNormaliser: 0.505
-  StarMinNorm: 0
-  StarMaxNorm: 0
   isDirty: 0
   isClone: 0
   grabbed: 0

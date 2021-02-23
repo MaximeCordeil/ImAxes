@@ -39,15 +39,10 @@ public class Axis : MonoBehaviour {
 
     public HashSet<Axis> ConnectedAxis = new HashSet<Axis>();
     public static Quaternion AxisRot = new Quaternion();
-    public float MinFilter;
-    public float StartMinFilter;
-    public float MaxFilter;
-    public float StartMaxFilter;
-
-    public float MinNormaliser;
-    public float MaxNormaliser;
-    public float StarMinNorm;
-    public float StarMaxNorm;
+    [Range(-0.505f, 0.505f)] public float MinFilter;
+    [Range(-0.505f, 0.505f)] public float MaxFilter;
+    [Range(-0.505f, 0.505f)] public float MinNormaliser;
+    [Range(-0.505f, 0.505f)] public float MaxNormaliser;
 
 
     public bool isDirty;
@@ -196,15 +191,44 @@ public class Axis : MonoBehaviour {
 
     void Start()
     {
-
         //all colliders from this object should ignore raycast
         // Collider[] colliders = GetComponentsInChildren<Collider>();
         // foreach (var item in colliders)
         // {
         //     item.gameObject.layer = 2;
         // }
-
     }
+
+    #if UNITY_EDITOR
+    private float prevMinFilter;
+    private float prevMaxFilter;
+    private float prevMinNormaliser;
+    private float prevMaxNormaliser;
+    
+    void Update()
+    {
+        if (prevMinFilter != MinFilter)
+        {
+            SetMinFilter(MinFilter);
+            prevMinFilter = MinFilter;
+        }
+        if (prevMaxFilter != MaxFilter)
+        {
+            SetMaxFilter(MaxFilter);
+            prevMaxFilter = MaxFilter;
+        }
+        if (prevMinNormaliser != MinNormaliser)
+        {
+            SetMinNormalizer(MinNormaliser);
+            prevMinNormaliser = MinNormaliser;
+        }
+        if (prevMaxNormaliser != MaxNormaliser)
+        {
+            SetMaxNormalizer(MaxNormaliser);
+            prevMaxNormaliser = MaxNormaliser;
+        }
+    }
+    #endif
 
     void OnDestroy()
     {
@@ -226,14 +250,18 @@ public class Axis : MonoBehaviour {
 
     public void SetMinFilter(float val)
     {
-        MinFilter = val;
+        MinFilter = Mathf.Clamp(val, -0.505f, 0.505f);
         OnFiltered.Invoke(MinFilter, MaxFilter);
+
+        SetLocalYPosition(minFilterObject.transform, UtilMath.normaliseValue(val, -0.505f, 0.505f, -0.5f, 0.5f));
     }
 
     public void SetMaxFilter(float val)
     {
-        MaxFilter = val;
+        MaxFilter = Mathf.Clamp(val, -0.505f, 0.505f);
         OnFiltered.Invoke(MinFilter, MaxFilter);
+
+        SetLocalYPosition(maxFilterObject.transform, UtilMath.normaliseValue(val, -0.505f, 0.505f, -0.5f, 0.5f));
     }
 
     public void SetMinNormalizer(float val)
@@ -456,4 +484,10 @@ public class Axis : MonoBehaviour {
         transform.DOMove(pos, 0.4f).SetEase(Ease.OutBack);
     }
 
+    private void SetLocalYPosition(Transform t, float y)
+    {
+        var pos = t.localPosition;
+        pos.y = y;
+        t.localPosition = pos;
+    }
 }

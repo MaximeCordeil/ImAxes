@@ -260,6 +260,7 @@ public class LinkedVisualisations : MonoBehaviour
                         break;
                     // Always truncate 3D scatterplots
                     case Visualization.ViewType.Scatterplot3D:
+                        isV1Truncated = true;
                         truncateV1 = 1;
                         break;
                 }
@@ -276,6 +277,7 @@ public class LinkedVisualisations : MonoBehaviour
                         break;
                     // Always truncate 3D scatterplots
                     case Visualization.ViewType.Scatterplot3D:
+                        isV2Truncated = true;
                         truncateV2 = 1;
                         break;
                 }
@@ -324,6 +326,7 @@ public class LinkedVisualisations : MonoBehaviour
                         break;
                     // Always truncate 3D scatterplots
                     case Visualization.ViewType.Scatterplot3D:
+                        isV1Truncated = true;
                         truncateV1 = 1;
                         break;
                 }
@@ -340,6 +343,7 @@ public class LinkedVisualisations : MonoBehaviour
                         break;
                     // Always truncate 3D scatterplots
                     case Visualization.ViewType.Scatterplot3D:
+                        isV2Truncated = true;
                         truncateV2 = 1;
                         break;
                 }

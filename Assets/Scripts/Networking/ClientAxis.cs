@@ -103,7 +103,7 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
 
     private void CreateAxisObject(int idx)
     {
-        createdAxis = (GameObject) Instantiate(Resources.Load("AxisVariant2"));
+        createdAxis = (GameObject) Instantiate(Resources.Load("Axis2"));
         axis = createdAxis.GetComponent<Axis>();
         axis.Init(SceneManager.Instance.dataObject, idx, false);
         axis.tag = "Axis";

@@ -73,6 +73,15 @@ public class Axis : MonoBehaviour {
     Axis ghostSourceAxis = null;
     public static Axis CurrentAxis;
     public static List<Axis> AxisList = new List<Axis>();
+    
+    // Axis infobox details
+    public bool IsInfoboxEnabled = false;
+    [Range(-0.505f, 0.505f)] public float InfoboxPosition;
+    public TextMeshPro InfoboxText;
+    private Renderer minFilterObjectRenderer;
+    private Renderer maxFilterObjectRenderer;
+    private Color originalMinFilterObjectColour;
+    private Color originalMaxFilterObjectColour;
 
     public void HideHandles()
     {
@@ -197,14 +206,20 @@ public class Axis : MonoBehaviour {
         // {
         //     item.gameObject.layer = 2;
         // }
+        
+        minFilterObjectRenderer = minFilterObject.GetComponent<Renderer>();
+        maxFilterObjectRenderer = maxFilterObject.GetComponent<Renderer>();
+        originalMinFilterObjectColour = minFilterObjectRenderer.material.color;
+        originalMaxFilterObjectColour = maxFilterObjectRenderer.material.color;
     }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR    // Debug code for interacting with inspector
     private float prevMinFilter;
     private float prevMaxFilter;
     private float prevMinNormaliser;
     private float prevMaxNormaliser;
-    
+    private bool prevInfoboxToggle;
+    private float prevInfoboxPosition;
     void Update()
     {
         if (prevMinFilter != MinFilter)
@@ -227,8 +242,18 @@ public class Axis : MonoBehaviour {
             SetMaxNormalizer(MaxNormaliser);
             prevMaxNormaliser = MaxNormaliser;
         }
+        if (prevInfoboxToggle != IsInfoboxEnabled)
+        {
+            ToggleInfobox(IsInfoboxEnabled);
+            prevInfoboxToggle = IsInfoboxEnabled;
+        }
+        if (prevInfoboxPosition != InfoboxPosition)
+        {
+            SetInfoboxPosition(InfoboxPosition);
+            prevInfoboxPosition = InfoboxPosition;
+        }
     }
-    #endif
+#endif
 
     void OnDestroy()
     {
@@ -253,7 +278,7 @@ public class Axis : MonoBehaviour {
         MinFilter = Mathf.Clamp(val, -0.505f, 0.505f);
         OnFiltered.Invoke(MinFilter, MaxFilter);
 
-        SetLocalYPosition(minFilterObject.transform, UtilMath.normaliseValue(val, -0.505f, 0.505f, -0.5f, 0.5f));
+        SetLocalYPosition(minFilterObject.transform, UtilMath.normaliseValue(MinFilter, -0.505f, 0.505f, -0.5f, 0.5f));
     }
 
     public void SetMaxFilter(float val)
@@ -261,7 +286,7 @@ public class Axis : MonoBehaviour {
         MaxFilter = Mathf.Clamp(val, -0.505f, 0.505f);
         OnFiltered.Invoke(MinFilter, MaxFilter);
 
-        SetLocalYPosition(maxFilterObject.transform, UtilMath.normaliseValue(val, -0.505f, 0.505f, -0.5f, 0.5f));
+        SetLocalYPosition(maxFilterObject.transform, UtilMath.normaliseValue(MaxFilter, -0.505f, 0.505f, -0.5f, 0.5f));
     }
 
     public void SetMinNormalizer(float val)
@@ -278,6 +303,61 @@ public class Axis : MonoBehaviour {
         UpdateRangeText();
         OnNormalized.Invoke(MinNormaliser, MaxNormaliser);
         UpdateTicks();
+    }
+
+    public void ToggleInfobox(bool toggle)
+    {
+        InfoboxText.enabled = toggle;
+        // Toggle visibility of all other labels
+        label.enabled = !toggle;
+        minimumValueDimensionLabel.enabled = !toggle;
+        maximumValueDimensionLabel.enabled = !toggle;
+        maximumValueDimensionLabel.enabled = !toggle;
+
+        if (toggle)
+        {
+            // Use the filter objects to mark the infobox location
+            SetInfoboxPosition(InfoboxPosition);
+            minFilterObjectRenderer.material.color = new Color(0, 0.4f, 0);
+            maxFilterObjectRenderer.material.color = new Color(0, 0.4f, 0);
+        }
+        else
+        {
+            // Reset filter object positions
+            minFilterObjectRenderer.material.color = originalMinFilterObjectColour;
+            maxFilterObjectRenderer.material.color = originalMaxFilterObjectColour;
+            SetMinFilter(MinFilter);
+            SetMaxFilter(MaxFilter);
+        }
+    }
+
+    public void SetInfoboxPosition(float val)
+    {
+        if (!IsInfoboxEnabled)
+            return;
+
+        InfoboxPosition = Mathf.Clamp(val, -0.505f, 0.505f);
+        float normalised = UtilMath.normaliseValue(InfoboxPosition, -0.505f, 0.505f, 0, 1f);
+        string dimension = string.Format("<size=16><b>{0}</b></size><br>" ,SceneManager.Instance.dataObject.indexToDimension(SourceIndex));
+
+        // Set infobox text
+        string type = SceneManager.Instance.dataObject.TypeDimensionDictionary1[SourceIndex];
+        if (type == "float")
+        {
+            InfoboxText.text = dimension + Mathf.Lerp(AttributeRange.x, AttributeRange.y, normalised).ToString("0.000");
+        }
+        else if (type == "string")
+        {
+            float value = Mathf.Lerp(AttributeRange.x, AttributeRange.y, normalised);
+            float nearestvalue = UtilMath.ClosestTo(SceneManager.Instance.dataObject.TextualDimensions.Keys.ToList(), value);
+            InfoboxText.text = dimension + SceneManager.Instance.dataObject.TextualDimensions[nearestvalue].ToString();
+        }
+
+        // Set infobox text position, as well as the filter handles
+        float y = UtilMath.normaliseValue(InfoboxPosition, -0.505f, 0.505f, -0.5f, 0.5f);
+        SetLocalYPosition(InfoboxText.transform, y);
+        SetLocalYPosition(minFilterObject, y);
+        SetLocalYPosition(maxFilterObject, y);
     }
 
     public GameObject Clone()

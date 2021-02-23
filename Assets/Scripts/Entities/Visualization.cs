@@ -617,76 +617,88 @@ public class Visualization : MonoBehaviour
 
     private void Update()
     {
-        // Chain filtering for lines and scatterplots (ignore histograms)
-        if (viewType != ViewType.Histogram)
+        // If the viewType has changed, update the filters
+        if (previousViewType != viewType)
         {
-            // If the viewType has changed, update the filters
-            if (previousViewType != viewType)
-            {
-                UpdateFilteredPoints();
-            }
-            else
-            {
-                // Check if the filters or normalisers changed at all
-                switch (viewType)
-                {
-                    case ViewType.Scatterplot2D:
-                        {
-                            Axis axisV = referenceAxis.vertical;
-                            Axis axisH = referenceAxis.horizontal;
-                            if (axisV != null && axisH != null)
-                            {
-                                if (minXNormalizer != axisH.MinNormaliser ||
-                                    maxXNormalizer != axisH.MaxNormaliser ||
-                                    minYNormalizer != axisV.MinNormaliser ||
-                                    maxYNormalizer != axisV.MaxNormaliser ||
-                                    minXFilter != axisH.MinFilter ||
-                                    maxXFilter != axisH.MaxFilter ||
-                                    minYFilter != axisV.MinFilter ||
-                                    maxYFilter != axisV.MaxFilter)
-                                {
-                                    UpdateFilteredPoints();
-                                }
-                            }
-                        }
-                        break;
-                    case ViewType.Scatterplot3D:
-                        {
-                            Axis axisV = referenceAxis.vertical;
-                            Axis axisH = referenceAxis.horizontal;
-                            Axis axisD = referenceAxis.depth;
-
-                            if (axisV != null && axisH != null && axisD != null)
-                            {
-                                if (minXNormalizer != axisH.MinNormaliser ||
-                                    maxXNormalizer != axisH.MaxNormaliser ||
-                                    minYNormalizer != axisV.MinNormaliser ||
-                                    maxYNormalizer != axisV.MaxNormaliser ||
-                                    minZNormalizer != axisD.MinNormaliser ||
-                                    maxZNormalizer != axisD.MaxNormaliser ||
-                                    minXFilter != axisH.MinFilter ||
-                                    maxXFilter != axisH.MaxFilter ||
-                                    minYFilter != axisV.MinFilter ||
-                                    maxYFilter != axisV.MaxFilter ||
-                                    minZFilter != axisD.MinFilter ||
-                                    maxZFilter != axisD.MaxFilter)
-                                {
-                                    UpdateFilteredPoints();
-                                }
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            previousViewType = viewType;
-
-            // Reset the connected visualisations such that they can be recalculated again at the end of this frame
-            ConnectedVisualisations = null;
-            ConnectedLinkedVisualisations = null;
+            UpdateFilteredPoints();
         }
+        else
+        {
+            // Check if the filters or normalisers changed at all
+            switch (viewType)
+            {
+                // Even though histograms can't really link with anything, we still need this here as LinkedVisualisations hooks into this
+                case ViewType.Histogram:
+                    {
+                        if (axes.Count > 0)
+                        {
+                            if (minYNormalizer != axes[0].MinNormaliser ||
+                                maxYNormalizer != axes[0].MaxNormaliser ||
+                                minYFilter != axes[0].MinFilter ||
+                                maxYFilter != axes[0].MaxFilter)
+                            {
+                                UpdateFilteredPoints();
+                            }
+                        }
+                    }
+                    break;
+
+                case ViewType.Scatterplot2D:
+                    {
+                        Axis axisV = referenceAxis.vertical;
+                        Axis axisH = referenceAxis.horizontal;
+                        if (axisV != null && axisH != null)
+                        {
+                            if (minXNormalizer != axisH.MinNormaliser ||
+                                maxXNormalizer != axisH.MaxNormaliser ||
+                                minYNormalizer != axisV.MinNormaliser ||
+                                maxYNormalizer != axisV.MaxNormaliser ||
+                                minXFilter != axisH.MinFilter ||
+                                maxXFilter != axisH.MaxFilter ||
+                                minYFilter != axisV.MinFilter ||
+                                maxYFilter != axisV.MaxFilter)
+                            {
+                                UpdateFilteredPoints();
+                            }
+                        }
+                    }
+                    break;
+                case ViewType.Scatterplot3D:
+                    {
+                        Axis axisV = referenceAxis.vertical;
+                        Axis axisH = referenceAxis.horizontal;
+                        Axis axisD = referenceAxis.depth;
+
+                        if (axisV != null && axisH != null && axisD != null)
+                        {
+                            if (minXNormalizer != axisH.MinNormaliser ||
+                                maxXNormalizer != axisH.MaxNormaliser ||
+                                minYNormalizer != axisV.MinNormaliser ||
+                                maxYNormalizer != axisV.MaxNormaliser ||
+                                minZNormalizer != axisD.MinNormaliser ||
+                                maxZNormalizer != axisD.MaxNormaliser ||
+                                minXFilter != axisH.MinFilter ||
+                                maxXFilter != axisH.MaxFilter ||
+                                minYFilter != axisV.MinFilter ||
+                                maxYFilter != axisV.MaxFilter ||
+                                minZFilter != axisD.MinFilter ||
+                                maxZFilter != axisD.MaxFilter)
+                            {
+                                UpdateFilteredPoints();
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        previousViewType = viewType;
+
+        // Reset the connected visualisations such that they can be recalculated again at the end of this frame
+        ConnectedVisualisations = null;
+        ConnectedLinkedVisualisations = null;
     }
 
     private void UpdateFilteredPoints()
@@ -708,84 +720,80 @@ public class Visualization : MonoBehaviour
     {
         UpdateViewType();
 
-        // Chain filtering for lines and scatterplots (ignore histograms)
-        if (viewType != ViewType.Histogram)
+        // Update the connected visualisations list for this LinkedVisualisation only if it has not yet already
+        // been set by another Visualisation ir LinkedVisualisation. This essentially means that the first Visualisation
+        // or LinkedVisualisation in the chain which executes is the one which sets it for all other ones in the chain
+        if (ConnectedVisualisations == null)
         {
-            // Update the connected visualisations list for this LinkedVisualisation only if it has not yet already
-            // been set by another Visualisation ir LinkedVisualisation. This essentially means that the first Visualisation
-            // or LinkedVisualisation in the chain which executes is the one which sets it for all other ones in the chain
-            if (ConnectedVisualisations == null)
-            {
-                var result = ImAxesRecognizer.Instance.GetChainedVisualisationsAndLinkedVisualisations(this);
-                ConnectedVisualisations = result.Item1;
-                ConnectedLinkedVisualisations = result.Item2;
+            var result = ImAxesRecognizer.Instance.GetChainedVisualisationsAndLinkedVisualisations(this);
+            ConnectedVisualisations = result.Item1;
+            ConnectedLinkedVisualisations = result.Item2;
 
-                // Combine the FilteredPoints of all ConnectedVisualisations if at least one of them has changed
-                bool updateFiltered = false;
+            // Combine the FilteredPoints of all ConnectedVisualisations if at least one of them has changed
+            bool updateFiltered = false;
+            foreach (var vis in ConnectedVisualisations)
+            {
+                if (vis.FilteredPointsChanged)
+                {
+                    updateFiltered = true;
+                    break;
+                }
+            }
+
+            // Create a shared filtered array of all ConnectedVisualisations and set it to all Visualisations and LinkedVisualisations
+            if (updateFiltered)
+            {
+                int dataCount = SceneManager.Instance.dataObject.DataPoints;
+                SharedFilteredPoints = new float[dataCount];
                 foreach (var vis in ConnectedVisualisations)
                 {
-                    if (vis.FilteredPointsChanged)
+                    for (int i = 0; i < dataCount; i++)
                     {
-                        updateFiltered = true;
-                        break;
+                        if (vis.FilteredPoints[i] == 1)
+                            SharedFilteredPoints[i] = 1;
                     }
+
+                    vis.FilteredPointsChanged = false;
                 }
 
-                // Create a shared filtered array of all ConnectedVisualisations and set it to all Visualisations and LinkedVisualisations
-                if (updateFiltered)
+                foreach (var vis in ConnectedVisualisations)
                 {
-                    int dataCount = SceneManager.Instance.dataObject.DataPoints;
-                    SharedFilteredPoints = new float[dataCount];
-                    foreach (var vis in ConnectedVisualisations)
-                    {
-                        for (int i = 0; i < dataCount; i++)
-                        {
-                            if (vis.FilteredPoints[i] == 1)
-                                SharedFilteredPoints[i] = 1;
-                        }
-
-                        vis.FilteredPointsChanged = false;
-                    }
-
-                    foreach (var vis in ConnectedVisualisations)
-                    {
-                        vis.SharedFilteredPoints = SharedFilteredPoints;
-                        vis.SharedFilteredPointsChanged = true;
-                    }
-                    foreach (var linkedVis in ConnectedLinkedVisualisations)
-                    {
-                        linkedVis.SharedFilteredPoints = SharedFilteredPoints;
-                        linkedVis.SharedFilteredPointsChanged = true;
-                    }
-
-                    SharedFilteredPointsChanged = true;
+                    vis.SharedFilteredPoints = SharedFilteredPoints;
+                    vis.SharedFilteredPointsChanged = true;
                 }
-            }
+                foreach (var linkedVis in ConnectedLinkedVisualisations)
+                {
+                    linkedVis.SharedFilteredPoints = SharedFilteredPoints;
+                    linkedVis.SharedFilteredPointsChanged = true;
+                }
 
-            if (SharedFilteredPointsChanged && viewType != ViewType.Histogram) // Histograms can't actually link with anything, so we just ignore
+                SharedFilteredPointsChanged = true;
+            }
+        }
+
+        if (SharedFilteredPointsChanged && viewType != ViewType.Histogram) // Histograms can't actually link with anything, so we just ignore
+        {
+            Mesh mesh = null;
+            switch (viewType)
             {
-                Mesh mesh = null;
-                switch (viewType)
-                {
-                    case ViewType.Scatterplot2D:
-                        mesh = scatterplot2DObject.GetComponentInChildren<MeshFilter>().mesh;
-                        break;
-                    case ViewType.Scatterplot3D:
-                        mesh = scatterplot3DObject.GetComponentInChildren<MeshFilter>().mesh;
-                        break;
-                }
-
-                List<Vector3> normals = new List<Vector3>();
-                mesh.GetNormals(normals);
-                for (int i = 0; i < normals.Count; i++)
-                {
-                    Vector3 norm = normals[i];
-                    norm.z = SharedFilteredPoints[i];
-                    normals[i] = norm;
-                }
-                mesh.SetNormals(normals);
-                SharedFilteredPointsChanged = false;
+                case ViewType.Scatterplot2D:
+                    mesh = scatterplot2DObject.GetComponentInChildren<MeshFilter>().mesh;
+                    break;
+                case ViewType.Scatterplot3D:
+                    mesh = scatterplot3DObject.GetComponentInChildren<MeshFilter>().mesh;
+                    break;
             }
+
+            List<Vector3> normals = new List<Vector3>();
+            mesh.GetNormals(normals);
+            for (int i = 0; i < normals.Count; i++)
+            {
+                Vector3 norm = normals[i];
+                norm.z = SharedFilteredPoints[i];
+                normals[i] = norm;
+            }
+            mesh.SetNormals(normals);
+            SharedFilteredPointsChanged = false;
         }
 
         switch (viewType)

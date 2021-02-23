@@ -33,10 +33,6 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        // Don't update anything if the scene is not yet calibrated
-        if (!HoloLensCalibrator.Instance.IsCalibrated)
-            return;
-
         // We read values from the stream in this script, which were sent by the ServerAxis.cs script
         if (!stream.IsWriting)
         {
@@ -55,7 +51,7 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
 
     public void UpdateClientTransform(Vector3 newPos, Quaternion newRot, Vector3 newScale)
     {
-        if (HoloLensCalibrator.Instance.Root != null)
+        if (QRCodeSceneCalibrator.Instance.Root != null)
         {
             Transform tmp = transform.parent;
             transform.parent = HoloLensCalibrator.Instance.Root;

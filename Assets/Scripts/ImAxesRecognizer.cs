@@ -31,20 +31,12 @@ public class ImAxesRecognizer : MonoBehaviour
     public float PCP_DISTANCE = 0.00001f;
     public float SP_MIDPOINT_DISTANCE = 0.25f;
 
-    private static ImAxesRecognizer _instance;
-    public static ImAxesRecognizer Instance { get { return _instance; } }
-
-    private void Awake()
+    static ImAxesRecognizer _instance;
+    public static ImAxesRecognizer Instance
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            _instance = this;
-        }
+        get { return _instance ?? (_instance = FindObjectOfType<ImAxesRecognizer>()); }
     }
+
 
     void Start()
     {

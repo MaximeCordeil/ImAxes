@@ -30,19 +30,10 @@ public class SceneManager : MonoBehaviour
     [SerializeField]
     bool createAxisShelf = true;
     
-    private static SceneManager _instance;
-    public static SceneManager Instance { get { return _instance; } }
-
-    private void Awake()
+    static SceneManager _instance;
+    public static SceneManager Instance
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            _instance = this;
-        }
+        get { return _instance ?? (_instance = FindObjectOfType<SceneManager>()); }
     }
 
     void Start()

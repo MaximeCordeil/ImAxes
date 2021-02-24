@@ -196,23 +196,21 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
         // We write values to the stream in this script, which gets read by the ClientAxis.cs script instead
         if (stream.IsWriting)
         {
-            transform.SetParent(SceneCalibrator.Instance.Root);
+            transform.SetParent(ViconOriginSceneCalibrator.Instance.Root);
 
             // Send the transform properties to the stream
             stream.SendNext(transform.localPosition);
             stream.SendNext(transform.localRotation);
             stream.SendNext(transform.localScale);
 
-            Debug.Log(transform.localPosition.ToString("F3"));
-
-            // Now send any boolean values to the stream
-            stream.SendNext(infoboxToggle);
-
             // Now send the axis properties to the stream
             stream.SendNext(dimensionIdx);
             stream.SendNext(minFilter);
             stream.SendNext(maxFilter);
             stream.SendNext(infoboxPosition);
+            
+            // Now send any boolean values to the stream
+            stream.SendNext(infoboxToggle);
 
             transform.parent = null;
         }

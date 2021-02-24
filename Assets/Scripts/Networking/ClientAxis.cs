@@ -22,6 +22,10 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
     private OneEuroFilter<Quaternion> rotationFilter;
     private OneEuroFilter<Vector3> scaleFilter;
 
+    public GameObject axisPrefab;
+    public SceneManager sceneManager;
+    private Transform root;
+
     private void Start()
     {
         mainCamera = Camera.main.transform;
@@ -29,6 +33,12 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         positionFilter = new OneEuroFilter<Vector3>(4);
         rotationFilter = new OneEuroFilter<Quaternion>(4);
         scaleFilter = new OneEuroFilter<Vector3>(4);
+
+#if UNITY_EDITOR
+        root = ViconOriginSceneCalibrator.Instance.Root;
+#else
+        root = QRCodeSceneCalibrator.Instance.Root;
+#endif
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -42,36 +52,34 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
                                   (Vector3)stream.ReceiveNext()
                                   );
 
-            // Datsa for axis booleans
-            ToggleInfoboxMode((bool)stream.ReceiveNext());
-
             // Data for axis properties
             UpdateClientAxis((int)stream.ReceiveNext(),
                              (float)stream.ReceiveNext(),
                              (float)stream.ReceiveNext(),
                              (float)stream.ReceiveNext()
                              );
+                             
+            // Data for axis booleans
+            ToggleInfoboxMode((bool)stream.ReceiveNext());
+
         }
     }
 
     public void UpdateClientTransform(Vector3 newPos, Quaternion newRot, Vector3 newScale)
     {
-        if (SceneCalibrator.Instance.Root != null)
-        {
-            Transform tmp = transform.parent;
-            transform.parent = SceneCalibrator.Instance.Root;
+        Transform tmp = transform.parent;
+        transform.parent = root;
 
-            // Filter the positions to smooth it a bit
-            newPos = positionFilter.Filter(newPos);
-            newRot = rotationFilter.Filter(newRot);
-            newScale = scaleFilter.Filter(newScale);
+        // Filter the positions to smooth it a bit
+        // newPos = positionFilter.Filter(newPos);
+        // newRot = rotationFilter.Filter(newRot);
+        // newScale = scaleFilter.Filter(newScale);
 
-            transform.localPosition = newPos;
-            transform.localRotation = newRot;
-            transform.localScale = newScale;
+        transform.localPosition = newPos;
+        transform.localRotation = newRot;
+        // transform.localScale = newScale;
 
-            transform.parent = tmp;
-        }
+        transform.parent = tmp;
     }
 
     public void UpdateClientAxis(int dimensionIdx, float minFilter, float maxFilter, float infoboxPosition)
@@ -116,14 +124,14 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
 
     private void CreateAxisObject(int idx)
     {
-        createdAxis = (GameObject) Instantiate(Resources.Load("Axis2"));
+        createdAxis = Instantiate(axisPrefab) as GameObject;
         axis = createdAxis.GetComponent<Axis>();
-        axis.Init(SceneManager.Instance.dataObject, idx, false);
+        axis.Init(sceneManager.dataObject, idx, false);
         axis.tag = "Axis";
         axis.isClone = true;
         // axis.HideHandles();
 
-        SceneManager.Instance.AddAxis(axis);
+        sceneManager.AddAxis(axis);
 
         createdAxis.transform.SetParent(transform);
         createdAxis.transform.localPosition = new Vector3(0.024f, 0.134f, 0.04f);
@@ -132,6 +140,6 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
 
     private void DestroyAxisObject(Axis axis)
     {
-        SceneManager.Instance.DestroyAxis(axis);
+        sceneManager.DestroyAxis(axis);
     }
 }

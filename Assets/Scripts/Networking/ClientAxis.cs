@@ -42,19 +42,24 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
                                   (Vector3)stream.ReceiveNext()
                                   );
 
+            // Datsa for axis booleans
+            ToggleInfoboxMode((bool)stream.ReceiveNext());
+
             // Data for axis properties
             UpdateClientAxis((int)stream.ReceiveNext(),
                              (float)stream.ReceiveNext(),
-                             (float)stream.ReceiveNext());
+                             (float)stream.ReceiveNext(),
+                             (float)stream.ReceiveNext()
+                             );
         }
     }
 
     public void UpdateClientTransform(Vector3 newPos, Quaternion newRot, Vector3 newScale)
     {
-        if (QRCodeSceneCalibrator.Instance.Root != null)
+        if (SceneCalibrator.Instance.Root != null)
         {
             Transform tmp = transform.parent;
-            transform.parent = HoloLensCalibrator.Instance.Root;
+            transform.parent = SceneCalibrator.Instance.Root;
 
             // Filter the positions to smooth it a bit
             newPos = positionFilter.Filter(newPos);
@@ -69,7 +74,7 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         }
     }
 
-    public void UpdateClientAxis(int dimensionIdx, float minNormaliser, float maxNormaliser)
+    public void UpdateClientAxis(int dimensionIdx, float minFilter, float maxFilter, float infoboxPosition)
     {
         if (axis == null)
         {
@@ -87,13 +92,25 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         }
 
         // Slider settings
-        if (axis.MaxNormaliser != maxNormaliser)
+        if (axis.MinFilter != minFilter)
         {
-            axis.SetMaxNormalizer(maxNormaliser);
+            axis.SetMinFilter(minFilter);
         }
-        if (axis.MinNormaliser != minNormaliser)
+        if (axis.MaxFilter != maxFilter)
         {
-            axis.SetMinNormalizer(minNormaliser);
+            axis.SetMaxFilter(maxFilter);
+        }
+        if (axis.InfoboxPosition != infoboxPosition)
+        {
+            axis.SetInfoboxPosition(infoboxPosition);
+        }
+    }
+
+    public void ToggleInfoboxMode(bool toggle)
+    {
+        if (axis.IsInfoboxEnabled != toggle)
+        {
+            axis.ToggleInfobox(toggle);
         }
     }
 
@@ -104,7 +121,7 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         axis.Init(SceneManager.Instance.dataObject, idx, false);
         axis.tag = "Axis";
         axis.isClone = true;
-        axis.HideHandles();
+        // axis.HideHandles();
 
         SceneManager.Instance.AddAxis(axis);
 

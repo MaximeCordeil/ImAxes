@@ -7,18 +7,11 @@ using Microsoft.Windows.Perception.Spatial.Preview;
 using MRTKExtensions.QRCodes;
 using UnityEngine;
 
-public class QRCodeSceneCalibrator : MonoBehaviour
+public class QRCodeSceneCalibrator : SceneCalibrator
 {
-    public Transform Root;
     public QRTrackerController TrackerController;
 
-    static QRCodeSceneCalibrator _instance;
-    public static QRCodeSceneCalibrator Instance
-    {
-        get { return _instance ?? (_instance = FindObjectOfType<QRCodeSceneCalibrator>()); }
-    }
-
-    private void Start()
+    protected void Start()
     {
         if (Root == null)
             Root = new GameObject("Root").transform;

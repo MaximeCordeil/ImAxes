@@ -17,10 +17,10 @@ MonoBehaviour:
     AppIdChat: 
     AppIdVoice: 
     AppVersion: 
-    UseNameServer: 0
+    UseNameServer: 1
     FixedRegion: 
-    Server: 192.168.0.145
-    Port: 5055
+    Server: 
+    Port: 0
     ProxyServer: 
     Protocol: 0
     EnableProtocolFallback: 1
@@ -52,6 +52,7 @@ MonoBehaviour:
   - ShiftRootRotationXRPC
   - ShiftRootRotationYRPC
   - ShiftRootRotationZRPC
+  - ToggleInfoboxMode
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

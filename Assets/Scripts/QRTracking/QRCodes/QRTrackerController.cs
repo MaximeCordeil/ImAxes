@@ -31,7 +31,6 @@ namespace MRTKExtensions.QRCodes
             {
                 return;
             }
-
             QRCodeTrackingService.QRCodeFound += ProcessTrackingFound;
             spatialGraphCoordinateSystemSetter.PositionAcquired += SetScale;
 

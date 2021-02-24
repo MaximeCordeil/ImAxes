@@ -132,8 +132,10 @@ public class VisualisationFactory : MonoBehaviour
         DiscreteBinner binner = new DiscreteBinner();
 
         float[] values = dobjs.GetCol(dobjs.DataArray, Dimension);
-        values = values.Where(x => x >= minFilter + 0.5f && x <= maxFilter + 0.5f).ToArray();
-
+        var filtered = values.Where(x => x >= minFilter + 0.5f && x <= maxFilter + 0.5f);
+        if (filtered.Count() > 0)
+            values = filtered.ToArray();
+            
         float minVal = dobjs.DimensionsRange[Dimension].x;
         float maxVal = dobjs.DimensionsRange[Dimension].y;
 

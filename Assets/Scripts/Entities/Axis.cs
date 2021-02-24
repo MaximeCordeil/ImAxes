@@ -85,13 +85,10 @@ public class Axis : MonoBehaviour {
 
     public void HideHandles()
     {
-
         minFilterObject.localScale = Vector3.zero;
         maxFilterObject.localScale = Vector3.zero;
-        minNormaliserObject.localScale = Vector3.zero;
-        maxNormaliserObject.localScale = Vector3.zero;
-
-
+        // minNormaliserObject.localScale = Vector3.zero;
+        // maxNormaliserObject.localScale = Vector3.zero;
     }
 
     public void Init(DataBinding.DataObject srcData, int idx, bool isPrototype = false)
@@ -213,6 +210,7 @@ public class Axis : MonoBehaviour {
         originalMaxFilterObjectColour = maxFilterObjectRenderer.material.color;
     }
 
+/*
 #if UNITY_EDITOR    // Debug code for interacting with inspector
     private float prevMinFilter;
     private float prevMaxFilter;
@@ -254,6 +252,7 @@ public class Axis : MonoBehaviour {
         }
     }
 #endif
+*/
 
     void OnDestroy()
     {
@@ -307,6 +306,7 @@ public class Axis : MonoBehaviour {
 
     public void ToggleInfobox(bool toggle)
     {
+        IsInfoboxEnabled = toggle;
         InfoboxText.enabled = toggle;
         // Toggle visibility of all other labels
         label.enabled = !toggle;

@@ -23,8 +23,9 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
 
     [Header("Client Axis Values")]
     public int dimensionIdx;
-    public float minNormaliser;
-    public float maxNormaliser;
+    public float minFilter;
+    public float maxFilter;
+    public float infoboxPosition;
 
     private int prevSliderOne;
     private int prevSliderTwo;
@@ -33,6 +34,7 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     private bool axisInitialised;   // Added these - to reset rotary to zero on if axes not repowered.
     private int rotaryDifference;
     private bool followMode;
+    private bool infoboxToggle;
 
     // Bluetooth variables
     private SerialPort sp;
@@ -135,8 +137,38 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
                             dimensionIdx += SceneManager.Instance.dataObject.NbDimensions;
                     }
                     prevRotary = rotary;
-                    minNormaliser = Remap((float)sliderOne, 0f, 255f, -0.505f, 0.505f);
-                    maxNormaliser = Remap((float)sliderTwo, 0f, 255f, -0.505f, 0.505f);
+
+
+                    // Check for button toggle
+                    if (buttonPress == 1)
+                    {
+                        infoboxToggle = !infoboxToggle;
+
+                        // Adjust modes depending on the new toggle
+                        if (infoboxToggle)
+                        {
+                            FollowModeChange(128);
+                            SendSlider(0, 128);
+                            SendSlider(1, 128);
+                        }
+                        else
+                        {
+                            TurnOffFollowMode();
+                            SendSlider(0, prevSliderOne);
+                            SendSlider(1, prevSliderTwo);
+                        }
+                    }
+
+                    // Send different values depending if the infobox is enabled or not
+                    if (infoboxToggle)
+                    {
+                        infoboxPosition = Remap(Mathf.RoundToInt(((float)sliderOne + (float)sliderTwo)) / 2, 0, 255f, -0.505f, 0.505f);
+                    }
+                    else
+                    {
+                        minFilter = Remap((float)sliderOne, 0f, 255f, -0.505f, 0.505f);
+                        maxFilter = Remap((float)sliderTwo, 0f, 255f, -0.505f, 0.505f);
+                    }
                 }
             }
             catch (SystemException f)
@@ -153,10 +185,8 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
         if (sp.IsOpen)
         {
             // We update the axis properties just for the server. These values are sent to the clients in OnPhotonSerializeView().
-            if (PhotonNetwork.IsMasterClient)
-            {
-                gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minNormaliser, maxNormaliser);
-            }
+            gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minFilter, maxFilter, infoboxPosition);
+            gameObject.GetComponent<ClientAxis>().ToggleInfoboxMode(infoboxToggle);
         }
 #endif
     }
@@ -166,15 +196,25 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
         // We write values to the stream in this script, which gets read by the ClientAxis.cs script instead
         if (stream.IsWriting)
         {
+            transform.SetParent(SceneCalibrator.Instance.Root);
+
             // Send the transform properties to the stream
-            stream.SendNext(transform.position);
-            stream.SendNext(transform.rotation);
+            stream.SendNext(transform.localPosition);
+            stream.SendNext(transform.localRotation);
             stream.SendNext(transform.localScale);
+
+            Debug.Log(transform.localPosition.ToString("F3"));
+
+            // Now send any boolean values to the stream
+            stream.SendNext(infoboxToggle);
 
             // Now send the axis properties to the stream
             stream.SendNext(dimensionIdx);
-            stream.SendNext(minNormaliser);
-            stream.SendNext(maxNormaliser);
+            stream.SendNext(minFilter);
+            stream.SendNext(maxFilter);
+            stream.SendNext(infoboxPosition);
+
+            transform.parent = null;
         }
     }
 

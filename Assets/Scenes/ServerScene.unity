@@ -964,7 +964,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: AxesBlue
+  ObjectName: ModulAx_AxesBlue
   Client: {fileID: 833475439}
 --- !u!1 &105367121
 GameObject:
@@ -2066,7 +2066,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: AxesBlack
+  ObjectName: ModulAx_AxesBlack
   Client: {fileID: 833475439}
 --- !u!114 &289700503
 MonoBehaviour:
@@ -6856,7 +6856,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: Origin
+  ObjectName: ModulAx_Origin
   Client: {fileID: 833475439}
 --- !u!1 &966724646
 GameObject:
@@ -9505,7 +9505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: HoloLens2
+  ObjectName: ModulAx_HoloLens2
   Client: {fileID: 833475439}
 --- !u!20 &1390161757
 Camera:
@@ -10080,7 +10080,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: AxesRed
+  ObjectName: ModulAx_AxesRed
   Client: {fileID: 833475439}
 --- !u!114 &1516549961
 MonoBehaviour:
@@ -11219,7 +11219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: HoloLens1
+  ObjectName: ModulAx_HoloLens1
   Client: {fileID: 833475439}
 --- !u!81 &1692335283
 AudioListener:

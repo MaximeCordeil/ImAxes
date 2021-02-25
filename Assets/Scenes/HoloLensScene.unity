@@ -398,7 +398,7 @@ MonoBehaviour:
     type: 3}
   sourceData: {fileID: 4900000, guid: 37b008166b12844bc967ab8195316518, type: 3}
   metadata: {fileID: 11400000, guid: 5469941c0faf14d7f9ae454c11b6150e, type: 2}
-  createAxisShelf: 1
+  createAxisShelf: 0
 --- !u!114 &554863328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -928,7 +928,7 @@ Transform:
   m_GameObject: {fileID: 755831994}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: 0.025, y: 0.025, z: 0.025}
   m_Children: []
   m_Father: {fileID: 2033483917}
   m_RootOrder: 0

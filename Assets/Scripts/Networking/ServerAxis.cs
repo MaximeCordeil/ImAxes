@@ -162,12 +162,12 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
                     // Send different values depending if the infobox is enabled or not
                     if (infoboxToggle)
                     {
-                        infoboxPosition = Remap(Mathf.RoundToInt(((float)sliderOne + (float)sliderTwo)) / 2, 0, 255f, -0.505f, 0.505f);
+                        infoboxPosition = Remap(Mathf.RoundToInt(((float)sliderOne + (float)sliderTwo)) / 2, 0, 255f, 0.505f, -0.505f);
                     }
                     else
                     {
-                        minFilter = Remap((float)sliderOne, 0f, 255f, -0.505f, 0.505f);
-                        maxFilter = Remap((float)sliderTwo, 0f, 255f, -0.505f, 0.505f);
+                        minFilter = Remap((float)sliderOne, 0f, 255f, 0.505f, -0.505f);
+                        maxFilter = Remap((float)sliderTwo, 0f, 255f, 0.505f, -0.505f);
                     }
                 }
             }

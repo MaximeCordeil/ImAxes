@@ -35,6 +35,9 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     private int rotaryDifference;
     private bool followMode;
     private bool infoboxToggle;
+    private bool ignoreSliderMovement;
+    private bool ignoreButtonPresses;
+    
 
     // Bluetooth variables
     private SerialPort sp;
@@ -137,43 +140,11 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
                             dimensionIdx += SceneManager.Instance.dataObject.NbDimensions;
                     }
                     prevRotary = rotary;
-
-
-                    // Check for button toggle
-                    if (buttonPress == 1)
-                    {
-                        infoboxToggle = !infoboxToggle;
-
-                        // Adjust modes depending on the new toggle
-                        if (infoboxToggle)
-                        {
-                            FollowModeChange(128);
-                            SendSlider(0, 128);
-                            SendSlider(1, 128);
-                        }
-                        else
-                        {
-                            TurnOffFollowMode();
-                            SendSlider(0, prevSliderOne);
-                            SendSlider(1, prevSliderTwo);
-                        }
-                    }
-
-                    // Send different values depending if the infobox is enabled or not
-                    if (infoboxToggle)
-                    {
-                        infoboxPosition = Remap(Mathf.RoundToInt(((float)sliderOne + (float)sliderTwo)) / 2, 0, 255f, 0.505f, -0.505f);
-                    }
-                    else
-                    {
-                        minFilter = Remap((float)sliderOne, 0f, 255f, 0.505f, -0.505f);
-                        maxFilter = Remap((float)sliderTwo, 0f, 255f, 0.505f, -0.505f);
-                    }
                 }
             }
             catch (SystemException f)
             {
-                print(f);
+                Debug.LogError(f);
                 ReadThread.Abort();
             }
         }
@@ -181,9 +152,46 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
 
     private void Update()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR    // We assume that the server is always a  Unity Editor
         if (sp.IsOpen)
         {
+            // Check for button toggle. Add a delay as well to prevent multiple button presses to be given in quick succession
+            if (buttonPress == 1 && !ignoreButtonPresses)
+            {
+                infoboxToggle = !infoboxToggle;
+
+                // Adjust modes depending on the new toggle
+                if (infoboxToggle)
+                {
+                    FollowModeChange(128);
+                    SendSlider(0, (int)Remap(infoboxPosition, 0.505f, -0.505f, 0f, 255f));
+                    SendSlider(1, (int)Remap(infoboxPosition, 0.505f, -0.505f, 0f, 255f));
+                }
+                else
+                {
+                    TurnOffFollowMode();
+                    SendSlider(0, (int)Remap(minFilter, 0.505f, -0.505f, 0f, 255f));
+                    SendSlider(1, (int)Remap(maxFilter, 0.505f, -0.505f, 0f, 255f));
+                }
+
+                StartCoroutine(IgnoreSliderMovementForDuration(0.8f));
+                StartCoroutine(IgnoreButtonPressesForDuration(1f));
+            }
+
+            if (!ignoreSliderMovement)
+            {
+                // Send different values depending if the infobox is enabled or not
+                if (infoboxToggle)
+                {
+                    infoboxPosition = Remap(Mathf.RoundToInt(((float)sliderOne + (float)sliderTwo)) / 2, 0, 255f, 0.505f, -0.505f);
+                }
+                else
+                {
+                    minFilter = Remap((float)sliderOne, 0f, 255f, 0.505f, -0.505f);
+                    maxFilter = Remap((float)sliderTwo, 0f, 255f, 0.505f, -0.505f);
+                }
+            }            
+
             // We update the axis properties just for the server. These values are sent to the clients in OnPhotonSerializeView().
             gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minFilter, maxFilter, infoboxPosition);
             gameObject.GetComponent<ClientAxis>().ToggleInfoboxMode(infoboxToggle);
@@ -280,6 +288,7 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     public void TurnOffFollowMode()
     {
         NewSendMsg(2, 999);
+        followMode = false;
     }
 
     private float Remap(float value, float fromLow, float fromHigh, float toLow, float toHigh)
@@ -287,9 +296,25 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
         return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
     }
 
+    private IEnumerator IgnoreButtonPressesForDuration(float time)
+    {
+        ignoreButtonPresses = true;
+        yield return new WaitForSeconds(time);
+        ignoreButtonPresses = false;
+
+    }
+
+    private IEnumerator IgnoreSliderMovementForDuration(float time)
+    {
+        ignoreSliderMovement = true;
+        yield return new WaitForSeconds(time);
+        ignoreSliderMovement = false;
+    }
+
     private void OnApplicationQuit()
     {
         SetLEDValue(0);
-        ReadThread.Abort();
+        if (ReadThread != null)
+            ReadThread.Abort();
     }
 }

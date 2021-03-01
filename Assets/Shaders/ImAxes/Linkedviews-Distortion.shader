@@ -292,7 +292,7 @@ Shader "Staxestk/Linked-Views-Material"
 		else
 			t = 1.0;
 
-		o.color = lerp(float4(0, 0, 0, 0), float4(i.color.rgb, 1), t);
+		o.color = lerp(float4(0, 0, 0, 0), float4(i.color.rgb, 0.5), t);
 		//o.color = i.color;
 		o.depth = i.vertex.z;
 		return o;

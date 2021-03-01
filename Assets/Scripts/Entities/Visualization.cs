@@ -195,13 +195,14 @@ public class Visualization : MonoBehaviour
         //ignore raycasts for brushing/details on demand
         GetComponent<SphereCollider>().gameObject.layer = 2;
 
-        StartCoroutine(delayedMiniClone());
-        //  GameObject clone = Instantiate(this.gameObject);
+        // StartCoroutine(delayedMiniClone());
+        // GameObject clone = Instantiate(this.gameObject);
         // Visualization cloneVis = clone.GetComponent<Visualization>();
         // cloneVis.isClone = true;
 
         FilteredPoints = new float[SceneManager.Instance.dataObject.DataPoints];
     }
+
     IEnumerator delayedMiniClone()
     {
         yield return new WaitForSeconds(2); // Makes sure all the meshes are initialised etc.
@@ -541,6 +542,8 @@ public class Visualization : MonoBehaviour
             linkedView.Item1.name += " linkedView";
 
         }
+
+        FilteredPointsChanged = true;
     }
 
     void CalculateCorners1(Axis axisA, Axis axisB, Axis axisC, ref Vector3 ftl, ref Vector3 ftr, ref Vector3 fbl, ref Vector3 fbr)

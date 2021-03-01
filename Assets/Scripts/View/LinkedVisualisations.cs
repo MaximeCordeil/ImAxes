@@ -48,65 +48,65 @@ public class LinkedVisualisations : MonoBehaviour
     {
         mymesh.Clear();
 
-        if (v1.viewType == Visualization.ViewType.Histogram && v2.viewType != Visualization.ViewType.Histogram)
-        {
-            //1 get list of axes in v2 and test parallelism
-            List<Axis> listOfAxes = v2.axes;
-            List<float> distances = new List<float>();
+        // if (v1.viewType == Visualization.ViewType.Histogram && v2.viewType != Visualization.ViewType.Histogram)
+        // {
+        //     //1 get list of axes in v2 and test parallelism
+        //     List<Axis> listOfAxes = v2.axes;
+        //     List<float> distances = new List<float>();
 
-            // the first value is the distance between the histogram and the centre of the visualsiation
-            distances.Add(Vector3.Distance(v1.axes[0].transform.position, v2.transform.position));
+        //     // the first value is the distance between the histogram and the centre of the visualsiation
+        //     distances.Add(Vector3.Distance(v1.axes[0].transform.position, v2.transform.position));
 
-            //the rest are the distances between the histogram and each axes
-            foreach (var item in listOfAxes)
-            {
-                distances.Add(Vector3.Distance(item.transform.position, v1.axes[0].transform.position));
-            }
+        //     //the rest are the distances between the histogram and each axes
+        //     foreach (var item in listOfAxes)
+        //     {
+        //         distances.Add(Vector3.Distance(item.transform.position, v1.axes[0].transform.position));
+        //     }
 
-            // the closest item
-            int indexClosestVisu = distances.IndexOf(distances.ToArray().Min());
+        //     // the closest item
+        //     int indexClosestVisu = distances.IndexOf(distances.ToArray().Min());
 
-            // get the corresponding histogram
-            if (indexClosestVisu > 0)
-            {
-                c2 = v2.get1DAxisCoordinates(indexClosestVisu - 1);
-            }
-            else c2 = v2.GetPoints();
+        //     // get the corresponding histogram
+        //     if (indexClosestVisu > 0)
+        //     {
+        //         c2 = v2.get1DAxisCoordinates(indexClosestVisu - 1);
+        //     }
+        //     else c2 = v2.GetPoints();
 
+        //     c1 = v1.GetPoints();
+        // }
+        // else if (v2.viewType == Visualization.ViewType.Histogram && v1.viewType != Visualization.ViewType.Histogram)
+        // {
+        //     //1 get list of axes in v2 and test parallelism
+        //     List<Axis> listOfAxes = v1.axes;
+        //     List<float> distances = new List<float>();
+
+        //     // the first value is the distance between the histogram and the centre of the visualsiation
+        //     distances.Add(Vector3.Distance(v1.transform.position, v2.axes[0].transform.position));
+
+        //     //the rest are the distances between the histogram and each axes
+        //     foreach (var item in listOfAxes)
+        //     {
+        //         distances.Add(Vector3.Distance(item.transform.position, v2.axes[0].transform.position));
+        //     }
+
+        //     // the closest item
+        //     int indexClosestVisu = distances.IndexOf(distances.ToArray().Min());
+
+        //     // get the corresponding histogram
+        //     if (indexClosestVisu > 0)
+        //     {
+        //         c1 = v1.get1DAxisCoordinates(indexClosestVisu - 1);
+        //     }
+        //     else c1 = v1.GetPoints();
+
+        //     c2 = v2.GetPoints();
+        // }
+        // else
+        // {
             c1 = v1.GetPoints();
-        }
-        else if (v2.viewType == Visualization.ViewType.Histogram && v1.viewType != Visualization.ViewType.Histogram)
-        {
-            //1 get list of axes in v2 and test parallelism
-            List<Axis> listOfAxes = v1.axes;
-            List<float> distances = new List<float>();
-
-            // the first value is the distance between the histogram and the centre of the visualsiation
-            distances.Add(Vector3.Distance(v1.transform.position, v2.axes[0].transform.position));
-
-            //the rest are the distances between the histogram and each axes
-            foreach (var item in listOfAxes)
-            {
-                distances.Add(Vector3.Distance(item.transform.position, v2.axes[0].transform.position));
-            }
-
-            // the closest item
-            int indexClosestVisu = distances.IndexOf(distances.ToArray().Min());
-
-            // get the corresponding histogram
-            if (indexClosestVisu > 0)
-            {
-                c1 = v1.get1DAxisCoordinates(indexClosestVisu - 1);
-            }
-            else c1 = v1.GetPoints();
-
             c2 = v2.GetPoints();
-        }
-        else
-        {
-            c1 = v1.GetPoints();
-            c2 = v2.GetPoints();
-        }
+        // }
 
         pointBuffer.Clear();
         indicesBuffer.Clear();

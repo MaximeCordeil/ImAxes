@@ -134,7 +134,7 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         sceneManager.AddAxis(axis);
 
         createdAxis.transform.SetParent(transform);
-        createdAxis.transform.localPosition = new Vector3(0.024f, 0.134f, 0.04f);
+        createdAxis.transform.localPosition = new Vector3(0, 0, 0.025f);
         createdAxis.transform.localEulerAngles = new Vector3(0, 270, 0);
     }
 

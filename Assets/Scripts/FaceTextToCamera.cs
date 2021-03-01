@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using TMPro;
 using UnityEngine;
 
@@ -11,16 +12,18 @@ public class FaceTextToCamera : MonoBehaviour
     public bool FlipAxisX = false;
     public bool FlipAxisY = false;
     public bool FlipAxisZ = false;
+    public bool ReverseFlip = false;
 
     private bool isFlipped = false;
     private bool prevFlipped = false;
 
     private void Update()
     {
-        if (Camera.main != null)
+        if (CameraCache.Main != null)
         {
-            float dot = Vector3.Dot(Camera.main.transform.forward, ParentAxis.forward);
+            float dot = Vector3.Dot(CameraCache.Main.transform.forward, ParentAxis.forward);
             isFlipped = (dot < 0);
+            if (ReverseFlip) isFlipped = !isFlipped;
 
             if (isFlipped != prevFlipped)
             {

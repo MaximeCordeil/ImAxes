@@ -97,7 +97,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "2.0.1",
+      "version": "2.1.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -135,7 +135,7 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.subsystemregistration": "1.0.6"
+        "com.unity.subsystemregistration": "1.0.5"
       },
       "url": "https://packages.unity.com"
     },

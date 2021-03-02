@@ -309,6 +309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9eb64f1a9a6c0a4c958d3fa0ca5865c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tm: {fileID: 0}
 --- !u!114 &4436640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -322,7 +323,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &4436641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1668,9 +1671,11 @@ MonoBehaviour:
   rotaryPress: 0
   buttonPress: 0
   followDistanceOverride: 0
+  serverAxisIndex: 0
   dimensionIdx: 0
   minFilter: 0
   maxFilter: 0
+  infoboxToggle: 0
   infoboxPosition: 0
   fixedDimensionMode: 0
   fixedDimensionIdx: 0
@@ -3345,9 +3350,11 @@ MonoBehaviour:
   rotaryPress: 0
   buttonPress: 0
   followDistanceOverride: 0
+  serverAxisIndex: 0
   dimensionIdx: 0
   minFilter: 0
   maxFilter: 0
+  infoboxToggle: 0
   infoboxPosition: 0
   fixedDimensionMode: 0
   fixedDimensionIdx: 0
@@ -4570,9 +4577,11 @@ MonoBehaviour:
   rotaryPress: 0
   buttonPress: 0
   followDistanceOverride: 0
+  serverAxisIndex: 0
   dimensionIdx: 0
   minFilter: 0
   maxFilter: 0
+  infoboxToggle: 0
   infoboxPosition: 0
   fixedDimensionMode: 0
   fixedDimensionIdx: 0
@@ -5176,6 +5185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9eb64f1a9a6c0a4c958d3fa0ca5865c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tm: {fileID: 0}
 --- !u!114 &424010765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5189,7 +5199,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &424010766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7941,7 +7953,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &710550922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8420,6 +8434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9eb64f1a9a6c0a4c958d3fa0ca5865c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tm: {fileID: 0}
 --- !u!114 &731938316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8433,7 +8448,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &731938317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8712,7 +8729,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &735782144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9725,6 +9744,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9eb64f1a9a6c0a4c958d3fa0ca5865c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tm: {fileID: 0}
 --- !u!114 &795984714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9738,7 +9758,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &795984715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12987,9 +13009,11 @@ MonoBehaviour:
   rotaryPress: 0
   buttonPress: 0
   followDistanceOverride: 0
+  serverAxisIndex: 0
   dimensionIdx: 0
   minFilter: 0
   maxFilter: 0
+  infoboxToggle: 0
   infoboxPosition: 0
   fixedDimensionMode: 0
   fixedDimensionIdx: 0
@@ -13415,7 +13439,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &1060905889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15123,7 +15149,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &1205040202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15402,7 +15430,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &1207483141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18815,9 +18845,11 @@ MonoBehaviour:
   rotaryPress: 0
   buttonPress: 0
   followDistanceOverride: 0
+  serverAxisIndex: 0
   dimensionIdx: 0
   minFilter: 0
   maxFilter: 0
+  infoboxToggle: 0
   infoboxPosition: 0
   fixedDimensionMode: 0
   fixedDimensionIdx: 0
@@ -21982,7 +22014,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &1869009007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23002,6 +23036,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9eb64f1a9a6c0a4c958d3fa0ca5865c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tm: {fileID: 0}
 --- !u!114 &1949016261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23015,7 +23050,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &1949016262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23162,6 +23199,63 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &1950107185
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1950107187}
+  - component: {fileID: 1950107186}
+  m_Layer: 0
+  m_Name: DataLoggingManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1950107186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1950107185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee6d29f2b3bce5440888b83e5e9416a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FilePath: D:/Users/Benjamin/Desktop
+  GroupID: 1
+  TimeBetweenLogs: 0.05
+  HeadTransforms:
+  - {fileID: 1692335285}
+  - {fileID: 1390161758}
+  Axes:
+  - {fileID: 101539236}
+  - {fileID: 389693385}
+  - {fileID: 1516549962}
+  - {fileID: 1025522066}
+  - {fileID: 289700504}
+  - {fileID: 2018654078}
+  IsLogging: 0
+--- !u!4 &1950107187
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1950107185}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5823007, y: 1.4998937, z: -0.38243747}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 18
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1951844744
 GameObject:
   m_ObjectHideFlags: 0
@@ -23873,9 +23967,11 @@ MonoBehaviour:
   rotaryPress: 0
   buttonPress: 0
   followDistanceOverride: 0
+  serverAxisIndex: 0
   dimensionIdx: 0
   minFilter: 0
   maxFilter: 0
+  infoboxToggle: 0
   infoboxPosition: 0
   fixedDimensionMode: 0
   fixedDimensionIdx: 0
@@ -24468,6 +24564,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9eb64f1a9a6c0a4c958d3fa0ca5865c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tm: {fileID: 0}
 --- !u!114 &2072281213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24481,7 +24578,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  tm: {fileID: 0}
   index: 0
+  currentAxes: 0
 --- !u!114 &2072281214
 MonoBehaviour:
   m_ObjectHideFlags: 0

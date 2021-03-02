@@ -20,11 +20,13 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
 
     [Header("Misc Settings")]
     public int followDistanceOverride;
+    public int serverAxisIndex;
 
     [Header("Client Axis Values")]
     public int dimensionIdx;
     public float minFilter;
     public float maxFilter;
+    public bool infoboxToggle;
     public float infoboxPosition;
 
     [Header("Axis Override Settings")]
@@ -38,7 +40,6 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     private bool axisInitialised;   // Added these - to reset rotary to zero on if axes not repowered.
     private int rotaryDifference;
     private bool followMode;
-    private bool infoboxToggle;
     private bool ignoreSliderMovement;
     private bool ignoreButtonPresses;
 

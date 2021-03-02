@@ -118,7 +118,6 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         axis = createdAxis.GetComponent<Axis>();
         axis.Init(sceneManager.dataObject, idx, false);
         axis.tag = "Axis";
-        axis.isClone = true;
         // axis.HideHandles();
 
         sceneManager.AddAxis(axis);

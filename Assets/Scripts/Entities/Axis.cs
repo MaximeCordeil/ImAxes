@@ -46,8 +46,6 @@ public class Axis : MonoBehaviour {
 
 
     public bool isDirty;
-    public bool isClone;
-    public bool grabbed;
 
     public bool isInSplom;
 
@@ -62,18 +60,13 @@ public class Axis : MonoBehaviour {
 
     //ticker and file path (etc) for logging activity
 
-    //SteamVR_TrackedObject trackedObject;
-    List<Vector3> tracking = new List<Vector3>();
-
     Vector2 AttributeRange;
 
     float ticksScaleFactor = 1.0f;
 
     // ghost properties
-    Axis ghostSourceAxis = null;
-    public static Axis CurrentAxis;
-    public static List<Axis> AxisList = new List<Axis>();
-    
+    public Axis ghostSourceAxis = null;
+
     // Axis infobox details
     public bool IsInfoboxEnabled = false;
     [Range(-0.505f, 0.505f)] public float InfoboxPosition;
@@ -93,7 +86,6 @@ public class Axis : MonoBehaviour {
 
     public void Init(DataBinding.DataObject srcData, int idx, bool isPrototype = false)
     {
-        print("INIT CALLED");
         SourceIndex = idx;
         axisId = idx;
         name = srcData.indexToDimension(idx);// changed name here js, removed axis
@@ -107,11 +99,6 @@ public class Axis : MonoBehaviour {
 
         CalculateTicksScale(srcData);
         UpdateTicks();
-        AxisList.Add(this);
-    }
-    public Vector3 ReportPosition()
-    {
-        return minFilterObject.transform.position;
     }
 
     void UpdateRangeText()
@@ -197,13 +184,13 @@ public class Axis : MonoBehaviour {
 
     void Start()
     {
-        //all colliders from this object should ignore raycast
-        // Collider[] colliders = GetComponentsInChildren<Collider>();
-        // foreach (var item in colliders)
-        // {
-        //     item.gameObject.layer = 2;
-        // }
-        
+        // all colliders from this object should ignore raycast
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (var item in colliders)
+        {
+            item.gameObject.layer = 2;
+        }
+
         minFilterObjectRenderer = minFilterObject.GetComponent<Renderer>();
         maxFilterObjectRenderer = maxFilterObject.GetComponent<Renderer>();
         originalMinFilterObjectColour = minFilterObjectRenderer.material.color;
@@ -254,6 +241,11 @@ public class Axis : MonoBehaviour {
 #endif
 */
 
+    public void LateUpdate()
+    {
+        isDirty = false;
+    }
+
     void OnDestroy()
     {
         if (ghostSourceAxis != null)
@@ -261,15 +253,6 @@ public class Axis : MonoBehaviour {
             ghostSourceAxis.OnFiltered.RemoveListener(Ghost_OnFiltered);
             ghostSourceAxis.OnNormalized.RemoveListener(Ghost_OnNormalized);
         }
-    }
-    public void CloneAll()
-    {
-        isPrototype = false;
-        GameObject clone = Clone();
-        clone.GetComponent<Axis>().OnExited.Invoke();
-        clone.GetComponent<Axis>().ReturnToOrigin();
-
-        SceneManager.Instance.AddAxis(clone.GetComponent<Axis>());
     }
 
     public void SetMinFilter(float val)
@@ -362,28 +345,16 @@ public class Axis : MonoBehaviour {
 
     public GameObject Clone()
     {
-
-       // AxisList.Add(this);
-
         GameObject clone = Instantiate(gameObject, transform.position, transform.rotation, null);
         Axis axis = clone.GetComponent<Axis>();
         axis.InitOrigin(originPosition, originRotation);
-        axis.AttributeRange = AttributeRange;
         axis.ticksRenderer.material = Instantiate(ticksRenderer.material) as Material;
-        isPrototype = false;
-       // GameObject clone = Clone();
-        clone.GetComponent<Axis>().OnExited.Invoke();
-      //  clone.GetComponent<Axis>().ReturnToOrigin();
-
-        SceneManager.Instance.AddAxis(clone.GetComponent<Axis>());
 
         return clone;
     }
 
     public GameObject Dup(GameObject go, Vector3 tp, Quaternion tr)
     {
-        print("DupCalled");
-        AxisList.Add(this);
         GameObject clone = Instantiate(go, tp, tr, null);
         Axis axis = clone.GetComponent<Axis>();
         axis.InitOrigin(originPosition, originRotation);
@@ -391,8 +362,6 @@ public class Axis : MonoBehaviour {
 
         return clone;
     }
-
-
 
     #region euclidan functions
 
@@ -531,6 +500,8 @@ public class Axis : MonoBehaviour {
 
     public void Ghost(Axis sourceAxis)
     {
+        ghostSourceAxis = sourceAxis;
+
         sourceAxis.OnFiltered.AddListener(Ghost_OnFiltered);
         sourceAxis.OnNormalized.AddListener(Ghost_OnNormalized);
 

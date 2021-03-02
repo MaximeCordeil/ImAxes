@@ -29,7 +29,7 @@ public class SceneManager : MonoBehaviour
 
     [SerializeField]
     bool createAxisShelf = true;
-    
+
     static SceneManager _instance;
     public static SceneManager Instance
     {
@@ -66,7 +66,7 @@ public class SceneManager : MonoBehaviour
                 GameObject obj = (GameObject)Instantiate(axisPrefab);
                 obj.transform.position = v;
                 Axis axis = obj.GetComponent<Axis>();
-                axis.Init(dataObject, i, true);
+                axis.Init(dataObject, i, false);
                 axis.InitOrigin(v, obj.transform.rotation);
                 axis.tag = "Axis";
 

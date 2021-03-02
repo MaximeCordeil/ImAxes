@@ -405,9 +405,4 @@ public class SPLOM3D : MonoBehaviour
 
         ZAxes1 = returnList;
     }
-
-    public int GetPriority()
-    {
-        return 0;
-    }
 }

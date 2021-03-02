@@ -170,10 +170,10 @@ public class ImAxesRecognizer : MonoBehaviour
                 {
                     if (k == j || k == i || i == j)
                         continue;
-                    /* Temporary
+
                     if (A[i].isPrototype && A[j].isPrototype && A[k].isPrototype)
                         continue;
-                    */
+
                     if (RSP1(A[i], A[j], A[k]) && adjacency[i, j, k] == null)
                     {
                         //create a 3D SPLOM
@@ -263,13 +263,12 @@ public class ImAxesRecognizer : MonoBehaviour
         {
             for (int j = 0; j < A.Count; j++)
             {
-                /* Temporary
                 if (i == j)
                     continue;
 
                 if (A[i].isPrototype && A[j].isPrototype)
                     continue;
-                */
+
                 if ((RSP1(A[i], A[j])) &&
                     adjacency[i, j, i] == null &&
                     !usedAxisIn3DSP.Contains(A[i]) &&
@@ -571,6 +570,18 @@ public class ImAxesRecognizer : MonoBehaviour
             {
                 if (i != j)
                 {
+                    if (SP[i].viewType != Visualization.ViewType.Histogram)
+                    {
+                        if (SP[i].axes.Select(x => x.ghostSourceAxis).Where(x => x != null).Intersect(SP[j].axes).Count() > 0)
+                            continue;
+                    }
+
+                    if (SP[j].viewType != Visualization.ViewType.Histogram)
+                    {
+                        if (SP[j].axes.Select(x => x.ghostSourceAxis).Where(x => x != null).Intersect(SP[i].axes).Count() > 0)
+                            continue;
+                    }
+
                     string _name = SP[i] + "-" + SP[j];
                     string _nameReverse = SP[j] + "-" + SP[i];
 
@@ -586,7 +597,6 @@ public class ImAxesRecognizer : MonoBehaviour
 
                             LinkVisualisations(_name, SP[i], SP[j]);
                         }
-
                     }
                     else if (SP[i].viewType == Visualization.ViewType.Histogram && SP[j].viewType != Visualization.ViewType.Histogram)
                     {

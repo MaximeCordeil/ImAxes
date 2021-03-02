@@ -258,7 +258,7 @@ public class LinkedVisualisations : MonoBehaviour
                 if (normals.Count > 0)
                 {
                     int normalIndex = 0;
-                    
+
                     for (int i = 0; i < SceneManager.Instance.dataObject.DataPoints; i++)
                     {
                         Vector3 norm1 = normals[normalIndex];
@@ -308,7 +308,7 @@ public class LinkedVisualisations : MonoBehaviour
                 linkRenderer.material.SetVector("_bbr2", transform.InverseTransformPoint(v2.bbr));
                 linkRenderer.material.SetVector("_btl2", transform.InverseTransformPoint(v2.btl));
                 linkRenderer.material.SetVector("_bbl2", transform.InverseTransformPoint(v2.bbl));
-                
+
                 linkRenderer.material.SetFloat("_MinXFilter1", v1.minXFilter);
                 linkRenderer.material.SetFloat("_MaxXFilter1", v1.maxXFilter);
                 linkRenderer.material.SetFloat("_MinYFilter1", v1.minYFilter);
@@ -371,7 +371,7 @@ public class LinkedVisualisations : MonoBehaviour
             case Visualization.ViewType.Scatterplot2D:
                 float angle = Vector3.Angle(vis.transform.forward, Vector3.up);
                 return !(45 < angle && angle < 135);
-                
+
             // Never truncate 3D scatterplots
             case Visualization.ViewType.Scatterplot3D:
                 return false;

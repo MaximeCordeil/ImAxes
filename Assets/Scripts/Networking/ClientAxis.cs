@@ -84,13 +84,16 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         }
 
         // Slider settings
-        if (axis.MinFilter != minFilter)
+        // Always use the minimum value for minfilter and vice versa
+        float newMinFilter = Mathf.Min(minFilter, maxFilter);
+        float newMaxFilter = Mathf.Max(minFilter, maxFilter);
+        if (axis.MinFilter != newMinFilter)
         {
-            axis.SetMinFilter(minFilter);
+            axis.SetMinFilter(newMinFilter);
         }
-        if (axis.MaxFilter != maxFilter)
+        if (axis.MaxFilter != newMaxFilter)
         {
-            axis.SetMaxFilter(maxFilter);
+            axis.SetMaxFilter(newMaxFilter);
         }
         if (axis.InfoboxPosition != infoboxPosition)
         {

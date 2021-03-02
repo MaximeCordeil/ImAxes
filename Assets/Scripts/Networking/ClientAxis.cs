@@ -17,11 +17,6 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
 
     private Transform mainCamera;
 
-    // Filtering for smoothing
-    private OneEuroFilter<Vector3> positionFilter;
-    private OneEuroFilter<Quaternion> rotationFilter;
-    private OneEuroFilter<Vector3> scaleFilter;
-
     public GameObject axisPrefab;
     public SceneManager sceneManager;
     private Transform root;
@@ -29,10 +24,6 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
     private void Start()
     {
         mainCamera = Camera.main.transform;
-
-        positionFilter = new OneEuroFilter<Vector3>(4);
-        rotationFilter = new OneEuroFilter<Quaternion>(4);
-        scaleFilter = new OneEuroFilter<Vector3>(4);
 
 #if UNITY_EDITOR
         root = ViconOriginSceneCalibrator.Instance.Root;
@@ -48,8 +39,7 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         {
             // Data for axis transform
             UpdateClientTransform((Vector3)stream.ReceiveNext(),
-                                  (Quaternion)stream.ReceiveNext(),
-                                  (Vector3)stream.ReceiveNext()
+                                  (Quaternion)stream.ReceiveNext()
                                   );
 
             // Data for axis properties
@@ -58,26 +48,20 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
                              (float)stream.ReceiveNext(),
                              (float)stream.ReceiveNext()
                              );
-                             
+
             // Data for axis booleans
             ToggleInfoboxMode((bool)stream.ReceiveNext());
 
         }
     }
 
-    public void UpdateClientTransform(Vector3 newPos, Quaternion newRot, Vector3 newScale)
+    public void UpdateClientTransform(Vector3 newPos, Quaternion newRot)
     {
         Transform tmp = transform.parent;
         transform.parent = root;
 
-        // Filter the positions to smooth it a bit
-        // newPos = positionFilter.Filter(newPos);
-        // newRot = rotationFilter.Filter(newRot);
-        // newScale = scaleFilter.Filter(newScale);
-
         transform.localPosition = newPos;
         transform.localRotation = newRot;
-        // transform.localScale = newScale;
 
         transform.parent = tmp;
     }
@@ -122,6 +106,12 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
         }
     }
 
+    [PunRPC]
+    public void ResetAxisObject()
+    {
+        DestroyAxisObject(axis);
+    }
+
     private void CreateAxisObject(int idx)
     {
         createdAxis = Instantiate(axisPrefab) as GameObject;
@@ -140,6 +130,10 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
 
     private void DestroyAxisObject(Axis axis)
     {
-        sceneManager.DestroyAxis(axis);
+        if (axis != null)
+        {
+            sceneManager.DestroyAxis(axis);
+            axis = null;
+        }
     }
 }

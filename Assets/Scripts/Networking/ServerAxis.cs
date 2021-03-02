@@ -27,6 +27,10 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     public float maxFilter;
     public float infoboxPosition;
 
+    [Header("Axis Override Settings")]
+    public bool fixedDimensionMode = false;
+    public int fixedDimensionIdx = 0;
+
     private int prevSliderOne;
     private int prevSliderTwo;
     private int prevRotary;
@@ -37,7 +41,7 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     private bool infoboxToggle;
     private bool ignoreSliderMovement;
     private bool ignoreButtonPresses;
-    
+
 
     // Bluetooth variables
     private SerialPort sp;
@@ -140,6 +144,10 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
                             dimensionIdx += SceneManager.Instance.dataObject.NbDimensions;
                     }
                     prevRotary = rotary;
+
+                    // If the fixed dimension mode is enabled, we just override any dimensionIdx we calculate with the fixed index value
+                    if (fixedDimensionMode)
+                        dimensionIdx = fixedDimensionIdx;
                 }
             }
             catch (SystemException f)
@@ -190,7 +198,15 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
                     minFilter = Remap((float)sliderOne, 0f, 255f, 0.505f, -0.505f);
                     maxFilter = Remap((float)sliderTwo, 0f, 255f, 0.505f, -0.505f);
                 }
-            }            
+            }
+
+            // Check for rotary press. Use this to reset the axis object in case of a bug
+            if (rotaryPress == 1 && !ignoreButtonPresses)
+            {
+                photonView.RPC("ResetAxisObject", RpcTarget.Others);
+                PhotonNetwork.SendAllOutgoingCommands();
+                gameObject.GetComponent<ClientAxis>().ResetAxisObject();
+            }
 
             // We update the axis properties just for the server. These values are sent to the clients in OnPhotonSerializeView().
             gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minFilter, maxFilter, infoboxPosition);
@@ -209,14 +225,13 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
             // Send the transform properties to the stream
             stream.SendNext(transform.localPosition);
             stream.SendNext(transform.localRotation);
-            stream.SendNext(transform.localScale);
 
             // Now send the axis properties to the stream
             stream.SendNext(dimensionIdx);
             stream.SendNext(minFilter);
             stream.SendNext(maxFilter);
             stream.SendNext(infoboxPosition);
-            
+
             // Now send any boolean values to the stream
             stream.SendNext(infoboxToggle);
 

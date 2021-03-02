@@ -1628,7 +1628,7 @@ GameObject:
   - component: {fileID: 101539235}
   - component: {fileID: 101539241}
   m_Layer: 12
-  m_Name: ModularAxisBlue1
+  m_Name: BlueAxis1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1672,6 +1672,8 @@ MonoBehaviour:
   minFilter: 0
   maxFilter: 0
   infoboxPosition: 0
+  fixedDimensionMode: 0
+  fixedDimensionIdx: 0
 --- !u!114 &101539237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1723,7 +1725,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: ModulAx_AxesBlue1
+  ObjectName: ModulAx_BlueAxis1
   Client: {fileID: 833475439}
 --- !u!1 &105367121
 GameObject:
@@ -3289,7 +3291,7 @@ GameObject:
   - component: {fileID: 289700503}
   - component: {fileID: 289700502}
   m_Layer: 12
-  m_Name: ModularAxisBlack1
+  m_Name: BlackAxis1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3307,7 +3309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: ModulAx_AxesBlack1
+  ObjectName: ModulAx_BlackAxis1
   Client: {fileID: 833475439}
 --- !u!114 &289700503
 MonoBehaviour:
@@ -3347,6 +3349,8 @@ MonoBehaviour:
   minFilter: 0
   maxFilter: 0
   infoboxPosition: 0
+  fixedDimensionMode: 0
+  fixedDimensionIdx: 0
 --- !u!114 &289700505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3384,7 +3388,7 @@ Transform:
   m_Children:
   - {fileID: 404101567}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: -90, y: 180, z: 0}
 --- !u!1 &297453326
 GameObject:
@@ -4512,7 +4516,7 @@ GameObject:
   - component: {fileID: 389693384}
   - component: {fileID: 389693383}
   m_Layer: 12
-  m_Name: ModularAxisBlue2
+  m_Name: BlueAxis2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4530,7 +4534,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: ModulAx_AxesBlue2
+  ObjectName: ModulAx_BlueAxis2
   Client: {fileID: 833475439}
 --- !u!114 &389693384
 MonoBehaviour:
@@ -4570,6 +4574,8 @@ MonoBehaviour:
   minFilter: 0
   maxFilter: 0
   infoboxPosition: 0
+  fixedDimensionMode: 0
+  fixedDimensionIdx: 0
 --- !u!114 &389693386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4607,7 +4613,7 @@ Transform:
   m_Children:
   - {fileID: 2049510852}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: -90, y: 180, z: 0}
 --- !u!1 &389914849
 GameObject:
@@ -6443,7 +6449,7 @@ MonoBehaviour:
     type: 3}
   sourceData: {fileID: 4900000, guid: 37b008166b12844bc967ab8195316518, type: 3}
   metadata: {fileID: 11400000, guid: 5469941c0faf14d7f9ae454c11b6150e, type: 2}
-  createAxisShelf: 0
+  createAxisShelf: 1
 --- !u!114 &554863328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12927,7 +12933,7 @@ GameObject:
   - component: {fileID: 1025522065}
   - component: {fileID: 1025522064}
   m_Layer: 12
-  m_Name: ModularAxisRed2
+  m_Name: RedAxis2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12945,7 +12951,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: ModulAx_AxesRed2
+  ObjectName: ModulAx_RedAxis2
   Client: {fileID: 833475439}
 --- !u!114 &1025522065
 MonoBehaviour:
@@ -12985,6 +12991,8 @@ MonoBehaviour:
   minFilter: 0
   maxFilter: 0
   infoboxPosition: 0
+  fixedDimensionMode: 0
+  fixedDimensionIdx: 0
 --- !u!114 &1025522067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13022,7 +13030,7 @@ Transform:
   m_Children:
   - {fileID: 352221472}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: -90, y: 180, z: 0}
 --- !u!1001 &1033219263
 PrefabInstance:
@@ -18753,7 +18761,7 @@ GameObject:
   - component: {fileID: 1516549961}
   - component: {fileID: 1516549960}
   m_Layer: 12
-  m_Name: ModularAxisRed1
+  m_Name: RedAxis1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18771,7 +18779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: ModulAx_AxesRed1
+  ObjectName: ModulAx_RedAxis1
   Client: {fileID: 833475439}
 --- !u!114 &1516549961
 MonoBehaviour:
@@ -18811,6 +18819,8 @@ MonoBehaviour:
   minFilter: 0
   maxFilter: 0
   infoboxPosition: 0
+  fixedDimensionMode: 0
+  fixedDimensionIdx: 0
 --- !u!114 &1516549963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18848,7 +18858,7 @@ Transform:
   m_Children:
   - {fileID: 875743587}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: -90, y: 180, z: 0}
 --- !u!4 &1517607903 stripped
 Transform:
@@ -23809,7 +23819,7 @@ GameObject:
   - component: {fileID: 2018654077}
   - component: {fileID: 2018654076}
   m_Layer: 12
-  m_Name: ModularAxisBlack2
+  m_Name: BlackAxis2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23827,7 +23837,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: ModulAx_AxesBlack2
+  ObjectName: ModulAx_BlackAxis2
   Client: {fileID: 833475439}
 --- !u!114 &2018654077
 MonoBehaviour:
@@ -23867,6 +23877,8 @@ MonoBehaviour:
   minFilter: 0
   maxFilter: 0
   infoboxPosition: 0
+  fixedDimensionMode: 0
+  fixedDimensionIdx: 0
 --- !u!114 &2018654079
 MonoBehaviour:
   m_ObjectHideFlags: 0

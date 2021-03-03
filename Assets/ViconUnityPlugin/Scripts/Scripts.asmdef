@@ -1,0 +1,42 @@
+{
+    "name": "Scripts",
+    "references": [
+        "Unity.XR.OpenVR",
+        "UnityEngine.SpatialTracking",
+        "UnityEngine.Experimental.XR.Interaction",
+        "UnityEngine.Experimental.XR.Interaction.Editor",
+        "ViconPluginUtils"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [
+        "Android"
+    ],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.valvesoftware.unity.openvr",
+            "expression": "",
+            "define": "OPENVR_XR_API"
+        },
+        {
+            "name": "com.unity.xr.legacyinputhelpers",
+            "expression": "",
+            "define": "UNITY_LEGACY_INPUT_HELPERS"
+        },
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "",
+            "define": "UNITY_URP"
+        },
+        {
+            "name": "com.unity.xr.management",
+            "expression": "",
+            "define": "UNITY_XR_MANAGEMENT"
+        }
+    ],
+    "noEngineReferences": false
+}

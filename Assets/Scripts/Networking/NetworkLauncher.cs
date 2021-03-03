@@ -13,10 +13,6 @@ public class NetworkLauncher : MonoBehaviourPunCallbacks
                               "in server timeouts if using cloud servers.")]
     public int sendRate = 30;
     public bool autoconnect = true;
-    public string UserId = "";
-
-    public Player Hololens1Player;
-    public Player Hololens2Player;
 
     static NetworkLauncher _instance;
     public static NetworkLauncher Instance
@@ -32,16 +28,12 @@ public class NetworkLauncher : MonoBehaviourPunCallbacks
         }
     }
 
-    public void ConnectToServer(string userId = "")
+    public void ConnectToServer()
     {
-        this.UserId = userId;
-
-        if (userId == "")
-            userId = Guid.NewGuid().ToString();
+        string userId = Guid.NewGuid().ToString();
 
         // We use the player custom properties as a workaround because the user id set in AuthValues returns null for the master client
         ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable();
-        properties["UserID"] = userId;
         PhotonNetwork.SetPlayerCustomProperties(properties);
         PhotonNetwork.AuthValues = new AuthenticationValues(userId);
         PhotonNetwork.AutomaticallySyncScene = false;
@@ -95,33 +87,11 @@ public class NetworkLauncher : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) {
         Debug.Log("Player connected");
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            if (newPlayer.CustomProperties["UserID"].ToString() == "HoloLens1")
-            {
-                Hololens1Player = newPlayer;
-            }
-            else if (newPlayer.CustomProperties["UserID"].ToString() == "HoloLens2")
-            {
-                Hololens2Player = newPlayer;
-            }
-        }
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
     {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            if (otherPlayer.CustomProperties["UserID"].ToString() == "HoloLens1")
-            {
-                Hololens1Player = null;
-            }
-            else if (otherPlayer.CustomProperties["UserID"].ToString() == "HoloLens2")
-            {
-                Hololens2Player = null;
-            }
-        }
+        Debug.Log("Player disconnected");
     }
 
     public override void OnDisconnected(DisconnectCause cause) {

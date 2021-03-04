@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -23,7 +22,7 @@ public class DataLoggingManagerEditor : Editor
         }
         else
         {
-            EditorGUILayout.HelpBox("Currently logging Group " + dataLogger.GroupID + "!", MessageType.Info);
+            EditorGUILayout.HelpBox("CURRENTLY LOGGING GROUP " + dataLogger.GroupID + "!", MessageType.Info);
             if (GUILayout.Button("Stop Logging"))
             {
                 dataLogger.StopLogging();

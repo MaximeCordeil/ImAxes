@@ -32,6 +32,7 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     [Header("Axis Override Settings")]
     public bool fixedDimensionMode = false;
     public int fixedDimensionIdx = 0;
+    public bool dataPlaybackMode = false;
 
     private int prevSliderOne;
     private int prevSliderTwo;
@@ -208,7 +209,10 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
                 PhotonNetwork.SendAllOutgoingCommands();
                 gameObject.GetComponent<ClientAxis>().ResetAxisObject();
             }
+        }
 
+        if (sp.IsOpen || dataPlaybackMode)
+        {
             // We update the axis properties just for the server. These values are sent to the clients in OnPhotonSerializeView().
             gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minFilter, maxFilter, infoboxPosition);
             gameObject.GetComponent<ClientAxis>().ToggleInfoboxMode(infoboxToggle);

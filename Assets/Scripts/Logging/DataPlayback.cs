@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class DataPlayback : MonoBehaviour
 {
@@ -16,10 +17,14 @@ public class DataPlayback : MonoBehaviour
     public Transform CameraObject;
 
     [Header("Replay Settings")]
-    public int LinesPerFrame = 1;
+    public VideoPlayer LiveVideo;
+    public float VideoStartTimeOffset;
 
     private bool isLiveReplayRunning = false;
     private bool isLiveReplayPaused = false;
+
+    private OneEuroFilter<Vector3> cameraTransformPositionFilter;
+    private OneEuroFilter<Quaternion> cameraTransformRotationFilter;
 
     public void StartLiveReplay()
     {
@@ -37,28 +42,51 @@ public class DataPlayback : MonoBehaviour
     public IEnumerator LiveReplay()
     {
         isLiveReplayRunning = true;
+        LiveVideo.gameObject.SetActive(true);
+        LiveVideo.Play();
+        LiveVideo.time = VideoStartTimeOffset;
 
         foreach (ServerAxis axis in AxesObjects)
         {
             axis.dataPlaybackMode = true;
+            axis.transform.GetChild(0).gameObject.SetActive(false);
         }
 
         string[] headTransformsDataLines = HeadTransformsData.text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         string[] axesDataLines = AxesData.text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         string[] cameraTransformDataLines = CameraTransformData.text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-        int axesLineIdx = 1;
+        cameraTransformPositionFilter = new OneEuroFilter<Vector3>(10);
+        cameraTransformRotationFilter = new OneEuroFilter<Quaternion>(10);
 
-        for (int i = 1; i < headTransformsDataLines.Length; i += (isLiveReplayPaused) ? 0 : LinesPerFrame)
+        int axesLineIdx = 1;
+        int cameraLineIdx = 1;
+
+        float startUnityTime = Time.time;
+
+        for (int i = 1; i < headTransformsDataLines.Length; i += (isLiveReplayPaused) ? 0 : 1)
         {
             if (isLiveReplayPaused)
             {
                 yield return new WaitForEndOfFrame();
                 continue;
             }
+            else if (LiveVideo.isPaused)
+            {
+                LiveVideo.Play();
+            }
 
             float currentTime = float.Parse(headTransformsDataLines[i].Split('\t')[0]);
-
+            float currentUnityTime = Time.time - startUnityTime;
+            
+            // If the dataset's timestamp is smaller than our Unity timestamp, skip a frame
+            if (currentTime + 1.2f > currentUnityTime)
+            {
+                i--;
+                yield return null;
+                continue;
+            }
+            
             // Set the positions and rotations of the heads
             for (int j = 0; j < HeadObjects.Length; j++)
             {
@@ -87,7 +115,11 @@ public class DataPlayback : MonoBehaviour
             {
                 string[] axesLine = axesDataLines[axesLineIdx + j].Split('\t');
 
-                ServerAxis axis = AxesObjects[int.Parse(axesLine[1])];
+                ServerAxis axis = AxesObjects[int.Parse(axesLine[9])];
+
+                // Check if the axis was running while logging. It returns everything as 0 if it does. In this case, ignore the line
+                if (int.Parse(axesLine[9]) == 0 && float.Parse(axesLine[10]) == 0 && float.Parse(axesLine[11]) == 0)
+                    continue;
 
                 axis.transform.position = new Vector3(float.Parse(axesLine[2]), float.Parse(axesLine[3]), float.Parse(axesLine[4]));
                 axis.transform.rotation = new Quaternion(float.Parse(axesLine[5]), float.Parse(axesLine[6]), float.Parse(axesLine[7]), float.Parse(axesLine[8]));
@@ -99,9 +131,13 @@ public class DataPlayback : MonoBehaviour
             }
 
             // Set the position and rotation of the external camera
-            string[] cameraTransformLine = cameraTransformDataLines[i].Split('\t');
-            CameraObject.position = new Vector3(float.Parse(cameraTransformLine[1]), float.Parse(cameraTransformLine[2]), float.Parse(cameraTransformLine[3]));
-            CameraObject.rotation = new Quaternion(float.Parse(cameraTransformLine[4]), float.Parse(cameraTransformLine[5]), float.Parse(cameraTransformLine[6]), float.Parse(cameraTransformLine[7]));
+            cameraLineIdx = Mathf.CeilToInt(i / 2f);
+            string[] cameraTransformLine = cameraTransformDataLines[cameraLineIdx].Split('\t');
+            Vector3 newCameraPosition = new Vector3(float.Parse(cameraTransformLine[1]), float.Parse(cameraTransformLine[2]), float.Parse(cameraTransformLine[3]));
+            Quaternion newCameraRotation = new Quaternion(float.Parse(cameraTransformLine[4]), float.Parse(cameraTransformLine[5]), float.Parse(cameraTransformLine[6]), float.Parse(cameraTransformLine[7]));;
+            // Filter camera position and rotation since it jitters in the Vicon
+            CameraObject.position = cameraTransformPositionFilter.Filter<Vector3>(newCameraPosition);
+            CameraObject.rotation = cameraTransformRotationFilter.Filter<Quaternion>(newCameraRotation);
 
             yield return null;
         }
@@ -112,12 +148,14 @@ public class DataPlayback : MonoBehaviour
         foreach (ServerAxis axis in AxesObjects)
         {
             axis.dataPlaybackMode = false;
+            axis.transform.GetChild(0).gameObject.SetActive(true);
         }
 
     }
 
     public void PauseLiveReplay()
     {
+        LiveVideo.Pause();
         isLiveReplayPaused = true;
     }
 

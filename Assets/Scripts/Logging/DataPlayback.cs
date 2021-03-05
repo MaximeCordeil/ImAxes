@@ -8,10 +8,12 @@ public class DataPlayback : MonoBehaviour
     [Header("Data Files")]
     public TextAsset HeadTransformsData;
     public TextAsset AxesData;
+    public TextAsset CameraTransformData;
 
     [Header("Replay Objects")]
     public Transform[] HeadObjects;
     public ServerAxis[] AxesObjects;
+    public Transform CameraObject;
 
     [Header("Replay Settings")]
     public int LinesPerFrame = 1;
@@ -43,6 +45,7 @@ public class DataPlayback : MonoBehaviour
 
         string[] headTransformsDataLines = HeadTransformsData.text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         string[] axesDataLines = AxesData.text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] cameraTransformDataLines = CameraTransformData.text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
         int axesLineIdx = 1;
 
@@ -94,6 +97,11 @@ public class DataPlayback : MonoBehaviour
                 axis.infoboxToggle = bool.Parse(axesLine[12]);
                 axis.infoboxPosition = float.Parse(axesLine[13]);
             }
+
+            // Set the position and rotation of the external camera
+            string[] cameraTransformLine = cameraTransformDataLines[i].Split('\t');
+            CameraObject.position = new Vector3(float.Parse(cameraTransformLine[1]), float.Parse(cameraTransformLine[2]), float.Parse(cameraTransformLine[3]));
+            CameraObject.rotation = new Quaternion(float.Parse(cameraTransformLine[4]), float.Parse(cameraTransformLine[5]), float.Parse(cameraTransformLine[6]), float.Parse(cameraTransformLine[7]));
 
             yield return null;
         }

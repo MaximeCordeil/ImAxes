@@ -13,12 +13,14 @@ public class DataLoggingManager : MonoBehaviour
     [Header("Logged Objects")]
     public List<Transform> HeadTransforms;
     public List<ServerAxis> Axes;
+    public Transform CameraTransform;
 
     [HideInInspector]
     public bool IsLogging = false;
 
     private StreamWriter headTransformsStreamWriter;
     private StreamWriter axesStreamWriter;
+    private StreamWriter cameraTransformStreamWriter;
     private float startTime;
     private float timer = 0f;
     private const string format = "F4";
@@ -36,9 +38,15 @@ public class DataLoggingManager : MonoBehaviour
         headTransformsStreamWriter = new StreamWriter(path, true);
         headTransformsStreamWriter.WriteLine("Timestamp\tID\tPosition.x\tPosition.y\tPosition.z\tRotation.x\tRotation.y\tRotation.z\tRotation.w");
 
+        // Axes transforms and properties
         path = string.Format("{0}G{1}_Axes.txt", FilePath, GroupID);
         axesStreamWriter = new StreamWriter(path, true);
         axesStreamWriter.WriteLine("Timestamp\tID\tPosition.x\tPosition.y\tPosition.z\tRotation.x\tRotation.y\tRotation.z\tRotation.w\tDimensionIdx\tMinFilter\tMaxFilter\tInfoboxToggle\tInfoboxPosition");
+
+        // Exteral camera transform
+        path = string.Format("{0}G{1}_CameraTransform.txt", FilePath, GroupID);
+        cameraTransformStreamWriter = new StreamWriter(path, true);
+        cameraTransformStreamWriter.WriteLine("Timestamp\tPosition.x\tPosition.y\tPosition.z\tRotation.x\tRotation.y\tRotation.z\tRotation.w");
 
         IsLogging = true;
         startTime = Time.time;
@@ -66,6 +74,7 @@ public class DataLoggingManager : MonoBehaviour
 
         headTransformsStreamWriter.Close();
         axesStreamWriter.Close();
+        cameraTransformStreamWriter.Close();
 
         Debug.Log("Logging Stopped");
     }
@@ -111,8 +120,20 @@ public class DataLoggingManager : MonoBehaviour
             );
         }
 
+        cameraTransformStreamWriter.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}",
+            timestamp,
+            CameraTransform.position.x.ToString(format),
+            CameraTransform.position.y.ToString(format),
+            CameraTransform.position.z.ToString(format),
+            CameraTransform.rotation.x.ToString(format),
+            CameraTransform.rotation.y.ToString(format),
+            CameraTransform.rotation.z.ToString(format),
+            CameraTransform.rotation.w.ToString(format)
+        );
+
         headTransformsStreamWriter.Flush();
         axesStreamWriter.Flush();
+        cameraTransformStreamWriter.Flush();
     }
 
     public void OnApplicationQuit()

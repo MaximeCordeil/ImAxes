@@ -13,6 +13,7 @@ public class NetworkLauncher : MonoBehaviourPunCallbacks
                               "in server timeouts if using cloud servers.")]
     public int sendRate = 30;
     public bool autoconnect = true;
+    public GameObject connectionMenu;
 
     static NetworkLauncher _instance;
     public static NetworkLauncher Instance
@@ -43,6 +44,9 @@ public class NetworkLauncher : MonoBehaviourPunCallbacks
 
         PhotonNetwork.ConnectUsingSettings();
         DontDestroyOnLoad(gameObject);
+
+        if (connectionMenu != null)
+            Destroy(connectionMenu);
     }
 
     public override void OnConnectedToMaster() {

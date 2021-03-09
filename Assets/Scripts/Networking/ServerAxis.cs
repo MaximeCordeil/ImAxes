@@ -48,21 +48,9 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     // Bluetooth variables
     private SerialPort sp;
     private Thread ReadThread;
-    private Thread CheckPortThread;
 
     private void Start()
     {
-        sp = new SerialPort(COM, 115200);
-        sp.ReadTimeout = 2000;
-        sp.WriteTimeout = 2000;
-        sp.WriteTimeout = 2000;
-        sp.Parity = Parity.None;
-        sp.DataBits = 8;
-        sp.StopBits = StopBits.One;
-        sp.RtsEnable = true;
-        sp.Handshake = Handshake.None;
-        sp.NewLine = "\n";  // Need this or ReadLine() fails
-
         TryConnectToPort();
     }
 
@@ -70,17 +58,28 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     {
         try
         {
+            sp = new SerialPort(COM, 115200);
+            sp.ReadTimeout = 2000;
+            sp.WriteTimeout = 2000;
+            sp.Parity = Parity.None;
+            sp.DataBits = 8;
+            sp.StopBits = StopBits.One;
+            sp.RtsEnable = true;
+            sp.Handshake = Handshake.None;
+            sp.NewLine = "\n";  // Need this or ReadLine() fails
             sp.Open();
         }
-        catch (SystemException f)
+        catch (Exception e)
         {
-            print("Failed to open port " + COM);
+            Debug.Log("Failed to open port " + COM);
+            sp.Close();
+            sp.Dispose();
             return;
         }
 
         if (sp.IsOpen)
         {
-            print("Successfully opened port " + COM);
+            Debug.Log("Successfully opened port " + COM);
 
             ReadThread = new Thread(new ThreadStart(ReadSerial));
             ReadThread.Start();
@@ -90,7 +89,7 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     }
 
     /// <summary>
-    /// Reads the serial to determine the input values for the Axis. These values are then send via RPC in the Update() loop.
+    /// Reads the serial to determine the input values for the Axis. These values are then send via RPC in the OnPhotonSerializeView() loop.
     /// </summary>
     private void ReadSerial()
     {
@@ -309,6 +308,22 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
     {
         NewSendMsg(2, 999);
         followMode = false;
+    }
+    
+    public void ResetSerialPort()
+    {
+        if (sp != null && sp.IsOpen)
+        {
+            Debug.Log("Force resetting port " + COM);
+            sp.Close();
+            sp.Dispose();
+
+            if (ReadThread.IsAlive)
+                ReadThread.Abort();
+        }
+
+        // Reconnect after a short delay
+        Invoke("TryConnectToPort", 0.25f);
     }
 
     private float Remap(float value, float fromLow, float fromHigh, float toLow, float toHigh)

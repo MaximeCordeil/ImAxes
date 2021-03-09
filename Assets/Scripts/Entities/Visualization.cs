@@ -138,7 +138,7 @@ public class Visualization : MonoBehaviour
     public delegate void StaxesAction(string[] visualisationType);
     public static event StaxesAction OnStaxesAction;
 
-    DetailsOnDemand DetailsOnDemandComponent = null;
+    // DetailsOnDemand DetailsOnDemandComponent = null;
 
     /// <summary>
     /// An array which indicates which points are filtered or not based on this visualisation's connected axes
@@ -437,9 +437,9 @@ public class Visualization : MonoBehaviour
             parallelT.Item1.tag = "View";
             parallelT.Item1.name += " parallel";
             parallelT.Item2.setColors(VisualisationAttributes.Instance.colors, true);
-            DetailsOnDemandComponent = parallelT.Item1.AddComponent<DetailsOnDemand>();
-            DetailsOnDemandComponent.VisualizationReference = this;
-            parallelT.Item1.GetComponentInChildren<DetailsOnDemand>().setTransformParent(transform);
+            // DetailsOnDemandComponent = parallelT.Item1.AddComponent<DetailsOnDemand>();
+            // DetailsOnDemandComponent.VisualizationReference = this;
+            // parallelT.Item1.GetComponentInChildren<DetailsOnDemand>().setTransformParent(transform);
 
             Staxes.Tuple<GameObject, View> scatter2DT = VisualisationFactory.Instance.CreateSingle2DView(SceneManager.Instance.dataObject, axisH.axisId, axisV.axisId, -1, VisualisationAttributes.Instance.LinkedAttribute, MeshTopology.Points,
                 VisualisationAttributes.Instance.LinkedAttribute < 0 ? VisualisationFactory.Instance.pointCloudMaterial : VisualisationFactory.Instance.connectedPointLineMaterial);
@@ -456,9 +456,9 @@ public class Visualization : MonoBehaviour
             scatter2DT.Item1.layer = LayerMask.NameToLayer("View");
             scatter2DT.Item1.tag = "View";
             scatter2DT.Item1.name += " scatterplot2D";
-            DetailsOnDemandComponent = scatter2DT.Item1.AddComponent<DetailsOnDemand>();
-            DetailsOnDemandComponent.VisualizationReference = this;
-            scatter2DT.Item1.GetComponentInChildren<DetailsOnDemand>().setTransformParent(transform);
+            // DetailsOnDemandComponent = scatter2DT.Item1.AddComponent<DetailsOnDemand>();
+            // DetailsOnDemandComponent.VisualizationReference = this;
+            // scatter2DT.Item1.GetComponentInChildren<DetailsOnDemand>().setTransformParent(transform);
 
             //scatter2DT.Item1.AddComponent<BrushingAndLinking>();
         }
@@ -510,9 +510,9 @@ public class Visualization : MonoBehaviour
                 OnChangeMaxPointSize(VisualisationAttributes.Instance.MaxScatterplotPointSize);
                 scatter3DT.Item1.tag = "View";
                 scatter3DT.Item1.name += " scatterplot3D";
-                DetailsOnDemandComponent = scatter3DT.Item1.AddComponent<DetailsOnDemand>();
-                scatter3DT.Item1.GetComponentInChildren<DetailsOnDemand>().setTransformParent(transform);
-                DetailsOnDemandComponent.VisualizationReference = this;
+                // DetailsOnDemandComponent = scatter3DT.Item1.AddComponent<DetailsOnDemand>();
+                // scatter3DT.Item1.GetComponentInChildren<DetailsOnDemand>().setTransformParent(transform);
+                // DetailsOnDemandComponent.VisualizationReference = this;
 
                 //TODO: erase
                 //scatter3DT.Item2.updateSizeChannel(1, SceneManager.Instance.dataObject.getDimension(1));

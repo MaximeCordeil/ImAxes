@@ -5396,7 +5396,7 @@ MonoBehaviour:
     type: 3}
   sourceData: {fileID: 4900000, guid: 37b008166b12844bc967ab8195316518, type: 3}
   metadata: {fileID: 11400000, guid: 5469941c0faf14d7f9ae454c11b6150e, type: 2}
-  createAxisShelf: 1
+  createAxisShelf: 0
 --- !u!114 &554863328
 MonoBehaviour:
   m_ObjectHideFlags: 0

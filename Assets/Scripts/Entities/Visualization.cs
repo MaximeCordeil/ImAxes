@@ -803,6 +803,8 @@ public class Visualization : MonoBehaviour
             if (tangents.Count == 0)
                 tangents = Enumerable.Repeat(Vector4.zero, SceneManager.Instance.dataObject.DataPoints).ToList();
 
+            bool unhighlight = (SharedHighlightedPoints.Count > 0);
+
             for (int i = 0; i < tangents.Count; i++)
             {
                 Vector4 tan = tangents[i];
@@ -810,6 +812,8 @@ public class Visualization : MonoBehaviour
                 tan.x = SharedFilteredPoints[i];
                 if (SharedHighlightedPoints.Contains(i))
                     tan.z = 1;
+                else if (unhighlight)
+                    tan.z = -1;
                 else
                     tan.z = 0;
 

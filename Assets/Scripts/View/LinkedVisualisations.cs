@@ -269,6 +269,8 @@ public class LinkedVisualisations : MonoBehaviour
                 if (tangents.Count == 0)
                     tangents = Enumerable.Repeat(Vector4.zero, SceneManager.Instance.dataObject.DataPoints * 2).ToList();
 
+                bool unhighlight = (SharedHighlightedPoints.Count > 0);
+
                 int tangentIndex = 0;
                 
                 for (int i = 0; i < SceneManager.Instance.dataObject.DataPoints; i++)
@@ -289,8 +291,16 @@ public class LinkedVisualisations : MonoBehaviour
                     }
                     else
                     {
-                        tan1.z = 0;
-                        tan2.z = 0;
+                        if (unhighlight)
+                        {
+                            tan1.z = -1;
+                            tan2.z = -1;
+                        }
+                        else
+                        {
+                            tan1.z = 0;
+                            tan2.z = 0;
+                        }
                     }
 
                     tangents[tangentIndex] = tan1;

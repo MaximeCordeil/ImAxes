@@ -262,6 +262,8 @@ Shader "Staxestk/Linked-Views-Material"
 
 			if (l[0].flags.z > 0 || l[1].flags.z > 0)
 				In.flags.z = 1;
+			else if (l[0].flags.z < 0 || l[1].flags.z < 0)
+				In.flags.z = -1;
 
 			In.color = l[0].color;
 			if (l[0].flags.y == 1)
@@ -307,6 +309,9 @@ Shader "Staxestk/Linked-Views-Material"
 			else
 				t = 1.0;
 			o.color = lerp(float4(0, 0, 0, 0), float4(i.color.rgb, 0.5), t);
+
+			if (i.flags.z < 0)
+				o.color.a = 0.025;
 		}
 
 		o.depth = i.vertex.z;

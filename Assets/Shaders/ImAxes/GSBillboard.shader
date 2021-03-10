@@ -299,6 +299,9 @@ Shader "Custom/Outline Dots"
 							output.color = float4(0.5, 0, 0.5, 1);
 						else
 							output.color = float4(input.color.x-dt*0.15,input.color.y-dt*0.15,input.color.z-dt*0.15,0.75);
+
+						if (input.flags.z < 0)
+							output.color.a = 0.1;
 						return output;
 					}
 					else if(dx * dx + dy * dy <= 0.21f)

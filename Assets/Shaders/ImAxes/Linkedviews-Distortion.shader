@@ -66,10 +66,7 @@ Shader "Staxestk/Linked-Views-Material"
 		float4 vertex	:	POSITION;
 		float4 color	:	COLOR;
 		float2 uv		:	TEXCOORD0;
-		bool filtered	:	BOOL;
-		bool isBrushed	:	BOOL;
-		bool isHighlighted : BOOL;
-		bool isTruncated : BOOL;
+		float4 flags		:	TEXCOORD1;  // [x: 0=notFiltered, 1=isFiltered ||| y: 0=notTruncated, 1=isTruncated ||| z: 0=notHighlighted, 1=isHighlighted ||| w: isBrushed]
 
 		UNITY_VERTEX_INPUT_INSTANCE_ID
 		UNITY_VERTEX_OUTPUT_STEREO
@@ -80,7 +77,7 @@ Shader "Staxestk/Linked-Views-Material"
 		float2 uv : TEXCOORD0;
 		float4 vertex : SV_POSITION;
 		float4 color: COLOR;
-		bool isHighlighted : BOOL;
+		float4 flags	:	TEXCOORD1;  // [x: 0=notFiltered, 1=isFiltered ||| y: 0=notTruncated, 1=isTruncated ||| z: 0=notHighlighted, 1=isHighlighted ||| w: isBrushed]
 
 		UNITY_VERTEX_OUTPUT_STEREO
 	};
@@ -195,12 +192,11 @@ Shader "Staxestk/Linked-Views-Material"
 					normalisedPosition.z < -0.45 ||
 					normalisedPosition.z > 0.45)
 				{
-					o.filtered = true;
-					//o.color.w=0;
+					o.flags.x = 1;
 				}
 				else
 				{
-					o.filtered = false;
+					o.flags.x = 0;
 				}
 			}
 			else if (v.normal.z == 1.0)
@@ -224,25 +220,27 @@ Shader "Staxestk/Linked-Views-Material"
 					normalisedPosition.z < -0.45 ||
 					normalisedPosition.z > 0.45)
 				{
-					o.filtered = true;
-					//o.color.w=0;
+					o.flags.x = 1;
 				}
 				else
 				{
-					o.filtered = false;
+					o.flags.x = 0;
 				}
 			}
 		}
 		else if (v.tangent.x == 1.0)
 		{
-			o.filtered = true;
+			o.flags.x = 1;
 		}
 
 		o.vertex = mul(UNITY_MATRIX_VP, ObjectToWorldDistort3d(normalisedPosition, v.normal.z > 0));
-		//o.vertex = UnityObjectToClipPos(pos);
-		o.isTruncated = (v.tangent.y > 0);
-		o.isBrushed = false;
-		o.isHighlighted = (v.tangent.z > 0);
+		
+		// isTruncated
+		o.flags.y = v.tangent.y;
+		// isBrushed
+		o.flags.w = 0;
+		// isHighlighted
+		o.flags.z = v.tangent.z;
 
 		return o;
 	}
@@ -252,7 +250,7 @@ Shader "Staxestk/Linked-Views-Material"
 	void geom (line gs_in l[2], inout LineStream<g2f> lineStream)
 	{
 		//bool filtered = false;
-		bool filtered = (l[0].filtered || l[1].filtered);
+		bool filtered = (l[0].flags.x == 1) || (l[1].flags.x == 1);
 
 		if(!filtered)
 		{
@@ -262,23 +260,27 @@ Shader "Staxestk/Linked-Views-Material"
 			UNITY_SETUP_INSTANCE_ID(l[0]);
 			UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(l[0]);
 
+			if (l[0].flags.z > 0 || l[1].flags.z > 0)
+				In.flags.z = 1;
+
 			In.color = l[0].color;
-			if (l[0].isTruncated == 1.0) In.color.w = 0;
-			else In.color.w = 0.75;
+			if (l[0].flags.y == 1)
+				In.color.w = 0;
+			else
+				In.color.w = 0.75;
 			In.vertex = l[0].vertex;
 			In.uv = l[0].uv;
 			UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(l[0], In);
 			lineStream.Append(In);
 
 			In.color = l[1].color;
-			if (l[1].isTruncated == 1.0) In.color.w = 0;
-			else In.color.w = 0.75;
+			if (l[1].flags.y == 1)
+				In.color.w = 0;
+			else
+				In.color.w = 0.75;
 			In.vertex = l[1].vertex;
 			In.uv = l[1].uv;
 			UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(l[0], In);
-
-			In.isHighlighted = l[0].isHighlighted;
-
 			lineStream.Append(In);
 		}
 	}
@@ -291,7 +293,7 @@ Shader "Staxestk/Linked-Views-Material"
 		UNITY_INITIALIZE_OUTPUT(f_output, o);
 		UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-		if (i.isHighlighted)
+		if (i.flags.z > 0)
 		{
 			o.color = float4(0.5, 0, 0.5, 1);
 		}

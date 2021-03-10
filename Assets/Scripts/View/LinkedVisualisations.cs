@@ -40,8 +40,7 @@ public class LinkedVisualisations : MonoBehaviour
     public List<LinkedVisualisations> ConnectedLinkedVisualisations;
     public float[] SharedFilteredPoints;
     public bool SharedFilteredPointsChanged;
-    public int HighlightedIdx = -1;
-    private int prevHighlightedIdx = -1;
+    public List<int> SharedHighlightedPoints;
     private bool wasV1Truncated = false;
     private bool wasV2Truncated = false;
 
@@ -218,10 +217,12 @@ public class LinkedVisualisations : MonoBehaviour
                 }
 
                 // Create a shared filtered array of all ConnectedVisualisations and set it to all Visualisations and LinkedVisualisations
+                // Also create a shared highlighted list
                 if (updateFiltered)
                 {
                     int dataCount = SceneManager.Instance.dataObject.DataPoints;
                     SharedFilteredPoints = new float[dataCount];
+                    SharedHighlightedPoints = new List<int>();
                     foreach (var vis in ConnectedVisualisations)
                     {
                         for (int i = 0; i < dataCount; i++)
@@ -229,19 +230,25 @@ public class LinkedVisualisations : MonoBehaviour
                             if (vis.FilteredPoints[i] == 1)
                                 SharedFilteredPoints[i] = 1;
                         }
-
                         vis.FilteredPointsChanged = false;
+                        
+                        foreach (var axis in vis.axes)
+                        {
+                            SharedHighlightedPoints = SharedHighlightedPoints.Union(axis.HighlightedIndices).ToList();
+                        }
                     }
 
                     foreach (var vis in ConnectedVisualisations)
                     {
                         vis.SharedFilteredPoints = SharedFilteredPoints;
+                        vis.SharedHighlightedPoints = SharedHighlightedPoints;
                         vis.SharedFilteredPointsChanged = true;
                     }
                     foreach (var linkedVis in ConnectedLinkedVisualisations)
                     {
                         linkedVis.SharedFilteredPoints = SharedFilteredPoints;
                         linkedVis.SharedFilteredPointsChanged = true;
+                        linkedVis.SharedHighlightedPoints = SharedHighlightedPoints;
                     }
 
                     SharedFilteredPointsChanged = true;
@@ -253,7 +260,7 @@ public class LinkedVisualisations : MonoBehaviour
             bool isV2Truncated = IsVisualizationTruncated(V2);
 
             // If either the SharedFilteredPoints or the truncated visualisations have changed, or the highlighted index has changed, update the mesh normals of this LinkedVisualisation
-            if (wasV1Truncated != isV1Truncated || wasV2Truncated != isV2Truncated || SharedFilteredPointsChanged || prevHighlightedIdx != HighlightedIdx)
+            if (wasV1Truncated != isV1Truncated || wasV2Truncated != isV2Truncated || SharedFilteredPointsChanged)
             {
                 // Filtering, truncating, and highlighting are passed through the tangents array
                 List<Vector4> tangents = new List<Vector4>();
@@ -275,7 +282,7 @@ public class LinkedVisualisations : MonoBehaviour
                     tan1.y = isV1Truncated ? 1 : 0;
                     tan2.y = isV2Truncated ? 1 : 0;
 
-                    if (HighlightedIdx == i)
+                    if (SharedHighlightedPoints.Contains(i))
                     {
                         tan1.z = 1;
                         tan2.z = 1;
@@ -296,7 +303,6 @@ public class LinkedVisualisations : MonoBehaviour
 
                 wasV1Truncated = isV1Truncated;
                 wasV2Truncated = isV2Truncated;
-                prevHighlightedIdx = HighlightedIdx;
             }
 
             // position the linked visualization between axis

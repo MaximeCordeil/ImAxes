@@ -75,6 +75,7 @@ public class Axis : MonoBehaviour {
     private Renderer maxFilterObjectRenderer;
     private Color originalMinFilterObjectColour;
     private Color originalMaxFilterObjectColour;
+    public List<int> HighlightedIndices = new List<int>();
 
     public void HideHandles()
     {
@@ -197,7 +198,6 @@ public class Axis : MonoBehaviour {
         originalMaxFilterObjectColour = maxFilterObjectRenderer.material.color;
     }
 
-/*
 #if UNITY_EDITOR    // Debug code for interacting with inspector
     private float prevMinFilter;
     private float prevMaxFilter;
@@ -239,7 +239,6 @@ public class Axis : MonoBehaviour {
         }
     }
 #endif
-*/
 
     public void LateUpdate()
     {
@@ -311,6 +310,14 @@ public class Axis : MonoBehaviour {
             maxFilterObjectRenderer.material.color = originalMaxFilterObjectColour;
             SetMinFilter(MinFilter);
             SetMaxFilter(MaxFilter);
+
+            HighlightedIndices.Clear();
+            List<Visualization> visualizations = correspondingVisualizations();
+            if (visualizations.Count > 0)
+            {
+                visualizations[0].FilteredPointsChanged = true;
+            }
+
         }
     }
 
@@ -321,22 +328,62 @@ public class Axis : MonoBehaviour {
 
         InfoboxPosition = Mathf.Clamp(val, -0.505f, 0.505f);
         float normalised = UtilMath.normaliseValue(InfoboxPosition, -0.505f, 0.505f, 0, 1f);
-        string dimension = string.Format("<size=16><b>{0}</b></size><br>" ,SceneManager.Instance.dataObject.indexToDimension(SourceIndex));
+        string dimension = SceneManager.Instance.dataObject.indexToDimension(SourceIndex);
 
         // Set infobox text
-        string type = SceneManager.Instance.dataObject.TypeDimensionDictionary1[SourceIndex];
-        if (type == "float")
+        // Get the array of filtered points from any corresponding visualisations
+        List<Visualization> visualizations = correspondingVisualizations();
+        if (visualizations.Count == 0)
+            return;
+        float[] filteredPoints = visualizations[0].SharedFilteredPoints;
+        // Get the array of float values for this dimension
+        float[] values = SceneManager.Instance.dataObject.getDimension(dimension);
+        // Keep only the indices which are not marked as 1 in the filteredPoints array
+        List<float> filteredValues = new List<float>();
+        for (int i = 0; i < filteredPoints.Length; i++)
         {
-            InfoboxText.text = dimension + Mathf.Lerp(AttributeRange.x, AttributeRange.y, normalised).ToString("0.000");
-        }
-        else if (type == "string")
-        {
-            float value = Mathf.Lerp(AttributeRange.x, AttributeRange.y, normalised);
-            float nearestvalue = UtilMath.ClosestTo(SceneManager.Instance.dataObject.TextualDimensions.Keys.ToList(), value);
-            InfoboxText.text = dimension + SceneManager.Instance.dataObject.TextualDimensions[nearestvalue].ToString();
+            if (filteredPoints[i] == 0)
+                filteredValues.Add(values[i]);
         }
 
-        // Set infobox text position, as well as the filter handles
+        if (filteredValues.Count == 0)
+        {
+            InfoboxText.text = string.Format("<size=16><b>{0}</b></size><br>{1}", dimension, "No points to view!");
+            visualizations[0].FilteredPointsChanged = true;
+        }
+        else
+        {
+            float nearestValue = UtilMath.ClosestTo(filteredValues, normalised);
+            string outputValue = "";
+
+            string type = SceneManager.Instance.dataObject.TypeDimensionDictionary1[SourceIndex];
+            if (type == "float")
+            {
+                outputValue = Mathf.Lerp(AttributeRange.x, AttributeRange.y, nearestValue).ToString();
+            }
+            else if (type == "string")
+            {
+                float value = Mathf.Lerp(AttributeRange.x, AttributeRange.y, nearestValue);
+                float textualDimensionIdx = UtilMath.ClosestTo(SceneManager.Instance.dataObject.TextualDimensions.Keys.ToList(), value);
+                outputValue = SceneManager.Instance.dataObject.TextualDimensions[textualDimensionIdx].ToString();
+            }
+
+
+            HighlightedIndices.Clear();
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] == nearestValue)
+                    HighlightedIndices.Add(i);
+            }
+            string overlappingText = (HighlightedIndices.Count > 1) ? HighlightedIndices.Count + " overlapping points" : "";
+
+            InfoboxText.text = string.Format("<size=10><b>{0}</b></size><br><size=16>{1}</size><br><size=8><i>{2}</i></size>", dimension, outputValue, overlappingText);
+
+            // Tell a connected axis to change the highlighted points
+            visualizations[0].FilteredPointsChanged = true;
+        }
+
+        // Set infobox position, as well as the filter handles
         float y = UtilMath.normaliseValue(InfoboxPosition, -0.505f, 0.505f, -0.5f, 0.5f);
         SetLocalYPosition(InfoboxText.transform, y);
         SetLocalYPosition(minFilterObject, y);

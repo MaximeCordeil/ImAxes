@@ -156,11 +156,10 @@ public class Visualization : MonoBehaviour
     /// A bool which other Visualisation scripts set on this to inform that it should update its filtered points
     /// </summary>
     public bool SharedFilteredPointsChanged;
+    public List<int> SharedHighlightedPoints;
     // Linked filtering variables
     public List<Visualization> ConnectedVisualisations;
     public List<LinkedVisualisations> ConnectedLinkedVisualisations;
-    public int HighlightedIdx = -1;
-    private int prevHighlightedIdx = -1;
 
     private ViewType previousViewType;
 
@@ -749,6 +748,7 @@ public class Visualization : MonoBehaviour
             {
                 int dataCount = SceneManager.Instance.dataObject.DataPoints;
                 SharedFilteredPoints = new float[dataCount];
+                SharedHighlightedPoints = new List<int>();
                 foreach (var vis in ConnectedVisualisations)
                 {
                     for (int i = 0; i < dataCount; i++)
@@ -756,26 +756,32 @@ public class Visualization : MonoBehaviour
                         if (vis.FilteredPoints[i] == 1)
                             SharedFilteredPoints[i] = 1;
                     }
-
                     vis.FilteredPointsChanged = false;
+                        
+                    foreach (var axis in vis.axes)
+                    {
+                        SharedHighlightedPoints = SharedHighlightedPoints.Union(axis.HighlightedIndices).ToList();
+                    }
                 }
 
                 foreach (var vis in ConnectedVisualisations)
                 {
                     vis.SharedFilteredPoints = SharedFilteredPoints;
                     vis.SharedFilteredPointsChanged = true;
+                    vis.SharedHighlightedPoints = SharedHighlightedPoints;
                 }
                 foreach (var linkedVis in ConnectedLinkedVisualisations)
                 {
                     linkedVis.SharedFilteredPoints = SharedFilteredPoints;
                     linkedVis.SharedFilteredPointsChanged = true;
+                    linkedVis.SharedHighlightedPoints = SharedHighlightedPoints;
                 }
 
                 SharedFilteredPointsChanged = true;
             }
         }
 
-        if ((SharedFilteredPointsChanged || prevHighlightedIdx != HighlightedIdx) && viewType != ViewType.Histogram)
+        if ((SharedFilteredPointsChanged && viewType != ViewType.Histogram))
         {
             Mesh mesh = null;
             switch (viewType)
@@ -796,13 +802,13 @@ public class Visualization : MonoBehaviour
             
             if (tangents.Count == 0)
                 tangents = Enumerable.Repeat(Vector4.zero, SceneManager.Instance.dataObject.DataPoints).ToList();
-                
+
             for (int i = 0; i < tangents.Count; i++)
             {
                 Vector4 tan = tangents[i];
                 
                 tan.x = SharedFilteredPoints[i];
-                if (HighlightedIdx == i)
+                if (SharedHighlightedPoints.Contains(i))
                     tan.z = 1;
                 else
                     tan.z = 0;
@@ -812,7 +818,6 @@ public class Visualization : MonoBehaviour
             
             mesh.SetTangents(tangents);
                 
-            prevHighlightedIdx = HighlightedIdx;
             SharedFilteredPointsChanged = false;
         }
 

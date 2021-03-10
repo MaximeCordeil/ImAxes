@@ -65,9 +65,7 @@ Shader "Custom/Outline Dots"
 					float3	normal	: NORMAL;
 					float2  tex0	: TEXCOORD0;
 					float4  color		: COLOR;
-					bool	isBrushed : BOOL;
-					bool 	isFiltered : BOOL;
-					bool 	isHighlighted : BOOL;
+					float4 flags	: TEXCOORD1; // [x: 0=notFiltered, 1=isFiltered ||| y : not used ||| z: 0=notHighlighted, 1=isHighlighted, w: isBrushed]
 
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 					UNITY_VERTEX_OUTPUT_STEREO
@@ -77,11 +75,9 @@ Shader "Custom/Outline Dots"
 				{
 					float4	pos		: POSITION;
 					float2  tex0	: TEXCOORD0;
-					//float2	tex1	: TEXCOORD1;
 					float4  color		: COLOR;
 					float3	normal	: NORMAL;
-					float	isBrushed : FLOAT;
-					bool isHighlighted : BOOL;
+					float4 flags	: TEXCOORD1;  // [x: 0=notFiltered, 1=isFiltered ||| y : not used ||| z: 0=notHighlighted, 1=isHighlighted, w: isBrushed]
 
                     UNITY_VERTEX_OUTPUT_STEREO
 				};
@@ -161,8 +157,6 @@ Shader "Custom/Outline Dots"
 					float2 indexUV = float2((v.normal.x % _DataWidth) / _DataWidth, 1.0 - ((v.normal.x / _DataWidth) / _DataHeight));
 					float4 brushValue = tex2Dlod(_MainTex, float4(indexUV, 0.0, 0.0));
 
-					output.isBrushed = brushValue.r;
-
 					//TODO LATER: THIS REMAPS THE RANGE OF VALUES
 					float3 normalisedPosition = float3(
 						normaliseValue(v.position.x, MinNormX, MaxNormX ,-0.45, 0.45),
@@ -180,7 +174,7 @@ Shader "Custom/Outline Dots"
 					//filtering
 					if (v.tangent.x > 0)
 					{
-						output.isFiltered = true;
+						output.flags.x = 1;
 					}
 					else if (v.position.x <= MinX ||
 							v.position.x >= MaxX ||
@@ -196,16 +190,19 @@ Shader "Custom/Outline Dots"
 							normalisedPosition.z < -0.5 ||
 							normalisedPosition.z > 0.5)
 					{
-						output.isFiltered = true;
+						output.flags.x = 1;
 					}
 					else
 					{
-						output.isFiltered = false;
+						output.flags.x = 0;
 					}
 
 					output.normal = v.normal;
-					output.isBrushed = false;
-					output.isHighlighted = (v.tangent.z > 0);
+					// isBrushed
+					output.flags.w = brushValue.r;
+					// isHighlighted
+					output.flags.z = v.tangent.z;
+
 					return output;
 				}
 
@@ -215,13 +212,16 @@ Shader "Custom/Outline Dots"
 				[maxvertexcount(4)]
 				void GS_Main(point GS_INPUT p[1], inout TriangleStream<FS_INPUT> triStream)
 				{
-					if (!p[0].isFiltered)
+					if (!(p[0].flags.x > 0))
 					{
 						FS_INPUT pIn;
 
 						UNITY_SETUP_INSTANCE_ID(p[0]);
 						UNITY_INITIALIZE_OUTPUT(FS_INPUT, pIn);
 						UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(p[0]);
+
+						pIn.flags.z = p[0].flags.z;
+						pIn.flags.w = p[0].flags.w;
 
 						// Access instanced variables
 						float Size = UNITY_ACCESS_INSTANCED_PROP(Props, _Size);
@@ -230,9 +230,7 @@ Shader "Custom/Outline Dots"
 
 						float3 up = float3(0, 1, 0);
 						float brushSizeFactor = 1.0;
-						//if (p[0].isBrushed == 1.0) brushSizeFactor = 1.2;
-						if(p[0].isBrushed) brushSizeFactor = 1.5;
-						pIn.isHighlighted = p[0].isHighlighted;
+						if(p[0].flags.w > 0) brushSizeFactor = 1.5;
 
 						float3 look = _WorldSpaceCameraPos - p[0].pos;
 						//look.y = 0;
@@ -251,7 +249,6 @@ Shader "Custom/Outline Dots"
 
 						float4x4 vp = UNITY_MATRIX_VP;
 
-						pIn.isBrushed = p[0].isBrushed;
 						pIn.color = p[0].color;
 						pIn.normal = p[0].normal;
 
@@ -298,7 +295,7 @@ Shader "Custom/Outline Dots"
 
 					if( dt <= 0.2f)
 					{
-						if (input.isHighlighted)
+						if (input.flags.z > 0)
 							output.color = float4(0.5, 0, 0.5, 1);
 						else
 							output.color = float4(input.color.x-dt*0.15,input.color.y-dt*0.15,input.color.z-dt*0.15,0.75);

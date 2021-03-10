@@ -55,7 +55,8 @@ Shader "Staxestk/Linked-Views-Material"
 		float4 position : POSITION;
 		float2 uv : TEXCOORD0;
 		float4 color: COLOR;
-		float3 normal	: NORMAL;  // [x: 0=notFiltered, 1=isFiltered ||| y: 0=notTruncated, 1=isTruncated ||| z: 0=v1, 1=v2]
+		float3 normal	: NORMAL;  // [x: not used ||| y: not used ||| z: 0=v1, 1=v2 ||| w: not used]
+		float4 tangent : TANGENT;  // [x: 0=notFiltered, 1=isFiltered ||| y: 0=notTruncated, 1=isTruncated ||| z: 0=notHighlighted, 1=isHighlighted ||| w: not used]
 
 		UNITY_VERTEX_INPUT_INSTANCE_ID
 	};
@@ -67,7 +68,8 @@ Shader "Staxestk/Linked-Views-Material"
 		float2 uv		:	TEXCOORD0;
 		bool filtered	:	BOOL;
 		bool isBrushed	:	BOOL;
-		float isTruncated : FLOAT;
+		bool isHighlighted : BOOL;
+		bool isTruncated : BOOL;
 
 		UNITY_VERTEX_INPUT_INSTANCE_ID
 		UNITY_VERTEX_OUTPUT_STEREO
@@ -78,6 +80,7 @@ Shader "Staxestk/Linked-Views-Material"
 		float2 uv : TEXCOORD0;
 		float4 vertex : SV_POSITION;
 		float4 color: COLOR;
+		bool isHighlighted : BOOL;
 
 		UNITY_VERTEX_OUTPUT_STEREO
 	};
@@ -168,7 +171,7 @@ Shader "Staxestk/Linked-Views-Material"
 		float3 normalisedPosition;
 
 		// Check if vertex is filtered
-		if (v.normal.x == 0.0)
+		if (v.tangent.x == 0.0)
 		{
 			// Check if vertex is v1 or v2
 			if (v.normal.z == 0.0)
@@ -230,15 +233,17 @@ Shader "Staxestk/Linked-Views-Material"
 				}
 			}
 		}
-		else if (v.normal.x == 1.0)
+		else if (v.tangent.x == 1.0)
 		{
 			o.filtered = true;
 		}
 
 		o.vertex = mul(UNITY_MATRIX_VP, ObjectToWorldDistort3d(normalisedPosition, v.normal.z > 0));
 		//o.vertex = UnityObjectToClipPos(pos);
-		o.isTruncated = v.normal.y;
-		o.isBrushed=false;
+		o.isTruncated = (v.tangent.y > 0);
+		o.isBrushed = false;
+		o.isHighlighted = (v.tangent.z > 0);
+
 		return o;
 	}
 
@@ -272,6 +277,8 @@ Shader "Staxestk/Linked-Views-Material"
 			In.uv = l[1].uv;
 			UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(l[0], In);
 
+			In.isHighlighted = l[0].isHighlighted;
+
 			lineStream.Append(In);
 		}
 	}
@@ -284,16 +291,22 @@ Shader "Staxestk/Linked-Views-Material"
 		UNITY_INITIALIZE_OUTPUT(f_output, o);
 		UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
-		float t = i.color.w;
-		if (t < 0.4)
-			t = 0.0;
-		else if (t < 0.55)
-			t = normaliseValue(t, 0.4, 0.55, 0.0, 0.75);
+		if (i.isHighlighted)
+		{
+			o.color = float4(0.5, 0, 0.5, 1);
+		}
 		else
-			t = 1.0;
+		{
+			float t = i.color.w;
+			if (t < 0.4)
+				t = 0.0;
+			else if (t < 0.55)
+				t = normaliseValue(t, 0.4, 0.55, 0.0, 0.75);
+			else
+				t = 1.0;
+			o.color = lerp(float4(0, 0, 0, 0), float4(i.color.rgb, 0.5), t);
+		}
 
-		o.color = lerp(float4(0, 0, 0, 0), float4(i.color.rgb, 0.5), t);
-		//o.color = i.color;
 		o.depth = i.vertex.z;
 		return o;
 	}

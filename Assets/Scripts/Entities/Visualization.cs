@@ -159,7 +159,8 @@ public class Visualization : MonoBehaviour
     // Linked filtering variables
     public List<Visualization> ConnectedVisualisations;
     public List<LinkedVisualisations> ConnectedLinkedVisualisations;
-
+    public int HighlightedIdx = -1;
+    private int prevHighlightedIdx = -1;
 
     private ViewType previousViewType;
 
@@ -774,11 +775,14 @@ public class Visualization : MonoBehaviour
             }
         }
 
-        if (SharedFilteredPointsChanged && viewType != ViewType.Histogram) // Histograms can't actually link with anything, so we just ignore
+        if ((SharedFilteredPointsChanged || prevHighlightedIdx != HighlightedIdx) && viewType != ViewType.Histogram)
         {
             Mesh mesh = null;
             switch (viewType)
             {
+                case ViewType.Histogram:
+                    mesh = histogramObject.GetComponentInChildren<MeshFilter>().mesh;
+                    break;
                 case ViewType.Scatterplot2D:
                     mesh = scatterplot2DObject.GetComponentInChildren<MeshFilter>().mesh;
                     break;
@@ -787,15 +791,28 @@ public class Visualization : MonoBehaviour
                     break;
             }
 
-            List<Vector3> normals = new List<Vector3>();
-            mesh.GetNormals(normals);
-            for (int i = 0; i < normals.Count; i++)
+            List<Vector4> tangents = new List<Vector4>();
+            mesh.GetTangents(tangents);
+            
+            if (tangents.Count == 0)
+                tangents = Enumerable.Repeat(Vector4.zero, SceneManager.Instance.dataObject.DataPoints).ToList();
+                
+            for (int i = 0; i < tangents.Count; i++)
             {
-                Vector3 norm = normals[i];
-                norm.z = SharedFilteredPoints[i];
-                normals[i] = norm;
+                Vector4 tan = tangents[i];
+                
+                tan.x = SharedFilteredPoints[i];
+                if (HighlightedIdx == i)
+                    tan.z = 1;
+                else
+                    tan.z = 0;
+
+                tangents[i] = tan;
             }
-            mesh.SetNormals(normals);
+            
+            mesh.SetTangents(tangents);
+                
+            prevHighlightedIdx = HighlightedIdx;
             SharedFilteredPointsChanged = false;
         }
 

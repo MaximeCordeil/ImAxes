@@ -40,6 +40,8 @@ public class LinkedVisualisations : MonoBehaviour
     public List<LinkedVisualisations> ConnectedLinkedVisualisations;
     public float[] SharedFilteredPoints;
     public bool SharedFilteredPointsChanged;
+    public int HighlightedIdx = -1;
+    private int prevHighlightedIdx = -1;
     private bool wasV1Truncated = false;
     private bool wasV2Truncated = false;
 
@@ -250,36 +252,51 @@ public class LinkedVisualisations : MonoBehaviour
             bool isV1Truncated = IsVisualizationTruncated(V1);
             bool isV2Truncated = IsVisualizationTruncated(V2);
 
-            // If either the SharedFilteredPoints or the truncated visualisations have changed, update the mesh normals of this LinkedVisualisation
-            if (wasV1Truncated != isV1Truncated || wasV2Truncated != isV2Truncated || SharedFilteredPointsChanged)
+            // If either the SharedFilteredPoints or the truncated visualisations have changed, or the highlighted index has changed, update the mesh normals of this LinkedVisualisation
+            if (wasV1Truncated != isV1Truncated || wasV2Truncated != isV2Truncated || SharedFilteredPointsChanged || prevHighlightedIdx != HighlightedIdx)
             {
-                List<Vector3> normals = new List<Vector3>();
-                mymesh.GetNormals(normals);
-                if (normals.Count > 0)
+                // Filtering, truncating, and highlighting are passed through the tangents array
+                List<Vector4> tangents = new List<Vector4>();
+                mymesh.GetTangents(tangents);
+                
+                if (tangents.Count == 0)
+                    tangents = Enumerable.Repeat(Vector4.zero, SceneManager.Instance.dataObject.DataPoints * 2).ToList();
+
+                int tangentIndex = 0;
+                
+                for (int i = 0; i < SceneManager.Instance.dataObject.DataPoints; i++)
                 {
-                    int normalIndex = 0;
+                    Vector4 tan1 = tangents[tangentIndex];
+                    Vector4 tan2 = tangents[tangentIndex + 1];
 
-                    for (int i = 0; i < SceneManager.Instance.dataObject.DataPoints; i++)
+                    tan1.x = SharedFilteredPoints[i];
+                    tan2.x = SharedFilteredPoints[i];
+
+                    tan1.y = isV1Truncated ? 1 : 0;
+                    tan2.y = isV2Truncated ? 1 : 0;
+
+                    if (HighlightedIdx == i)
                     {
-                        Vector3 norm1 = normals[normalIndex];
-                        Vector3 norm2 = normals[normalIndex + 1];
-
-                        norm1.x = SharedFilteredPoints[i];
-                        norm2.x = SharedFilteredPoints[i];
-
-                        norm1.y = isV1Truncated ? 1 : 0;
-                        norm2.y = isV2Truncated ? 1 : 0;
-
-                        normals[normalIndex] = norm1;
-                        normals[normalIndex + 1] = norm2;
-
-                        normalIndex += 2;
+                        tan1.z = 1;
+                        tan2.z = 1;
                     }
-                    mymesh.SetNormals(normals);
-                    SharedFilteredPointsChanged = false;
+                    else
+                    {
+                        tan1.z = 0;
+                        tan2.z = 0;
+                    }
+
+                    tangents[tangentIndex] = tan1;
+                    tangents[tangentIndex + 1] = tan2;
+
+                    tangentIndex += 2;
                 }
+                mymesh.SetTangents(tangents);
+                SharedFilteredPointsChanged = false;
+
                 wasV1Truncated = isV1Truncated;
                 wasV2Truncated = isV2Truncated;
+                prevHighlightedIdx = HighlightedIdx;
             }
 
             // position the linked visualization between axis

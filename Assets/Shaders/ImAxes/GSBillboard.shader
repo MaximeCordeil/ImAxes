@@ -53,7 +53,8 @@ Shader "Custom/Outline Dots"
 		        struct VS_INPUT {
           		    float4 position : POSITION;
             		float4 color: COLOR;
-					float3 normal:	NORMAL;  // [x: index ||| y: size ||| z: 0=notFiltered, 1=isFiltered]
+					float3 normal:	NORMAL;  // [x: index ||| y: size ||| z: not used]
+					float4 tangent : TANGENT; // [x: 0=notFiltered, 1=isFiltered ||| y : not used ||| z: 0=notHighlighted, 1=isHighlighted]
 
                     UNITY_VERTEX_INPUT_INSTANCE_ID
         		};
@@ -64,7 +65,9 @@ Shader "Custom/Outline Dots"
 					float3	normal	: NORMAL;
 					float2  tex0	: TEXCOORD0;
 					float4  color		: COLOR;
-					float	isBrushed : FLOAT;
+					bool	isBrushed : BOOL;
+					bool 	isFiltered : BOOL;
+					bool 	isHighlighted : BOOL;
 
 					UNITY_VERTEX_INPUT_INSTANCE_ID
 					UNITY_VERTEX_OUTPUT_STEREO
@@ -76,8 +79,9 @@ Shader "Custom/Outline Dots"
 					float2  tex0	: TEXCOORD0;
 					//float2	tex1	: TEXCOORD1;
 					float4  color		: COLOR;
-					float	isBrushed : FLOAT;
 					float3	normal	: NORMAL;
+					float	isBrushed : FLOAT;
+					bool isHighlighted : BOOL;
 
                     UNITY_VERTEX_OUTPUT_STEREO
 				};
@@ -172,31 +176,36 @@ Shader "Custom/Outline Dots"
 					output.tex0 = float2(0, 0);
 
 					output.color = v.color;
-					output.isBrushed= 0.0;
 
 					//filtering
-					if (v.normal.z == 1.0)
+					if (v.tangent.x > 0)
 					{
-						output.color.w = 0;
+						output.isFiltered = true;
 					}
 					else if (v.position.x <= MinX ||
-					 v.position.x >= MaxX ||
-					 v.position.y <= MinY ||
-					 v.position.y >= MaxY ||
-					 v.position.z <= MinZ ||
-					 v.position.z >= MaxZ ||
+							v.position.x >= MaxX ||
+							v.position.y <= MinY ||
+							v.position.y >= MaxY ||
+							v.position.z <= MinZ ||
+							v.position.z >= MaxZ ||
 
-					 normalisedPosition.x < -0.5 ||
-					 normalisedPosition.x > 0.5 ||
-					 normalisedPosition.y < -0.5 ||
-					 normalisedPosition.y > 0.5 ||
-					 normalisedPosition.z < -0.5 ||
-					 normalisedPosition.z > 0.5)
+							normalisedPosition.x < -0.5 ||
+							normalisedPosition.x > 0.5 ||
+							normalisedPosition.y < -0.5 ||
+							normalisedPosition.y > 0.5 ||
+							normalisedPosition.z < -0.5 ||
+							normalisedPosition.z > 0.5)
 					{
-						output.color.w = 0;
+						output.isFiltered = true;
+					}
+					else
+					{
+						output.isFiltered = false;
 					}
 
 					output.normal = v.normal;
+					output.isBrushed = false;
+					output.isHighlighted = (v.tangent.z > 0);
 					return output;
 				}
 
@@ -206,68 +215,72 @@ Shader "Custom/Outline Dots"
 				[maxvertexcount(4)]
 				void GS_Main(point GS_INPUT p[1], inout TriangleStream<FS_INPUT> triStream)
 				{
-					FS_INPUT pIn;
+					if (!p[0].isFiltered)
+					{
+						FS_INPUT pIn;
 
-					UNITY_SETUP_INSTANCE_ID(p[0]);
-					UNITY_INITIALIZE_OUTPUT(FS_INPUT, pIn);
-					UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(p[0]);
+						UNITY_SETUP_INSTANCE_ID(p[0]);
+						UNITY_INITIALIZE_OUTPUT(FS_INPUT, pIn);
+						UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(p[0]);
 
-					// Access instanced variables
-                    float Size = UNITY_ACCESS_INSTANCED_PROP(Props, _Size);
-                    float MinSize = UNITY_ACCESS_INSTANCED_PROP(Props, _MinSize);
-                    float MaxSize = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxSize);
+						// Access instanced variables
+						float Size = UNITY_ACCESS_INSTANCED_PROP(Props, _Size);
+						float MinSize = UNITY_ACCESS_INSTANCED_PROP(Props, _MinSize);
+						float MaxSize = UNITY_ACCESS_INSTANCED_PROP(Props, _MaxSize);
 
-					float3 up = float3(0, 1, 0);
-					float brushSizeFactor = 1.0;
-					//if (p[0].isBrushed == 1.0) brushSizeFactor = 1.2;
-					if(p[0].isBrushed > 0.0) brushSizeFactor = 1.5;
+						float3 up = float3(0, 1, 0);
+						float brushSizeFactor = 1.0;
+						//if (p[0].isBrushed == 1.0) brushSizeFactor = 1.2;
+						if(p[0].isBrushed) brushSizeFactor = 1.5;
+						pIn.isHighlighted = p[0].isHighlighted;
 
-					float3 look = _WorldSpaceCameraPos - p[0].pos;
-					//look.y = 0;
-					look = normalize(look);
+						float3 look = _WorldSpaceCameraPos - p[0].pos;
+						//look.y = 0;
+						look = normalize(look);
 
-					float3 right = cross(up, look);
-					float sizeFactor = normaliseValue(p[0].normal.y, 0.0, 1.0, MinSize, MaxSize);
-					float halfS = 0.01f * Size*sizeFactor * p[0].normal.y;
+						float3 right = cross(up, look);
+						float sizeFactor = normaliseValue(p[0].normal.y, 0.0, 1.0, MinSize, MaxSize);
+						float halfS = 0.01f * Size*sizeFactor * p[0].normal.y;
 
-					float4 v[4];
+						float4 v[4];
 
-					v[0] = float4(p[0].pos + halfS * right - halfS * up, 1.0f);
-					v[1] = float4(p[0].pos + halfS * right + halfS * up, 1.0f);
-					v[2] = float4(p[0].pos - halfS * right - halfS * up, 1.0f);
-					v[3] = float4(p[0].pos - halfS * right + halfS * up, 1.0f);
+						v[0] = float4(p[0].pos + halfS * right - halfS * up, 1.0f);
+						v[1] = float4(p[0].pos + halfS * right + halfS * up, 1.0f);
+						v[2] = float4(p[0].pos - halfS * right - halfS * up, 1.0f);
+						v[3] = float4(p[0].pos - halfS * right + halfS * up, 1.0f);
 
-					float4x4 vp = UNITY_MATRIX_VP;
+						float4x4 vp = UNITY_MATRIX_VP;
 
-					pIn.isBrushed = p[0].isBrushed;
-					pIn.color = p[0].color;
-					pIn.normal = p[0].normal;
+						pIn.isBrushed = p[0].isBrushed;
+						pIn.color = p[0].color;
+						pIn.normal = p[0].normal;
 
-					pIn.pos = mul(vp, v[0]);
-					pIn.tex0 = float2(1.0f, 0.0f);
-					pIn.normal = p[0].normal;
-					UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p[0], pIn);
-					triStream.Append(pIn);
+						pIn.pos = mul(vp, v[0]);
+						pIn.tex0 = float2(1.0f, 0.0f);
+						pIn.normal = p[0].normal;
+						UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p[0], pIn);
+						triStream.Append(pIn);
 
-					pIn.pos = mul(vp, v[1]);
-					pIn.tex0 = float2(1.0f, 1.0f);
-					pIn.normal = p[0].normal;
-					UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p[0], pIn);
-					triStream.Append(pIn);
+						pIn.pos = mul(vp, v[1]);
+						pIn.tex0 = float2(1.0f, 1.0f);
+						pIn.normal = p[0].normal;
+						UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p[0], pIn);
+						triStream.Append(pIn);
 
-					pIn.pos =  mul(vp, v[2]);
-					pIn.tex0 = float2(0.0f, 0.0f);
-					pIn.normal = p[0].normal;
-					UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p[0], pIn);
-					triStream.Append(pIn);
+						pIn.pos =  mul(vp, v[2]);
+						pIn.tex0 = float2(0.0f, 0.0f);
+						pIn.normal = p[0].normal;
+						UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p[0], pIn);
+						triStream.Append(pIn);
 
-					pIn.pos =  mul(vp, v[3]);
-					pIn.tex0 = float2(0.0f, 1.0f);
-					pIn.normal = p[0].normal;
-					UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p[0], pIn);
-					triStream.Append(pIn);
+						pIn.pos =  mul(vp, v[3]);
+						pIn.tex0 = float2(0.0f, 1.0f);
+						pIn.normal = p[0].normal;
+						UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(p[0], pIn);
+						triStream.Append(pIn);
 
-					triStream.RestartStrip();
+						triStream.RestartStrip();
+					}
 				}
 
 				// Fragment Shader -----------------------------------------------
@@ -283,44 +296,25 @@ Shader "Custom/Outline Dots"
 					float dt = dx * dx + dy * dy;
 					output.depth = input.pos.z;
 
-					if(input.color.w == 0)
+					if( dt <= 0.2f)
 					{
-						//if( dt <= 0.2f)
-						//	return float4(0.1,0.1,0.1,1.0);
-						//else
-						//	if(dx * dx + dy * dy <= 0.25f)
-						//	return float4(0.0, 0.0, 0.0, 1.0);
-						//	else
-						//	{
-						discard;
-						output.color = float4(0.0, 0.0, 0.0, 0.0);
+						if (input.isHighlighted)
+							output.color = float4(0.5, 0, 0.5, 1);
+						else
+							output.color = float4(input.color.x-dt*0.15,input.color.y-dt*0.15,input.color.z-dt*0.15,0.75);
 						return output;
-//							}
+					}
+					else if(dx * dx + dy * dy <= 0.21f)
+					{
+						output.color = float4(0.0, 0.0, 0.0, 1.0);
+						return output;
 					}
 					else
 					{
-						if( dt <= 0.2f)
-						{
-							//if(input.isBrushed==1.0)
-							//return float4(1.0,0.0,0.0,1.0);
-							//else
-							output.color = float4(input.color.x-dt*0.15,input.color.y-dt*0.15,input.color.z-dt*0.15,0.8);
-							return output;
-						}// float4(input.color.x-dt*0.25,input.color.y-dt*0.25,input.color.z-dt*0.25,1.0);
-						else if(dx * dx + dy * dy <= 0.21f)
-						{
-							output.color = float4(0.0, 0.0, 0.0, 1.0);
-							return output;
-						}
-						else
-						{
-							discard;
-							output.color = float4(0.1, 0.1, 0.1, 1.0);
-							return output;
-						}
+						discard;
+						output.color = float4(0.1, 0.1, 0.1, 1.0);
+						return output;
 					}
-
-					//return fo;
 				}
 
 			ENDCG

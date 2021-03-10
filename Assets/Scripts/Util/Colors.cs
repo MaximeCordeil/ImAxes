@@ -8,7 +8,7 @@ using System.Collections.Generic;
             Color[] cols = new Color[n];
             for (int i = 0; i < n; i++)
             {
-                cols[i] = Color.HSVToRGB((float)i / (float)n, 0.85f, 1.0f);
+                cols[i] = Color.HSVToRGB((float)i / (float)(n + 1), 0.85f, 1.0f);
             }
             return cols;
         }

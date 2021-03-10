@@ -1078,7 +1078,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42ebca56627608a4b81faf1db63c7e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  axisPrefab: {fileID: 259107908354201862, guid: 262a04a9dffd52d438a9f4053f0e770f,
+  axisPrefab: {fileID: 792125919815336626, guid: af6301539339c3940a3269d0f7fe2b32,
     type: 3}
   sceneManager: {fileID: 554863327}
 --- !u!114 &101539236
@@ -2729,7 +2729,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42ebca56627608a4b81faf1db63c7e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  axisPrefab: {fileID: 259107908354201862, guid: 262a04a9dffd52d438a9f4053f0e770f,
+  axisPrefab: {fileID: 792125919815336626, guid: af6301539339c3940a3269d0f7fe2b32,
     type: 3}
   sceneManager: {fileID: 554863327}
 --- !u!114 &289700504
@@ -3806,7 +3806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42ebca56627608a4b81faf1db63c7e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  axisPrefab: {fileID: 259107908354201862, guid: 262a04a9dffd52d438a9f4053f0e770f,
+  axisPrefab: {fileID: 792125919815336626, guid: af6301539339c3940a3269d0f7fe2b32,
     type: 3}
   sceneManager: {fileID: 554863327}
 --- !u!114 &389693385
@@ -5392,7 +5392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e4e4174732a89446b934a01dda3a3fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  axisPrefab: {fileID: 259107908354201862, guid: 262a04a9dffd52d438a9f4053f0e770f,
+  axisPrefab: {fileID: 792125919815336626, guid: af6301539339c3940a3269d0f7fe2b32,
     type: 3}
   sourceData: {fileID: 4900000, guid: 37b008166b12844bc967ab8195316518, type: 3}
   metadata: {fileID: 11400000, guid: 5469941c0faf14d7f9ae454c11b6150e, type: 2}
@@ -10225,7 +10225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42ebca56627608a4b81faf1db63c7e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  axisPrefab: {fileID: 259107908354201862, guid: 262a04a9dffd52d438a9f4053f0e770f,
+  axisPrefab: {fileID: 792125919815336626, guid: af6301539339c3940a3269d0f7fe2b32,
     type: 3}
   sceneManager: {fileID: 554863327}
 --- !u!114 &1025522066
@@ -10813,8 +10813,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1103894705}
-  m_LocalRotation: {x: 0.12935999, y: 0.4338338, z: -0.056122214, w: 0.88989013}
-  m_LocalPosition: {x: -1.1366, y: 1.5341, z: -1.7002}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1.595}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 263183423}
@@ -13925,7 +13925,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42ebca56627608a4b81faf1db63c7e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  axisPrefab: {fileID: 259107908354201862, guid: 262a04a9dffd52d438a9f4053f0e770f,
+  axisPrefab: {fileID: 792125919815336626, guid: af6301539339c3940a3269d0f7fe2b32,
     type: 3}
   sceneManager: {fileID: 554863327}
 --- !u!114 &1516549962
@@ -18581,7 +18581,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42ebca56627608a4b81faf1db63c7e71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  axisPrefab: {fileID: 259107908354201862, guid: 262a04a9dffd52d438a9f4053f0e770f,
+  axisPrefab: {fileID: 792125919815336626, guid: af6301539339c3940a3269d0f7fe2b32,
     type: 3}
   sceneManager: {fileID: 554863327}
 --- !u!114 &2018654078

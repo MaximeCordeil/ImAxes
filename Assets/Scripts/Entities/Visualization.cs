@@ -828,7 +828,7 @@ public class Visualization : MonoBehaviour
                     if (axes.Count > 0)
                     {
                         Vector3 pos = axes[0].transform.position;
-                        pos += axes[0].transform.TransformDirection(Vector3.right * 0.1f);
+                        pos += axes[0].transform.TransformDirection(Vector3.right * 0.094f);
                         transform.position = pos;
                         transform.rotation = axes[0].transform.rotation;
 

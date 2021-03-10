@@ -290,6 +290,7 @@ public class Axis : MonoBehaviour {
     {
         IsInfoboxEnabled = toggle;
         InfoboxText.enabled = toggle;
+        InfoboxText.verticalAlignment = VerticalAlignmentOptions.Top;
         // Toggle visibility of all other labels
         label.enabled = !toggle;
         minimumValueDimensionLabel.enabled = !toggle;

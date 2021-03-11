@@ -263,7 +263,7 @@ public class Axis : MonoBehaviour {
         MinFilter = Mathf.Clamp(val, -0.505f, 0.505f);
         OnFiltered.Invoke(MinFilter, MaxFilter);
 
-        SetLocalYPosition(minFilterObject.transform, UtilMath.normaliseValue(MinFilter, -0.505f, 0.505f, -0.5f, 0.5f));
+        SetLocalYPosition(minFilterObject.transform, UtilMath.normaliseValue(MinFilter, -0.505f, 0.505f, -0.45f, 0.45f));
     }
 
     public void SetMaxFilter(float val)
@@ -271,7 +271,7 @@ public class Axis : MonoBehaviour {
         MaxFilter = Mathf.Clamp(val, -0.505f, 0.505f);
         OnFiltered.Invoke(MinFilter, MaxFilter);
 
-        SetLocalYPosition(maxFilterObject.transform, UtilMath.normaliseValue(MaxFilter, -0.505f, 0.505f, -0.5f, 0.5f));
+        SetLocalYPosition(maxFilterObject.transform, UtilMath.normaliseValue(MaxFilter, -0.505f, 0.505f, -0.45f, 0.45f));
     }
 
     public void SetMinNormalizer(float val)
@@ -392,7 +392,7 @@ public class Axis : MonoBehaviour {
         }
 
         // Set infobox position, as well as the filter handles
-        float y = UtilMath.normaliseValue(InfoboxPosition, -0.505f, 0.505f, -0.5f, 0.5f);
+        float y = UtilMath.normaliseValue(InfoboxPosition, -0.505f, 0.505f, -0.45f, 0.45f);
         SetLocalYPosition(InfoboxText.transform, y);
         SetLocalYPosition(minFilterObject, y);
         SetLocalYPosition(maxFilterObject, y);

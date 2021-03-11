@@ -246,8 +246,23 @@ public class VisualisationFactory : MonoBehaviour
             float y1 = UtilMath.normaliseValue(i, 0, bins.Length - 1, -0.5f, 0.5f);
             if ((y1 >= (minFilter) && y1 <= (maxFilter)))
             {
+                /*
                 // normalize positions to range in -0.5...0.5
                 float y = UtilMath.normaliseValue(i, 0, bins.Length - 1, 0.5f, -0.5f);
+
+                float ynorm = UtilMath.normaliseValue(-y, minNormalizer, maxNormalizer, 0.5f, -0.5f);
+                if (ynorm >= -0.5f &&
+                         ynorm <= 0.5f)
+                {
+                    float x = UtilMath.normaliseValue(bins[i], minBin, maxBin, -0.5f, 0.5f);
+
+                    Vector3 v = new Vector3(x, ynorm, 0f);
+                    l.Add(v);
+                }
+                */
+                
+                // normalize positions to range in -0.45...0.45
+                float y = UtilMath.normaliseValue(i, 0, bins.Length - 1, 0.45f, -0.45f);
 
                 float ynorm = UtilMath.normaliseValue(-y, minNormalizer, maxNormalizer, 0.5f, -0.5f);
                 if (ynorm >= -0.5f &&

@@ -145,10 +145,6 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
                             dimensionIdx += SceneManager.Instance.dataObject.NbDimensions;
                     }
                     prevRotary = rotary;
-
-                    // If the fixed dimension mode is enabled, we just override any dimensionIdx we calculate with the fixed index value
-                    if (fixedDimensionMode)
-                        dimensionIdx = fixedDimensionIdx;
                 }
             }
             catch (SystemException f)
@@ -212,8 +208,12 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
 
         if (sp.IsOpen || dataPlaybackMode)
         {
-            // We update the axis properties just for the server. These values are sent to the clients in OnPhotonSerializeView().
-            gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minFilter, maxFilter, infoboxPosition);
+            // We update the axis properties just for the server. These values are sent to the clients in OnPhotonSerializeView()
+            // If the fixed dimension mode is enabled, we just override any dimensionIdx we calculate with the fixed index value
+            if (fixedDimensionMode)
+                gameObject.GetComponent<ClientAxis>().UpdateClientAxis(fixedDimensionIdx, minFilter, maxFilter, infoboxPosition);
+            else
+                gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minFilter, maxFilter, infoboxPosition);
             gameObject.GetComponent<ClientAxis>().ToggleInfoboxMode(infoboxToggle);
         }
 #endif
@@ -231,7 +231,11 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
             stream.SendNext(transform.localRotation);
 
             // Now send the axis properties to the stream
-            stream.SendNext(dimensionIdx);
+            // If the fixed dimension mode is enabled, we just override any dimensionIdx we calculate with the fixed index value
+            if (fixedDimensionMode)
+                stream.SendNext(fixedDimensionIdx);
+            else
+                stream.SendNext(dimensionIdx);
             stream.SendNext(minFilter);
             stream.SendNext(maxFilter);
             stream.SendNext(infoboxPosition);

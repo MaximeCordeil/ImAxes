@@ -9,7 +9,7 @@ public class ClientAxis : MonoBehaviourPun, IPunObservable
     private Axis lastAxis;
     private GameObject createdAxis;
 
-    private int currentDimensionIdx = 0;
+    private int currentDimensionIdx = -1;
 
     private int prevSliderOne;
     private int prevSliderTwo;

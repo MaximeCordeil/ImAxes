@@ -439,15 +439,18 @@ public class ImAxesRecognizer : MonoBehaviour
             Axis newYAxis = null;
             Axis newZAxis = null;
 
+            float SPLOM_DISTANCE = SP_DISTANCE / 2f;
+            float SPLOM_TIP_OFFSET = 0.0275f;
+
             foreach (var axis in A)
             {
-                if (x3D!=null && Vector3.Distance(x3D.MaxPosition, axis.MinPosition) < SP_DISTANCE / 4f && x3D.IsColinear(axis)
+                if (x3D!=null && Vector3.Distance(x3D.MaxPosition + x3D.Up * SPLOM_TIP_OFFSET, axis.MinPosition) < SPLOM_DISTANCE && x3D.IsColinear(axis)
                     && !splom3D.XAxes1.Contains(axis))
                     newXAxis = axis;
-                else if (y3D != null && Vector3.Distance(y3D.MaxPosition, axis.MinPosition) < SP_DISTANCE / 4f && y3D.IsColinear(axis)
+                else if (y3D != null && Vector3.Distance(y3D.MaxPosition + y3D.Up * SPLOM_TIP_OFFSET, axis.MinPosition) < SPLOM_DISTANCE && y3D.IsColinear(axis)
                     && !splom3D.YAxes1.Contains(axis))
                     newYAxis = axis;
-                else if (z3D!=null && Vector3.Distance(z3D.MaxPosition, axis.MinPosition) < SP_DISTANCE / 4f && z3D.IsColinear(axis)
+                else if (z3D!=null && Vector3.Distance(z3D.MaxPosition + z3D.Up * SPLOM_TIP_OFFSET, axis.MinPosition) < SPLOM_DISTANCE && z3D.IsColinear(axis)
                     && !splom3D.ZAxes1.Contains(axis))
                     newZAxis = axis;
             }
@@ -463,7 +466,7 @@ public class ImAxesRecognizer : MonoBehaviour
                 for (int i = 0; i < splom3D.XAxes1.Count - 1; i++)
                 {
                     //look for the first broken axis
-                    if (Vector3.Distance(splom3D.XAxes1[i].MaxPosition, splom3D.XAxes1[i + 1].MinPosition) > SP_DISTANCE / 4f)
+                    if (Vector3.Distance(splom3D.XAxes1[i].MaxPosition + splom3D.XAxes1[i].Up * SPLOM_TIP_OFFSET, splom3D.XAxes1[i + 1].MinPosition) > SPLOM_DISTANCE)
                     //broken axis
                     {
                         indexX = i + 1;
@@ -478,7 +481,7 @@ public class ImAxesRecognizer : MonoBehaviour
                 for (int i = 0; i < splom3D.YAxes1.Count - 1; i++)
                 {
                     //look for the first broken axis
-                    if (Vector3.Distance(splom3D.YAxes1[i].MaxPosition, splom3D.YAxes1[i + 1].MinPosition) > SP_DISTANCE / 4f)
+                    if (Vector3.Distance(splom3D.YAxes1[i].MaxPosition + splom3D.YAxes1[i].Up * SPLOM_TIP_OFFSET, splom3D.YAxes1[i + 1].MinPosition) > SPLOM_DISTANCE)
                     //broken axis
                     {
                         indexY = i + 1;
@@ -494,7 +497,7 @@ public class ImAxesRecognizer : MonoBehaviour
                 for (int i = 0; i < splom3D.ZAxes1.Count - 1; i++)
                 {
                     //look for the first broken axis
-                    if (Vector3.Distance(splom3D.ZAxes1[i].MaxPosition, splom3D.ZAxes1[i + 1].MinPosition) > SP_DISTANCE / 4f)
+                    if (Vector3.Distance(splom3D.ZAxes1[i].MaxPosition + splom3D.ZAxes1[i].Up * SPLOM_TIP_OFFSET, splom3D.ZAxes1[i + 1].MinPosition) > SPLOM_DISTANCE)
                     //broken axis
                     {
                         indexZ = i + 1;
@@ -506,10 +509,7 @@ public class ImAxesRecognizer : MonoBehaviour
 
             if (indexX >= 0)
             {
-                splom3D.deleteS3DFromXAxes(indexX, ref SP);
-
                 //show histograms on disconnected axes
-
                 for (int i = indexX; i < splom3D.XAxes1.Count; i++)
                 {
                     foreach (var sp1 in SP.Where(x=>x.axes.Count==1))
@@ -518,12 +518,10 @@ public class ImAxesRecognizer : MonoBehaviour
                             sp1.ShowHistogram(true);
                     }
                 }
-
+                splom3D.deleteS3DFromXAxes(indexX, ref SP);
             }
             if (indexY >= 0)
             {
-                splom3D.deleteS3DFromYAxes(indexY, ref SP);
-
                 for (int i = indexY; i < splom3D.YAxes1.Count; i++)
                 {
                     foreach (var sp1 in SP.Where(x => x.axes.Count == 1))
@@ -532,11 +530,10 @@ public class ImAxesRecognizer : MonoBehaviour
                             sp1.ShowHistogram(true);
                     }
                 }
+                splom3D.deleteS3DFromYAxes(indexY, ref SP);
             }
             if (indexZ >= 0)
             {
-                splom3D.deleteS3DFromZAxes(indexZ, ref SP);
-
                 for (int i = indexZ; i < splom3D.ZAxes1.Count; i++)
                 {
                     foreach (var sp1 in SP.Where(x => x.axes.Count == 1))
@@ -545,6 +542,7 @@ public class ImAxesRecognizer : MonoBehaviour
                             sp1.ShowHistogram(true);
                     }
                 }
+                splom3D.deleteS3DFromZAxes(indexZ, ref SP);
             }
         }
 

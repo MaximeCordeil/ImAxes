@@ -304,8 +304,8 @@ public class Axis : MonoBehaviour {
         {
             // Use the filter objects to mark the infobox location
             SetInfoboxPosition(InfoboxPosition);
-            minFilterObjectRenderer.material.color = new Color(0, 0.4f, 0);
-            maxFilterObjectRenderer.material.color = new Color(0, 0.4f, 0);
+            minFilterObjectRenderer.material.color = new Color(0, 0.4f, 0, minFilterObjectRenderer.material.color.a);
+            maxFilterObjectRenderer.material.color = new Color(0, 0.4f, 0, maxFilterObjectRenderer.material.color.a);
         }
         else
         {

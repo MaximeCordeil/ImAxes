@@ -13006,7 +13006,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: ModulAx_HoloLens2
+  ObjectName: ModulAx_HL2:3
   Client: {fileID: 833475439}
 --- !u!4 &1390161758
 Transform:
@@ -15819,7 +15819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fead0a62ec76b479f2b95a6bab9234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectName: ModulAx_HoloLens1
+  ObjectName: ModulAx_HL2:2
   Client: {fileID: 833475439}
 --- !u!4 &1692335285
 Transform:

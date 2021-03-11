@@ -58,6 +58,9 @@ public class Axis : MonoBehaviour {
     public class NormalizeEvent : UnityEvent<float, float> { };
     public NormalizeEvent OnNormalized = new NormalizeEvent();
 
+    public class InfoboxEvent : UnityEvent<bool, float> { };
+    public InfoboxEvent OnInfobox = new InfoboxEvent();
+
     //ticker and file path (etc) for logging activity
 
     Vector2 AttributeRange;
@@ -251,6 +254,7 @@ public class Axis : MonoBehaviour {
         {
             ghostSourceAxis.OnFiltered.RemoveListener(Ghost_OnFiltered);
             ghostSourceAxis.OnNormalized.RemoveListener(Ghost_OnNormalized);
+            ghostSourceAxis.OnInfobox.RemoveListener(Ghost_OnInfobox);
         }
     }
 
@@ -319,10 +323,14 @@ public class Axis : MonoBehaviour {
             }
 
         }
+
+        OnInfobox.Invoke(toggle, InfoboxPosition);
     }
 
     public void SetInfoboxPosition(float val)
     {
+        OnInfobox.Invoke(IsInfoboxEnabled, InfoboxPosition);
+
         if (!IsInfoboxEnabled)
             return;
 
@@ -551,6 +559,7 @@ public class Axis : MonoBehaviour {
 
         sourceAxis.OnFiltered.AddListener(Ghost_OnFiltered);
         sourceAxis.OnNormalized.AddListener(Ghost_OnNormalized);
+        sourceAxis.OnInfobox.AddListener(Ghost_OnInfobox);
 
         foreach (Renderer r in transform.GetComponentsInChildren<Renderer>(true))
         {
@@ -566,14 +575,20 @@ public class Axis : MonoBehaviour {
     {
         MinFilter = minFilter;
         MaxFilter = maxFilter;
-        OnFiltered.Invoke(MinFilter, MaxFilter);
+        //OnFiltered.Invoke(MinFilter, MaxFilter);
     }
 
     void Ghost_OnNormalized(float minNorm, float maxNorm)
     {
         MinNormaliser = minNorm;
         MaxNormaliser = maxNorm;
-        OnNormalized.Invoke(MinNormaliser, MaxNormaliser);
+        //OnNormalized.Invoke(MinNormaliser, MaxNormaliser);
+    }
+
+    void Ghost_OnInfobox(bool infoboxEnabled, float infoboxPosition)
+    {
+        ToggleInfobox(infoboxEnabled);
+        SetInfoboxPosition(infoboxPosition);
     }
 
     public void AnimateTo(Vector3 pos, Quaternion rot)

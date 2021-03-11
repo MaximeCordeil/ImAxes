@@ -440,7 +440,7 @@ public class ImAxesRecognizer : MonoBehaviour
             Axis newZAxis = null;
 
             float SPLOM_DISTANCE = SP_DISTANCE / 2f;
-            float SPLOM_TIP_OFFSET = 0.0275f;
+            float SPLOM_TIP_OFFSET = 0.025f;
 
             foreach (var axis in A)
             {

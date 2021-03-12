@@ -92,8 +92,6 @@ public class DataPlayback : MonoBehaviour
         int axesLineIdx = 1;
         int cameraLineIdx = 1;
 
-        float startUnityTime = Time.time;
-
         for (int i = 0; i < headTransformsData.Count; i += (isLiveReplayPaused) ? 0 : 1)
         {
             if (TimeScrubber != prevTimeScrubber)
@@ -136,7 +134,7 @@ public class DataPlayback : MonoBehaviour
             if (UseRealTime && LiveVideo.clip != null)
             {
                 // If the dataset's timestamp is larger than our video timestamp, skip a frame
-                if (currentTime > (LiveVideo.time - VideoStartTimeOffset))
+                if (currentTime > (LiveVideo.frame / 25 - VideoStartTimeOffset))
                 {
                     i--;
                     yield return null;

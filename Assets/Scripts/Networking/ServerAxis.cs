@@ -210,7 +210,7 @@ public class ServerAxis : MonoBehaviourPun, IPunObservable
         {
             // We update the axis properties just for the server. These values are sent to the clients in OnPhotonSerializeView()
             // If the fixed dimension mode is enabled, we just override any dimensionIdx we calculate with the fixed index value
-            if (fixedDimensionMode)
+            if (fixedDimensionMode && !dataPlaybackMode)
                 gameObject.GetComponent<ClientAxis>().UpdateClientAxis(fixedDimensionIdx, minFilter, maxFilter, infoboxPosition);
             else
                 gameObject.GetComponent<ClientAxis>().UpdateClientAxis(dimensionIdx, minFilter, maxFilter, infoboxPosition);

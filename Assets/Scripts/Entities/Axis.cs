@@ -201,6 +201,7 @@ public class Axis : MonoBehaviour {
         originalMaxFilterObjectColour = maxFilterObjectRenderer.material.color;
     }
 
+/*
 #if UNITY_EDITOR    // Debug code for interacting with inspector
     private float prevMinFilter;
     private float prevMaxFilter;
@@ -242,6 +243,7 @@ public class Axis : MonoBehaviour {
         }
     }
 #endif
+*/
 
     public void LateUpdate()
     {

@@ -635,6 +635,9 @@ public class Visualization : MonoBehaviour
                     {
                         if (axes.Count > 0)
                         {
+#if UNITY_EDITOR
+                            UpdateFilteredPoints();
+#else
                             if (minYNormalizer != axes[0].MinNormaliser ||
                                 maxYNormalizer != axes[0].MaxNormaliser ||
                                 minYFilter != axes[0].MinFilter ||
@@ -642,12 +645,16 @@ public class Visualization : MonoBehaviour
                             {
                                 UpdateFilteredPoints();
                             }
+#endif
                         }
                     }
                     break;
 
                 case ViewType.Scatterplot2D:
                     {
+#if UNITY_EDITOR
+                        UpdateFilteredPoints();
+#else
                         Axis axisV = referenceAxis.vertical;
                         Axis axisH = referenceAxis.horizontal;
                         if (axisV != null && axisH != null)
@@ -664,10 +671,14 @@ public class Visualization : MonoBehaviour
                                 UpdateFilteredPoints();
                             }
                         }
+#endif
                     }
                     break;
                 case ViewType.Scatterplot3D:
                     {
+#if UNITY_EDITOR
+                        UpdateFilteredPoints();
+#else
                         Axis axisV = referenceAxis.vertical;
                         Axis axisH = referenceAxis.horizontal;
                         Axis axisD = referenceAxis.depth;
@@ -690,6 +701,7 @@ public class Visualization : MonoBehaviour
                                 UpdateFilteredPoints();
                             }
                         }
+#endif
                     }
                     break;
                 default:
@@ -1447,7 +1459,7 @@ public class Visualization : MonoBehaviour
         }
     }
 
-    #region Interaction
+#region Interaction
     /// <summary>
     /// listens to slider change values for point size value
     /// </summary>
@@ -1568,7 +1580,7 @@ public class Visualization : MonoBehaviour
         memory = actions;
     }
 
-    #endregion
+#endregion
 
     List<Visualization> collidedVisualizations = new List<Visualization>();
 

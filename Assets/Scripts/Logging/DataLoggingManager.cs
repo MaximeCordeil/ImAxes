@@ -112,7 +112,7 @@ public class DataLoggingManager : MonoBehaviour
                 axis.transform.rotation.y.ToString(format),
                 axis.transform.rotation.z.ToString(format),
                 axis.transform.rotation.w.ToString(format),
-                axis.dimensionIdx,
+                axis.fixedDimensionMode ? axis.fixedDimensionIdx : axis.dimensionIdx,
                 axis.minFilter.ToString(format),
                 axis.maxFilter.ToString(format),
                 axis.infoboxToggle.ToString(),

@@ -59,7 +59,7 @@ public class DataLoggingManager : MonoBehaviour
         if (IsLogging)
         {
             timer += Time.fixedDeltaTime;
-            if (timer <= TimeBetweenLogs)
+            if (timer >= TimeBetweenLogs)
             {
                 timer = 0;
                 LogData();

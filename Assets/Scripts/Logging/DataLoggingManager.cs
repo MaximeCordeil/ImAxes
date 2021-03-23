@@ -54,11 +54,11 @@ public class DataLoggingManager : MonoBehaviour
         Debug.Log("Logging Started");
     }
 
-    public void FixedUpdate()
+    public void Update()
     {
         if (IsLogging)
         {
-            timer += Time.fixedDeltaTime;
+            timer += Time.unscaledDeltaTime;
             if (timer >= TimeBetweenLogs)
             {
                 timer = 0;
@@ -81,7 +81,7 @@ public class DataLoggingManager : MonoBehaviour
 
     private void LogData()
     {
-        float timestamp = Time.time - startTime;
+        float timestamp = Time.unscaledTime - startTime;
 
         for (int i = 0; i < HeadTransforms.Count; i++)
         {
